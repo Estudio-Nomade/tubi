@@ -1,7 +1,7 @@
 # HANDOFF — Tubi
 
 > **Para quién es esto:** un agente de IA (o humano) que retoma el proyecto sin contexto previo.
-> **Prompt listo para pegar:** [`docs/PROMPT-AGENTE.md`](docs/PROMPT-AGENTE.md) (orquestación) · [`docs/PROMPT-IMPLEMENTACION.md`](docs/PROMPT-IMPLEMENTACION.md) (implementación del MVP).
+> **Prompt listo para pegar:** [`docs/PROMPT-AGENTE.md`](docs/PROMPT-AGENTE.md) (orquestación) · [`docs/PROMPT-UI-PENCIL.md`](docs/PROMPT-UI-PENCIL.md) (UI en Pencil / shadcn) · [`docs/PROMPT-IMPLEMENTACION.md`](docs/PROMPT-IMPLEMENTACION.md) (código MVP).
 > **Repo:** `https://github.com/Estudio-Nomade/tubi` (privado). Trabajo actual en `grok/fase-6-wireframes` (no mergeado a `main`).
 
 ---

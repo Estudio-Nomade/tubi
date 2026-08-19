@@ -34,4 +34,4 @@ Fases 0–5 hechas (PRD, arquitectura, flujos, datos, API, reglas). En curso: fa
 
 ## Convenciones de trabajo
 
-Ver [`AGENTS.md`](AGENTS.md). Handoff: [`HANDOFF.md`](HANDOFF.md). Prompt para otro agente: [`docs/PROMPT-AGENTE.md`](docs/PROMPT-AGENTE.md).
+Ver [`AGENTS.md`](AGENTS.md). Handoff: [`HANDOFF.md`](HANDOFF.md). Prompts: [`PROMPT-AGENTE.md`](docs/PROMPT-AGENTE.md) · [`PROMPT-UI-PENCIL.md`](docs/PROMPT-UI-PENCIL.md) · [`PROMPT-IMPLEMENTACION.md`](docs/PROMPT-IMPLEMENTACION.md).
