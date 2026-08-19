@@ -17,6 +17,7 @@ Etapa temprana. Definidos: visión, alcance, requisitos de producto (PRD) y hoja
 | [`docs/02-arquitectura.md`](docs/02-arquitectura.md) | Arquitectura de solución (spine) |
 | [`docs/03-flujos-de-usuario.md`](docs/03-flujos-de-usuario.md) | Flujos de usuario (pasajero, conductor, operador) |
 | [`docs/04-modelo-de-datos.md`](docs/04-modelo-de-datos.md) | Modelo de datos (schema Postgres/Supabase) |
+| [`docs/05-api.md`](docs/05-api.md) | API y contratos (endpoints + realtime) |
 
 ## Roadmap (resumen)
 
