@@ -66,7 +66,7 @@ Hay **dos ejes de “fase”**: roadmap 0–11 = desarrollo. En el PRD, “fase 
 - Stack: Next.js 16 + React 19 + Tailwind 4 + shadcn/ui + Supabase (Postgres, Auth, Realtime, RLS, Storage, Edge Functions) + Google Maps detrás de `MapsProvider` + Serwist (PWA) + Zod. npm, Node 22.
 - Arquitectura: monolito modular por capas + puertos/adaptadores. El dominio no importa React ni Supabase ni SDKs.
 - Config en **dos capas**: `.env` = secretos (nunca commitear). Tabla `settings` = negocio (tarifa, comisión, seña, espera, devoluciones, feature flags). **Nunca hardcodear valores de negocio.**
-- Paleta de wireframe (no es marca): gris `#F4F4F5` / `#18181B` + turquesa `#0D9488`. Paleta final = fase 8.
+- Paleta de wireframe (no es marca): blanco `#FFFFFF` / tinta `#18181B` + turquesa `#0D9488`. Paleta final = fase 8.
 
 **Settings defaults:** tarifa fija por ruta (precio a definir) · comisión 15% (0–15) · seña $5.000 · espera 5 min · devolución >24h 100% / 12–24h 50% / <12h o no-show 0% · ratings off.
 
