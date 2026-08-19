@@ -24,7 +24,7 @@
 |---|---|
 | `docs/00-roadmap.md` | Hoja de ruta |
 | `docs/01-prd.md` | PRD (fuente de verdad) |
-| `docs/02-arquitectura.md` | Spine, 14 ADs |
+| `docs/02-arquitectura.md` | Spine, 15 ADs |
 | `docs/03-flujos-de-usuario.md` | Flujos + contrato de pantallas |
 | `docs/04-modelo-de-datos.md` | Schema + RLS + migración |
 | `docs/05-api.md` | REST + realtime |

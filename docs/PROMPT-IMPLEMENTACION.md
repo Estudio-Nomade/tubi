@@ -90,7 +90,7 @@ Web app **mobile-first (375px)** de **viajes compartidos interurbanos programado
 |---|---|
 | `AGENTS.md` | Convenciones. Leelo primero. |
 | `docs/01-prd.md` | Fuente de verdad de producto. P0 = FR-01..18. |
-| `docs/02-arquitectura.md` | 14 ADs. Obligatorio. |
+| `docs/02-arquitectura.md` | 15 ADs. Obligatorio. |
 | `docs/03-flujos-de-usuario.md` | Flujos por actor. |
 | `docs/04-modelo-de-datos.md` | Schema + RLS + **migración SQL lista** (extraéla a `supabase/migrations/0001_init.sql`). |
 | `docs/05-api.md` | Endpoints + realtime + códigos de error. |
