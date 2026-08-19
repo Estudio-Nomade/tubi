@@ -106,15 +106,33 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Login operador (panel)"] --> B{"¿Qué gestiona?"}
-    B --> C["Configurar settings: tarifa, comisión, seña, espera, devoluciones, flags"]
-    B --> D["Gestionar conductores y vehículos"]
-    B --> E["Gestionar rutas y paradas"]
-    B --> F["Crear viajes programados"]
-    B --> G["Verificar identidad de pasajeros (DNI, manual fase 1)"]
-    B --> H["Monitorear viajes en vivo: estados y tracking"]
-    B --> I["Ver reservas, pagos y cancelaciones"]
-    B --> J["Gestionar incidentes"]
+    A["Login operador"] --> B["Panel de operación"]
+
+    subgraph Config["Configuración"]
+        C["Settings: tarifa, comisión, seña, espera, devoluciones"]
+    end
+
+    subgraph Catalogo["Catálogo"]
+        D["Conductores y vehículos"]
+        E["Rutas y paradas"]
+        F["Viajes programados"]
+    end
+
+    subgraph Operacion["Operación"]
+        G["Verificación de identidad (DNI)"]
+        H["Monitoreo en vivo (estados + GPS)"]
+        I["Reservas, pagos y cancelaciones"]
+        J["Incidentes"]
+    end
+
+    B --> C
+    B --> D
+    B --> E
+    B --> F
+    B --> G
+    B --> H
+    B --> I
+    B --> J
 ```
 
 ---
