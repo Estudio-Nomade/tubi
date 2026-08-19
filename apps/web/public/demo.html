@@ -2,8 +2,16 @@
 <html lang="es-AR">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0D9488" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Tubi" />
+  <meta name="mobile-web-app-capable" content="yes" />
   <title>Tubi — demo de flujo</title>
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="/icon.svg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -27,28 +35,36 @@
     html, body { margin: 0; height: 100%; }
     body {
       font-family: Inter, system-ui, sans-serif;
-      background: #e4e4e7;
+      background: var(--bg);
       color: var(--ink);
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
     .stage {
-      min-height: 100%;
+      min-height: 100dvh;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      padding: 20px 12px 32px;
+      align-items: stretch;
+      gap: 0;
+      padding: 0;
     }
     .guide {
-      width: min(920px, 100%);
+      width: 100%;
       background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 16px;
+      border: 0;
+      border-bottom: 1px solid var(--border);
+      border-radius: 0;
+      padding: 10px 16px calc(10px + env(safe-area-inset-top));
+      padding-top: calc(10px + env(safe-area-inset-top));
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
       align-items: center;
       justify-content: space-between;
+      flex-shrink: 0;
+    }
+    @media (display-mode: standalone) {
+      .guide { display: none; }
     }
     .guide h1 { font-size: 16px; margin: 0; }
     .guide p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
@@ -61,20 +77,18 @@
     .next { background: var(--primary); color: #fff; }
     .ghost:disabled, .next:disabled { opacity: .4; cursor: not-allowed; }
     .phone {
-      width: var(--phone-w);
-      height: var(--phone-h);
+      width: 100%;
+      flex: 1;
+      min-height: 0;
       background: var(--bg);
-      border-radius: 28px;
-      box-shadow: 0 20px 50px rgba(24,24,27,.18);
+      border-radius: 0;
+      box-shadow: none;
       overflow: hidden;
       position: relative;
       display: flex;
       flex-direction: column;
     }
-    .status {
-      height: 44px; background: #fff; display: flex; align-items: center;
-      justify-content: space-between; padding: 0 20px; font-size: 14px; font-weight: 600;
-    }
+    .status { display: none; }
     .header {
       height: 56px; background: #fff; border-bottom: 1px solid var(--border);
       display: flex; align-items: center; justify-content: space-between;
@@ -85,7 +99,10 @@
     .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
     .screen.on { display: flex; }
     .body { flex: 1; overflow: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
-    .foot { padding: 20px 20px 24px; display: flex; flex-direction: column; gap: 10px; background: var(--surface); }
+    .foot {
+      padding: 16px 16px calc(16px + env(safe-area-inset-bottom));
+      display: flex; flex-direction: column; gap: 10px; background: var(--surface);
+    }
     h2 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
     label { display: block; font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
     input, select {
@@ -180,10 +197,30 @@
     .settings b { color: var(--primary); font-size: 15px; }
     .home-grid { display: grid; gap: 10px; }
     .tiny { font-size: 13px; color: var(--muted); text-align: center; }
-    @media (max-width: 420px) {
-      .stage { padding: 0; }
-      .guide { border-radius: 0; width: 100%; }
-      .phone { width: 100%; height: calc(100dvh - 92px); border-radius: 0; box-shadow: none; }
+    @media (min-width: 768px) {
+      body { background: #e4e4e7; }
+      .stage {
+        align-items: center;
+        gap: 16px;
+        padding: 20px 12px 32px;
+      }
+      .guide {
+        width: min(920px, 100%);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 12px 16px;
+      }
+      .phone {
+        width: var(--phone-w);
+        height: var(--phone-h);
+        flex: none;
+        border-radius: 28px;
+        box-shadow: 0 20px 50px rgba(24,24,27,.18);
+      }
+      .status {
+        display: flex; height: 44px; background: #fff; align-items: center;
+        justify-content: space-between; padding: 0 20px; font-size: 14px; font-weight: 600;
+      }
     }
   </style>
 </head>
@@ -540,6 +577,9 @@
         b.classList.add("on");
       });
     });
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw-demo.js");
+    }
   </script>
 </body>
 </html>

@@ -1,0 +1,20 @@
+{
+  "name": "Tubi",
+  "short_name": "Tubi",
+  "description": "Viajes compartidos interurbanos Tandil ↔ Buenos Aires.",
+  "start_url": "/demo.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#FFFFFF",
+  "theme_color": "#0D9488",
+  "lang": "es-AR",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
