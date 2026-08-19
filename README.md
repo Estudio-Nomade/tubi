@@ -14,10 +14,12 @@ Etapa temprana. Definidos: visión, alcance, requisitos de producto (PRD) y hoja
 |---|---|
 | [`docs/00-roadmap.md`](docs/00-roadmap.md) | Hoja de ruta, orden de trabajo y prompt maestro |
 | [`docs/01-prd.md`](docs/01-prd.md) | Requisitos de producto — **fuente de verdad** |
+| [`docs/02-arquitectura.md`](docs/02-arquitectura.md) | Arquitectura de solución (spine) |
+| [`docs/03-flujos-de-usuario.md`](docs/03-flujos-de-usuario.md) | Flujos de usuario (pasajero, conductor, operador) |
 
 ## Roadmap (resumen)
 
-`0 Setup → 1 Arquitectura → 2 Modelo de datos → 3 API → 4 Reglas y estados → 5 Wireframes → 6 Diseño UI → 7 Marca → 8 MVP → 9 Demo → 10 Deploy`
+`0 Setup → 1 Arquitectura → 2 Flujos de usuario → 3 Modelo de datos → 4 API → 5 Reglas y estados → 6 Wireframes → 7 Diseño UI → 8 Marca → 9 MVP → 10 Demo → 11 Deploy`
 
 ## Roles del proyecto
 

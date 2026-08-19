@@ -54,21 +54,22 @@
 
 ## B. Roadmap ordenado (qué hacer primero, qué después)
 
-El criterio de orden: **primero definir (arquitectura y datos), después diseñar (UX y marca), recién después construir.** La marca va al final porque el nombre, el dominio y la paleta dependen de lo que la plataforma *sea* y *haga*, no al revés.
+El criterio de orden: **primero definir (arquitectura, flujos y datos), después diseñar (UX y marca), recién después construir.** Los flujos de usuario van antes de los wireframes: definen el contrato de pantallas. La marca va al final porque el nombre, el dominio y la paleta dependen de lo que la plataforma *sea* y *haga*, no al revés.
 
 | # | Fase | Entregable | Por qué en este orden |
 |---|---|---|---|
 | 0 | Setup del repo | git init, `.gitignore`, `README.md`, `AGENTS.md`, repo en GitHub | Todo lo demás vive acá; sin esto no hay trazabilidad |
 | 1 | Arquitectura | `docs/02-arquitectura.md` | Decide stack, web vs PWA, realtime y providers; condiciona todo |
-| 2 | Modelo de datos | `docs/03-modelo-de-datos.md` + migraciones | Formaliza las entidades del PRD en schema real |
-| 3 | API y contratos | `docs/04-api.md` | Define endpoints + canal realtime de posición |
-| 4 | Reglas y estados | `docs/05-reglas-y-estados.md` | Máquina de estados de viaje/reserva + reglas de negocio en función de settings |
-| 5 | Wireframes UX | wireframes por flujo (Pencil) | Valida los flujos antes de gastar en diseño visual |
-| 6 | Diseño UI / design system | componentes y tokens | Base visual consistente |
-| 7 | Marca | `docs/06-marca.md` (nombre, dominio, paleta, tipografía, logo) | Nombre y paleta se eligen cuando ya se sabe qué es el producto |
-| 8 | Implementación P0 (MVP) | código del MVP, por partes | Construir sobre decisiones ya tomadas |
-| 9 | Demo y validación | demo funcional con Ariel (+ José) | Hito acordado |
-| 10 | Deploy y operación | dominio, hosting, puesta en producción | Cierre del ciclo inicial |
+| 2 | Flujos de usuario | `docs/03-flujos-de-usuario.md` | Diagrama todos los flujos por actor; define el contrato de pantallas |
+| 3 | Modelo de datos | `docs/04-modelo-de-datos.md` + migraciones | Formaliza las entidades del PRD en schema real |
+| 4 | API y contratos | `docs/05-api.md` | Define endpoints + canal realtime de posición |
+| 5 | Reglas y estados | `docs/06-reglas-y-estados.md` | Máquina de estados de viaje/reserva + reglas de negocio en función de settings |
+| 6 | Wireframes UX | wireframes por flujo (Pencil) | Valida los flujos antes de gastar en diseño visual |
+| 7 | Diseño UI / design system | componentes y tokens | Base visual consistente |
+| 8 | Marca | `docs/07-marca.md` (nombre, dominio, paleta, tipografía, logo) | Nombre y paleta se eligen cuando ya se sabe qué es el producto |
+| 9 | Implementación P0 (MVP) | código del MVP, por partes | Construir sobre decisiones ya tomadas |
+| 10 | Demo y validación | demo funcional con Ariel (+ José) | Hito acordado |
+| 11 | Deploy y operación | dominio, hosting, puesta en producción | Cierre del ciclo inicial |
 
 **Reglas de trabajo transversales (aplican a todas las fases):**
 - El sistema de configuración (`.env` + settings) se diseña desde la fase 1 y se respeta en todas.
@@ -118,22 +119,23 @@ ORDEN DE TRABAJO (guiame paso a paso, una fase a la vez, sin saltear):
 0) Setup: git, .gitignore, README, AGENTS.md, repo GitHub.
 1) Arquitectura (docs/02-arquitectura.md): stack, web vs PWA para el GPS en background,
    realtime, providers detrás de interfaces.
-2) Modelo de datos (docs/03-modelo-de-datos.md): schema real de las entidades.
-3) API y contratos (docs/04-api.md): endpoints + canal realtime de posición.
-4) Reglas y estados (docs/05-reglas-y-estados.md): máquina de estados + reglas de negocio.
-5) Wireframes UX por flujo (Pencil).
-6) Diseño UI / design system (componentes, tokens).
-7) Marca (docs/06-marca.md): nombre, dominio, paleta de colores, tipografía, logo.
-8) Implementación P0 (MVP) por partes.
-9) Demo y validación con el cliente (+ consulta a un experto del rubro).
-10) Deploy y operación (dominio, hosting).
+2) Flujos de usuario (docs/03-flujos-de-usuario.md): diagramas de todos los flujos por actor.
+3) Modelo de datos (docs/04-modelo-de-datos.md): schema real de las entidades.
+4) API y contratos (docs/05-api.md): endpoints + canal realtime de posición.
+5) Reglas y estados (docs/06-reglas-y-estados.md): máquina de estados + reglas de negocio.
+6) Wireframes UX por flujo (Pencil).
+7) Diseño UI / design system (componentes, tokens).
+8) Marca (docs/07-marca.md): nombre, dominio, paleta de colores, tipografía, logo.
+9) Implementación P0 (MVP) por partes.
+10) Demo y validación con el cliente (+ consulta a un experto del rubro).
+11) Deploy y operación (dominio, hosting).
 
 REGLAS DE TRABAJO:
 - Empezá SIEMPRE por la fase en curso y terminá su entregable antes de pasar a la siguiente.
 - Al terminar cada fase, mostrame el entregable y esperá mi OK antes de seguir.
 - No hardcodees valores de negocio: siempre settings.
 - La IA es herramienta de implementación; el criterio técnico y las decisiones son mías.
-- No definas nombre/marca hasta la fase 7 (usá placeholder "la plataforma" hasta entonces).
+- No definas nombre/marca hasta la fase 8 (usá placeholder "la plataforma" hasta entonces).
 - Respondé en español argentino, concreto, sin relleno.
 
 Decime qué fase querés arrancar (o si arranco por la 0) y avanzá.
@@ -147,12 +149,13 @@ Cada uno asume que ya existe el contexto del prompt maestro. Para arrancar una f
 
 - **Fase 0 — Setup:** "Ejecutá la fase 0: inicializá el repo (git, .gitignore), escribí README.md y AGENTS.md con las convenciones del proyecto y prepará todo para subir a GitHub."
 - **Fase 1 — Arquitectura:** "Ejecutá la fase 1 y escribí docs/02-arquitectura.md: definí el stack, resolvé web vs PWA vs app para el GPS en background (NFR-02), el canal realtime de posición, y cómo quedan PaymentProvider / MapsProvider / IdentityVerifier."
-- **Fase 2 — Modelo de datos:** "Ejecutá la fase 2 y escribí docs/03-modelo-de-datos.md: schema real (tablas, columnas, enums, índices, RLS) a partir de las entidades del PRD, más las migraciones SQL."
-- **Fase 3 — API:** "Ejecutá la fase 3 y escribí docs/04-api.md: endpoints/RPC, contratos request/response, errores y el canal realtime de posición."
-- **Fase 4 — Reglas y estados:** "Ejecutá la fase 4 y escribí docs/05-reglas-y-estados.md: máquina de estados de viaje y reserva y las reglas de negocio expresadas en función de los settings."
-- **Fase 5 — Wireframes:** "Ejecutá la fase 5: armá wireframes por flujo (búsqueda, detalle, reserva, pago de seña, QR, escaneo del conductor, seguimiento, panel operador)."
-- **Fase 6 — Diseño UI:** "Ejecutá la fase 6: definí el design system (tokens de color/espaciado/tipografía y componentes base)."
-- **Fase 7 — Marca:** "Ejecutá la fase 7 y escribí docs/06-marca.md: proponé nombres con dominio disponible (~$12–20k ARS/año), paleta de colores, tipografía y dirección de logo."
-- **Fase 8 — Implementación:** "Ejecutá la fase 8: construí el MVP (P0) por partes, usando IA como herramienta, respetando el sistema de configuración y las interfaces de providers."
-- **Fase 9 — Demo:** "Ejecutá la fase 9: prepará y probá la demo funcional de los flujos principales."
-- **Fase 10 — Deploy:** "Ejecutá la fase 10: definí dominio, hosting e infra para puesta en producción."
+- **Fase 2 — Flujos de usuario:** "Ejecutá la fase 2 y escribí docs/03-flujos-de-usuario.md: diagramá todos los flujos por actor (pasajero, conductor, operador) con mermaid, y mapeá cada flujo a las pantallas que alimentarán los wireframes."
+- **Fase 3 — Modelo de datos:** "Ejecutá la fase 3 y escribí docs/04-modelo-de-datos.md: schema real (tablas, columnas, enums, índices, RLS) a partir de las entidades del PRD, más las migraciones SQL."
+- **Fase 4 — API:** "Ejecutá la fase 4 y escribí docs/05-api.md: endpoints/RPC, contratos request/response, errores y el canal realtime de posición."
+- **Fase 5 — Reglas y estados:** "Ejecutá la fase 5 y escribí docs/06-reglas-y-estados.md: máquina de estados de viaje y reserva y las reglas de negocio expresadas en función de los settings."
+- **Fase 6 — Wireframes:** "Ejecutá la fase 6: armá wireframes por flujo (búsqueda, detalle, reserva, pago de seña, QR, escaneo del conductor, seguimiento, panel operador)."
+- **Fase 7 — Diseño UI:** "Ejecutá la fase 7: definí el design system (tokens de color/espaciado/tipografía y componentes base)."
+- **Fase 8 — Marca:** "Ejecutá la fase 8 y escribí docs/07-marca.md: proponé nombres con dominio disponible (~$12–20k ARS/año), paleta de colores, tipografía y dirección de logo."
+- **Fase 9 — Implementación:** "Ejecutá la fase 9: construí el MVP (P0) por partes, usando IA como herramienta, respetando el sistema de configuración y las interfaces de providers."
+- **Fase 10 — Demo:** "Ejecutá la fase 10: prepará y probá la demo funcional de los flujos principales."
+- **Fase 11 — Deploy:** "Ejecutá la fase 11: definí dominio, hosting e infra para puesta en producción."

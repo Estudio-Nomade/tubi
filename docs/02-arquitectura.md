@@ -269,6 +269,32 @@ Puente entre los requisitos del PRD y dónde viven.
 
 ---
 
+## Flujos de usuario
+
+Los flujos completos por actor (pasajero, conductor, operador) están diagramados en [`docs/03-flujos-de-usuario.md`](03-flujos-de-usuario.md). Definen el **contrato de pantallas** que alimenta los wireframes (fase 6): cada flujo mapea a un conjunto de pantallas mobile-first.
+
+Ciclo de vida (los tres actores convergen en un viaje):
+
+```mermaid
+flowchart LR
+    subgraph Planificacion["Planificación"]
+        OP1["Operador crea viaje"] --> OP2["Viaje programado"]
+    end
+    subgraph Reserva["Reserva"]
+        PA1["Pasajero busca"] --> PA2["Reserva + seña"] --> PA3["QR generado"]
+    end
+    subgraph Ejecucion["Ejecución"]
+        CO1["Conductor recoge (QR)"] --> CO2["En curso (GPS)"] --> CO3["Completado"]
+    end
+    OP2 --> PA1
+    PA3 --> CO1
+    CO3 --> OP3["Operador: trazabilidad"]
+```
+
+Los estados que aparecen en los flujos son los de AD-12; los valores de negocio salen de settings (AD-5).
+
+---
+
 ## Deferred (decisiones que este doc no toma)
 
 - **Hosting/producción** (Vercel vs Cloudflare vs self-host, dominio) → fase 10.
