@@ -4,7 +4,8 @@
 **Fecha:** 2026-08-19  
 **Estado:** implementado en `design-artifacts/tubi-wireframes.pen`  
 **Base:** wireframes P0 en `design-artifacts/tubi-wireframes.pen` (`docs/superpowers/specs/2026-08-18-tubi-wireframes-design.md`)  
-**Entregable:** mismo archivo `.pen` actualizado (tokens + componentes reutilizables + 15 pantallas rediseñadas en piel y composición)
+**Entregable:** mismo archivo `.pen` actualizado (tokens + componentes reutilizables + pantallas hi-fi en piel “Ruta de la siesta”).  
+**Inventario canvas (2026-08-19):** **25 pantallas** (15 P0 + homes + gaps de flujo). Ver §6.
 
 ## 1. Objetivo
 
@@ -19,7 +20,7 @@ Elevar los wireframes funcionales a una UI **cálida, local y legible**, con des
 | Alcance de trabajo | Piel + componentes + **composición mejorada** (no solo recolor) |
 | Formularios largos | **Wizard paso a paso** (registro pasajero/conductor, checkout seña) |
 | Modo de color | **Claro cálido** (un solo tema en esta pasada) |
-| Cobertura | **15 pantallas**, los 3 roles al mismo nivel de cuidado |
+| Cobertura | Base 15 P0 + homes + pantallas de gap de flujo (login, seña en revisión, resultado escaneo, cuenta); los 3 roles al mismo nivel de cuidado visual |
 | Viewport | 375 × 812, mobile-first |
 | Archivo | Un solo `.pen`: `design-artifacts/tubi-wireframes.pen` |
 | Marca final | Fuera de alcance (logo, dominio, naming legal → fase 8). Wordmark tipográfico “Tubi” alcanza. |
@@ -121,29 +122,47 @@ Construir primero en una fila de librería arriba del canvas; las pantallas inst
 
 ## 6. Layouts por pantalla
 
-### Pasajero
+### Pasajero (fila canvas P1–P12)
 
-1. **Registro** — Wizard 3 pasos + `ProgressDots`. Un campo foco por paso: Nombre → DNI → Contacto. Título Fraunces conversacional (ej. “¿Cómo te llamás?”). `BottomCTA` “Continuar” / último “Crear cuenta”. Link “Ya tengo cuenta” como secondary.
-2. **Búsqueda** — Título “¿A dónde vas?”. Card con origen/destino + control swap. Chips de fecha. Horario. CTA “Buscar”.
-3. **Resultados** — Cabecera con fecha. Lista de `TripCard`. `EmptyHint` si no hay viajes.
-4. **Detalle** — Hero ruta + hora (Fraunces). `StatusPill` si aplica. Bloque conductor/vehículo (`InfoRow`). Timeline vertical de paradas. Precio + CTA “Reservar” en `BottomCTA`.
-5. **Checkout seña** — Wizard: (A) resumen viaje (B) monto seña en display + datos transferencia demo (C) subir comprobante + “Enviar”. Copy: confirmación manual del operador.
-6. **QR** — Mínimo chrome. `QRPass` centrado. Secondary “Cancelar reserva” + hint de política de devolución.
-7. **Seguimiento** — `MapPlaceholder` ~45% superior. Sheet inferior: ETA, próxima parada, conductor.
+| # | Frame | Contenido |
+|---|---|---|
+| P1 | Registro | Wizard 3 pasos + `ProgressDots`. Un campo foco: Nombre → DNI → Contacto. CTA Continuar / Crear cuenta. Link “Ya tengo cuenta”. |
+| P2 | Home empty | Sin reserva. `EmptyHint` + CTA “Buscar viaje”. TabBar. |
+| P3 | Búsqueda | “¿A dónde vas?”. Origen/destino + swap. Chips fecha. Horario. CTA Buscar. TabBar. |
+| P4 | Resultados | Fecha + lista `TripCard`. TabBar. |
+| P5 | Detalle | Hero ruta/hora. `InfoRow` conductor/vehículo. Timeline paradas. CTA Reservar. |
+| P6 | Checkout seña | Wizard representativo (monto + transferencia). Copy confirmación manual. |
+| P7 | Home | Hero reserva activa + CTA Ver mi QR / Completar seña. TabBar. |
+| P8 | QR | `QRPass` centrado. Cancelar + política. TabBar. |
+| P9 | Seguimiento | `MapPlaceholder` + sheet ETA/parada/conductor. |
+| **P10** | **Login** | Email o teléfono + CTA Continuar + link Crear cuenta. Sin TabBar. |
+| **P11** | **Seña en revisión** | Pill Pendiente. Monto seña. ETA confirmación demo. CTA Ir al inicio. Puente checkout → QR. |
+| **P12** | **Cuenta** | Avatar, DNI/contacto/email, Cerrar sesión. TabBar Cuenta activo. |
 
-### Conductor
+### Conductor (fila canvas C1–C11)
 
-8. **Registro** — Wizard: Nombre → Apellido → Teléfono (mismo patrón que pasajero).
-9. **Viajes del día** — Lista agenda: hora | ruta | cupos | chevron.
-10. **Recogida** — Parada actual hero + pasajero. `WaitTimer`. CTA “Escanear QR” y secondary “Marcar no-show”. Preview de siguiente parada.
-11. **Escanear QR** — Visor full-bleed + tip “Apuntá al código del pasajero”. Banner de resultado válido/rechazado (no pantalla extra salvo el estado en el mismo frame).
-12. **Saldo** — Nombre + monto grande. `Segmented` efectivo/transferencia. Confirmar abordado.
-13. **En ruta** — Mapa + pasajeros a bordo + indicador GPS activo. CTA “Finalizar viaje”. Sin flujo de incidentes en P0 (queda fuera, igual que wireframes).
+| # | Frame | Contenido |
+|---|---|---|
+| C1 | Registro | Wizard nombre (representativo). |
+| C2 | Home empty | Sin viajes hoy. |
+| C3 | Home | Viaje hoy + Empezar recogida + TabBar 3 ítems. |
+| C4 | Viajes del día | Agenda. TabBar Viajes activo. |
+| C5 | Recogida | Parada hero + `WaitTimer` + Escanear / No-show. |
+| C6 | Escanear QR | Visor + tip. |
+| C7 | Saldo | Monto + `Segmented` + Confirmar abordado. |
+| C8 | En ruta | Mapa + GPS + Finalizar. Sin incidentes. |
+| **C9** | **Escaneo OK** | Check sage. Datos pasajero. CTA Confirmar abordado → saldo. |
+| **C10** | **Escaneo inválido** | Error danger. Banner no autorizado. CTA Escanear de nuevo / Volver a recogida. |
+| **C11** | **Cuenta** | Datos + vehículo (patente/modelo). Cerrar sesión. TabBar Cuenta activo. |
 
 ### Operador
 
-14. **Confirmar seña** — Card de reserva + preview comprobante. `BtnDanger` Rechazar + `BtnPrimary` Confirmar.
-15. **Settings** — Grupos con título de sección (tarifas, seña, espera, devolución, flags). Filas label + valor; look de lista iOS/settings, no tabla densa.
+| # | Frame | Contenido |
+|---|---|---|
+| O1 | Confirmar seña | Card reserva + preview comprobante. Rechazar / Confirmar. |
+| O2 | Settings | Grupos tarifas, seña, espera, devolución, flags. |
+
+**Nota StatusBar:** no se usa barra de sistema (web app). Chrome = `AppHeader` con padding superior ~16px.
 
 ## 7. Copy (español argentino)
 
@@ -152,6 +171,8 @@ Se mantienen y se priorizan estos mensajes:
 - Recogida: “Espera máxima 5 min. Si no llega, no-show y seguís.”
 - QR: “Mostralo al conductor. No compartas esta pantalla.”
 - Checkout: “Transferí la seña y subí el comprobante. Te confirmamos a mano.”
+- Seña en revisión: “Recibimos el comprobante. Te confirmamos a mano en cuanto lo revisemos.”
+- Escaneo inválido: “Esta reserva no corresponde a este viaje, conductor o vehículo.”
 - Wizard: títulos en segunda persona, cortos, sin jerga de trámite.
 
 Montos y tiempos en UI son **ejemplos de demo**; etiquetar visualmente o en nota de frame cuando ayude (“según settings”).
@@ -175,16 +196,17 @@ Montos y tiempos en UI son **ejemplos de demo**; etiquetar visualmente o en nota
 
 ## 10. Criterios de aceptación
 
-- [ ] Tokens del §4 aplicados en las 15 pantallas (sin teal wireframe residual como acento primario).
-- [ ] Componentes del §5 existen como `reusable` y se usan en pantallas (no solo duplicados sueltos).
-- [ ] Registro pasajero y conductor son wizard (no formulario de 3 campos en una sola vista plana).
-- [ ] Checkout seña es wizard de 3 pasos.
-- [ ] QR usa `QRPass` con jerarquía tipo boarding pass.
-- [ ] Recogida muestra `WaitTimer` legible y CTAs claros.
-- [ ] Tipografía Fraunces + DM Sans visible en títulos vs UI.
-- [ ] Un primary CTA por pantalla de acción; altura ≥ 52 en primarios.
-- [ ] Copy de negocio del §7 presente donde corresponde.
-- [ ] Viewport 375×812 sin clipping grave de contenido principal.
+- [x] Tokens del §4 aplicados (sin teal wireframe residual como acento primario).
+- [x] Componentes del §5 existen como `reusable` y se usan en pantallas.
+- [x] Registro pasajero y conductor son wizard (paso representativo + dots).
+- [x] Checkout seña es wizard representativo.
+- [x] QR usa `QRPass` con jerarquía tipo boarding pass.
+- [x] Recogida muestra `WaitTimer` legible y CTAs claros.
+- [x] Tipografía Fraunces + DM Sans visible en títulos vs UI.
+- [x] Un primary CTA por pantalla de acción; altura ≥ 52 en primarios.
+- [x] Copy de negocio del §7 presente donde corresponde.
+- [x] Viewport 375×812 sin clipping grave de contenido principal.
+- [x] Gaps de flujo: Login, Seña en revisión, Escaneo OK/inválido, Cuenta pasajero/conductor.
 
 ## 11. Relación con el roadmap
 
