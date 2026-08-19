@@ -34,4 +34,4 @@ Fases 0–5 hechas (PRD, arquitectura, flujos, datos, API, reglas). En curso: fa
 
 ## Convenciones de trabajo
 
-Ver [`AGENTS.md`](AGENTS.md). Para un agente que retoma el proyecto sin contexto, ver [`HANDOFF.md`](HANDOFF.md).
+Ver [`AGENTS.md`](AGENTS.md). Handoff: [`HANDOFF.md`](HANDOFF.md). Prompt para otro agente: [`docs/PROMPT-AGENTE.md`](docs/PROMPT-AGENTE.md).
