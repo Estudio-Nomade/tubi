@@ -70,17 +70,17 @@ Fuente: `apps/web/src/app/globals.css` + `apps/web/components.json` (`style: rad
 
 | Token | Hex | Uso |
 |---|---|---|
-| `--background` | `#F4F4F5` | fondo de pantalla |
+| `--background` | `#FFFFFF` | fondo de pantalla |
 | `--foreground` | `#18181B` | texto |
 | `--card` | `#FFFFFF` | cards |
 | `--muted-foreground` | `#71717A` | labels, hints |
-| `--border` / `--input` | `#D4D4D8` | bordes e inputs |
+| `--border` / `--input` | `#E4E4E7` | bordes e inputs |
 | `--primary` / `--ring` | `#0D9488` | CTA, wordmark, foco, chip activo, marco QR |
 | `--primary-foreground` | `#FFFFFF` | texto sobre primary |
 | `--destructive` | `#B91C1C` | cancelar, no-show, QR inválido |
 | `--radius` | `0.625rem` (10px) | cards / botones |
 
-- Tipografía: Inter / Geist Sans. Títulos 22–24 semibold. Body 15. Labels 12 muted.
+- Tipografía: Inter / Geist Sans. Títulos 24 semibold. Body 16. Secondary 14. Labels 13 muted. Si una pantalla queda corta, subí tamaños/aires en vez de estirar vacíos.
 - Header sticky 56px: “Tubi” primary a la izquierda, rol muted a la derecha + status bar 44px.
 - CTA primario: full-width, alto 48px, `#0D9488`, texto blanco, radius 10px. Abajo, alcance del pulgar.
 - Turquesa **solo** en: wordmark, CTA primario, ring de input, Badge activo, marco QR. No tiñas fondos enteros.
@@ -106,7 +106,7 @@ Cada bloque visual = un componente. Nombrá los layers en Pencil como el compone
 
 - **Button** `size="lg"`: 48px, primary filled. Secondary = outline border `$border`. Destructive = texto/borde `$destructive`, no fill salvo no-show.
 - **Input + Label:** label 12px arriba, input 48px, border 1px `$border`, radius 8–10. Placeholder muted.
-- **Card:** fill `$card`, border `$border`, radius 10–12, padding 16. `CardHeader` / `CardContent` si hay título.
+- **Card:** fill `$card`, border `$border`, radius 10–12, padding 16, sombra sutil `0 1px 2px rgba(24,24,27,.05), 0 4px 16px rgba(24,24,27,.06)`. `CardHeader` / `CardContent` si hay título.
 - **Badge:** pill, height ~22. Default muted; activo = fondo `#CCFBF1` + texto `$primary`.
 - **Alert:** banner 12px pad; info = borde `$primary` + fondo `#F0FDFA`; error = `$destructive` + `#FEF2F2`.
 - **AlertDialog:** cancelar reserva (pantalla 6).

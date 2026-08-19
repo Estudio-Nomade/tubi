@@ -54,7 +54,7 @@ Web app **mobile-first (375px)** de **viajes compartidos interurbanos programado
 ### UI con shadcn/ui — tema y convenciones
 
 - **Tema vía CSS variables** (Tailwind 4 + shadcn). Configurá los tokens para que coincidan con la paleta del wireframe (provisional, hasta que la marca de la fase 8 la reemplace):
-  - `--background: #F4F4F5` · `--foreground: #18181B` · `--muted-foreground: #71717A` · `--border: #D4D4D8` · `--primary: #0D9488` (turquesa) · `--destructive: #B91C1C` · tarjetas `#FFFFFF`.
+  - `--background: #FFFFFF` · `--foreground: #18181B` · `--muted-foreground: #71717A` · `--border: #E4E4E7` · `--primary: #0D9488` (turquesa) · `--destructive: #B91C1C` · tarjetas `#FFFFFF` (separadas por `ring-foreground/10`).
 - **Mobile-first 375px.** Header sticky 56px (wordmark "Tubi" + rol). CTA primario `Button size="lg"` full-width, 48px, abajo del contenido (alcance del pulgar).
 - **Acento turquesa** solo en: wordmark, CTA primario, foco de input, chip de estado activo y marco del QR. No abuses del color.
 - **Notificaciones** con `sonner` (toasts) para: seña enviada, seña confirmada, QR inválido, no-show, cambio de estado.
