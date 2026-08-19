@@ -19,6 +19,7 @@ Fases 0–5 hechas (PRD, arquitectura, flujos, datos, API, reglas). En curso: fa
 | [`docs/04-modelo-de-datos.md`](docs/04-modelo-de-datos.md) | Modelo de datos (schema Postgres/Supabase) |
 | [`docs/05-api.md`](docs/05-api.md) | API y contratos (endpoints + realtime) |
 | [`docs/06-reglas-y-estados.md`](docs/06-reglas-y-estados.md) | Reglas de negocio y máquinas de estado |
+| [`design-artifacts/tubi-wireframes.pen`](design-artifacts/tubi-wireframes.pen) | Wireframes P0 (Pencil) |
 
 ## Roadmap (resumen)
 

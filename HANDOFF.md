@@ -34,7 +34,7 @@ Plataforma para organizar **viajes compartidos interurbanos programados**, tramo
 
 | Fase | Qué es | Entregable |
 |---|---|---|
-| 6 | Wireframes | wireframes por flujo (Pencil) |
+| 6 | Wireframes | `design-artifacts/tubi-wireframes.pen` (P0, en revisión) |
 | 7 | Diseño UI | design system (tokens, componentes) |
 | 8 | Marca | `docs/07-marca.md` (nombre, dominio, paleta, logo) |
 | 9 | Implementación MVP (P0) | código |
