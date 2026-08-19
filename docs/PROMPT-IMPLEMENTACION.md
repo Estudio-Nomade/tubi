@@ -10,6 +10,8 @@
 
 Sos el agente de **implementación** de Tubi. Todo el *qué* ya está especificado (PRD, arquitectura, modelo de datos, API, reglas) y el *cómo se ve* está en wireframes (15 pantallas). Tu trabajo es **construir el MVP por partes, respetando esas especificaciones sin re-decidirlas**. No sos arquitecto ni product manager: si algo de la spec te parece mal, lo señalás y preguntás, no lo cambiás por tu cuenta.
 
+**UI con shadcn/ui.** Construís toda la interfaz con **shadcn/ui** (componentes sobre Tailwind CSS + Radix). No inventes estilos a mano donde ya exista un componente de shadcn.
+
 Respondé en **español argentino**, formal pero claro, concreto, sin relleno.
 
 ---
@@ -41,12 +43,44 @@ Web app **mobile-first (375px)** de **viajes compartidos interurbanos programado
 
 ## Stack y arquitectura (obligatorio)
 
-- **Stack:** Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4 + shadcn/ui + Supabase (`@supabase/supabase-js` 2.x: Postgres, Auth, Realtime, RLS, Storage, Edge Functions) + Google Maps detrás de `MapsProvider` + Serwist (PWA) + Zod. npm, Node 22.
-- **Paradigma:** monolito modular por capas con **puertos y adaptadores**. El dominio no importa React, Supabase ni SDKs. Dependencias siempre hacia adentro: presentación → aplicación → dominio/puertos → adaptadores.
+- **Stack:** Next.js 16 (App Router) + React 19 + TypeScript + Tailwind CSS 4 + **shadcn/ui** + Supabase (`@supabase/supabase-js` 2.x: Postgres, Auth, Realtime, RLS, Storage, Edge Functions) + Google Maps detrás de `MapsProvider` + Serwist (PWA) + Zod. npm, Node 22.
+- **UI = shadcn/ui.** Todos los componentes de UI salen de shadcn (vía `npx shadcn@latest add …`). No crees botones, inputs, cards, dialogs ni toasts a mano si shadcn ya los tiene.
+- **Paradigma:** monolito modular por capas con **puertos y adaptadores**. El dominio no importa React, Supabase, shadcn ni SDKs. Dependencias siempre hacia adentro: presentación → aplicación → dominio/puertos → adaptadores.
 - **Puertos (interfaces) obligatorios:** `PaymentProvider` (pagos efectivo/transferencia, confirmación manual), `MapsProvider` (Google Maps), `IdentityVerifier` (DNI manual fase 1).
 - **Estructura** (AD-14): `apps/web/` (Next.js) + `supabase/` (migraciones y funciones) + `packages/` (solo si hay dominio compartido real; si no, saltealo). `docs/` y `design-artifacts/` quedan en la raíz.
 - **Tiempo real:** el conductor escribe en `tracking_events`; los pasajeros se suscriben a **Postgres Changes** de esa tabla (sin polling, sin WebSocket propio).
 - **DNI:** cifrado (pgcrypto), acceso restringido a dueño + operador. El conductor no lo ve.
+
+### UI con shadcn/ui — tema y convenciones
+
+- **Tema vía CSS variables** (Tailwind 4 + shadcn). Configurá los tokens para que coincidan con la paleta del wireframe (provisional, hasta que la marca de la fase 8 la reemplace):
+  - `--background: #F4F4F5` · `--foreground: #18181B` · `--muted-foreground: #71717A` · `--border: #D4D4D8` · `--primary: #0D9488` (turquesa) · `--destructive: #B91C1C` · tarjetas `#FFFFFF`.
+- **Mobile-first 375px.** Header sticky 56px (wordmark "Tubi" + rol). CTA primario `Button size="lg"` full-width, 48px, abajo del contenido (alcance del pulgar).
+- **Acento turquesa** solo en: wordmark, CTA primario, foco de input, chip de estado activo y marco del QR. No abuses del color.
+- **Notificaciones** con `sonner` (toasts) para: seña enviada, seña confirmada, QR inválido, no-show, cambio de estado.
+- Componentes shadcn que vas a usar sí o sí: `Button`, `Input`, `Label`, `Card`, `Badge`, `Separator`, `Dialog`, `Sheet`, `AlertDialog`, `Select`, `Switch`, `RadioGroup`, `Textarea`, `Tabs`, `Progress`, `Skeleton`, `Sonner`, `Calendar` (fecha).
+
+**Mapa pantallas → shadcn (guía, no límite):**
+
+| # | Pantalla | shadcn / UI |
+|---|---|---|
+| 1 | Registro pasajero | `Card`, `Input`, `Label`, `Button`, `Separator` |
+| 2 | Búsqueda | `Card`, `Select` (origen/destino), `Calendar` (fecha), `Input` (hora), `Button` |
+| 3 | Resultados | `Card` (lista), `Badge` (asientos/estado), `Button` |
+| 4 | Detalle | `Card`, `Badge`, `Separator`, `Button` |
+| 5 | Checkout seña | `Card`, `Input`, `Label`, `Textarea` (comprobante), `Button`, `Alert` |
+| 6 | QR | `Card`, `Badge` (estado), QR con `qrcode.react`, `AlertDialog` (cancelar) |
+| 7 | Seguimiento | `Card`, mapa (`MapsProvider`), `Skeleton` (carga), `Badge` (ETA) |
+| 8 | Registro conductor | `Card`, `Input`, `Label`, `Button` |
+| 9 | Viajes del día | `Tabs`, `Card` (lista), `Badge` (ocupación) |
+| 10 | Recogida | `Card`, lista de paradas, `Badge` (timer), `Progress`, `Button` (no-show) |
+| 11 | Escanear QR | visor de cámara (ej. `@zxing/browser` o `html5-qrcode`), `Alert` (válido/rechazado), `Badge` |
+| 12 | Saldo | `Card`, `RadioGroup` (efectivo/transferencia), `Input` (monto), `Button` |
+| 13 | En ruta | `Card`, `Badge` (estado), `Switch` (GPS activo), `Button` (completar) |
+| 14 | Confirmar seña | `Card`, imagen del comprobante, `Button` (confirmar/rechazar), `Alert` |
+| 15 | Settings | `Card`, `Input`, `Label`, `Switch`, `Select`, `Button` (guardar) |
+
+> QR: generarlo con `qrcode.react`; escanearlo con una lib de cámara. Son dependencias funcionales (no shadcn), pero la pantalla que las contiene usa shadcn para el resto.
 
 ---
 
@@ -68,7 +102,7 @@ Web app **mobile-first (375px)** de **viajes compartidos interurbanos programado
 
 ## Alcance del MVP (P0)
 
-**15 pantallas** (viewport 375×812):
+**15 pantallas** (viewport 375×812), todas con shadcn/ui:
 
 | # | Pantalla | Actor |
 |---|---|---|
@@ -94,17 +128,17 @@ Web app **mobile-first (375px)** de **viajes compartidos interurbanos programado
 
 ## Orden de construcción (slices)
 
-Avanzá un slice a la vez; al terminar cada uno, verificá y commitée (Conventional Commits). No saltees.
+Avanzá un slice a la vez; al terminar cada uno, verificá y commitée (Conventional Commits). No saltees. En cada slice usá shadcn para todo lo visual.
 
 ### Slice 0 — Fundaciones
-- Scaffold `apps/web` (create-next-app, TS, Tailwind 4, shadcn/ui), npm, Node 22. Agregá Serwist (PWA) y Zod.
+- Scaffold `apps/web` (create-next-app, TS, Tailwind 4), npm, Node 22. **Inicializá shadcn** (`npx shadcn@latest init`) y configurá el tema con los tokens de la paleta del wireframe. Agregá Serwist (PWA) y Zod.
 - Supabase: `supabase init` + extraé la migración de `docs/04` a `supabase/migrations/0001_init.sql` + seed de `settings` (11 defaults). Levantá local (`supabase start`) o creá proyecto cloud (pedile al usuario la URL/keys → `.env`, **nunca commitear**).
 - `.env.example` con las claves necesarias (Supabase URL/anon, Google Maps key).
-- **Aceptación:** `apps/web` compila y corre; migración aplicada; tabla `settings` con los defaults.
+- **Aceptación:** `apps/web` compila y corre con shadcn funcionando; migración aplicada; tabla `settings` con los defaults.
 
 ### Slice 1 — Auth y perfiles
 - Supabase Auth (email+password en MVP). Trigger que crea `profiles` al registrarse.
-- Registro pasajero (nombre+DNI+contacto) y conductor (nombre+apellido+teléfono) → pantallas 1 y 8.
+- Registro pasajero (nombre+DNI+contacto) y conductor (nombre+apellido+teléfono) → pantallas 1 y 8 (shadcn: `Card` + `Input` + `Button`).
 - RLS de `profiles` (dueño + operador).
 - **Aceptación:** me registro como pasajero y como conductor; el perfil queda persistido con su rol.
 
@@ -121,7 +155,7 @@ Avanzá un slice a la vez; al terminar cada uno, verificá y commitée (Conventi
 
 ### Slice 4 — Reserva + seña + QR
 - `POST /reservas` (control de capacidad `RN-CAPACIDAD`), `POST /pagos/seña` (comprobante).
-- Generación de `qr_token` opaco. `GET /reservas/{id}/qr`. Cancelación + devolución (`RN-03`). Pantallas 5, 6.
+- Generación de `qr_token` opaco (`qrcode.react`). `GET /reservas/{id}/qr`. Cancelación + devolución (`RN-03`). Pantallas 5, 6.
 - **Aceptación:** reservo, la reserva queda `pendiente_sena`, recibo QR; sin capacidad → `RESERVA_SIN_ASIENTOS`.
 
 ### Slice 5 — Operador: confirmar seña + settings
@@ -145,6 +179,7 @@ Avanzá un slice a la vez; al terminar cada uno, verificá y commitée (Conventi
 
 ## Reglas duras (no negociables)
 
+- **UI siempre con shadcn/ui**: no reinventes componentes ni estilos globales a mano.
 - **Nunca hardcodees** $5.000, 15%, 5 min, ni ningún valor de negocio: siempre `settings`.
 - Proveedores siempre detrás de puertos (`PaymentProvider`, `MapsProvider`, `IdentityVerifier`). No importes SDKs en el dominio.
 - **RLS** en todas las tablas (matriz en `docs/04`). La autorización es a nivel de base, no solo en el cliente.
@@ -161,6 +196,7 @@ Avanzá un slice a la vez; al terminar cada uno, verificá y commitée (Conventi
 3. Cero valores de negocio hardcodeados; todo editable en `settings`.
 4. Tracking en vivo con cola offline idempotente.
 5. Migración SQL reproducible y semillas de settings cargadas.
+6. UI 100% shadcn/ui, mobile-first, consistente con los 15 wireframes.
 
 ---
 
@@ -169,7 +205,7 @@ Avanzá un slice a la vez; al terminar cada uno, verificá y commitée (Conventi
 - **LIFTY** (`~/Documentos/LIfty`) es otro producto: no copies código sin confirmación explícita del usuario.
 - BMAD (en `~/Documentos/Estudio Nomade/Tumo/_bmad`) es metodología, no dependencia de código.
 - No inventes MercadoPago, ratings, tarifa/km, historial, incidentes ni pantallas P1.
-- La paleta del wireframe (`#0D9488`) no es la marca final (fase 8) — usala como acento de wireframe hasta que exista la marca.
+- La paleta del wireframe (`#0D9488`) no es la marca final (fase 8) — usala como acento de wireframe hasta que exista la marca, y centralizala en los tokens del tema para cambiarla fácil.
 - No montes la demo sobre datos fake en el frontend: la seña, los estados y el tracking deben pasar por el backend real.
 
 ---
