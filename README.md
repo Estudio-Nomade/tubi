@@ -1,12 +1,12 @@
-# Plataforma de Viajes Compartidos Interurbanos
+# Tubi
 
-> Proyecto en etapa temprana de conceptualización. **Nombre y marca aún no definidos** — en toda la documentación se usa el placeholder "la plataforma".
+> Viajes compartidos interurbanos programados. Nombre cerrado: **Tubi**. Paleta, dominio y logo quedan para la fase 8.
 
 Plataforma para organizar viajes compartidos interurbanos programados, con tramo principal **Tandil ↔ Buenos Aires** (Argentina) y paradas intermedias (Rauch, Flores, etc.). Convierte la dinámica informal actual de viajes entre ciudades en un servicio **organizado, trazable y confiable**.
 
 ## Estado
 
-Etapa temprana. Definidos: visión, alcance, requisitos de producto (PRD) y hoja de ruta. Pendientes: arquitectura, modelo de datos, API, UX, marca e implementación.
+Fases 0–5 hechas (PRD, arquitectura, flujos, datos, API, reglas). En curso: fase 6 (wireframes). Pendientes: UI, marca, MVP, demo y deploy.
 
 ## Documentación
 
@@ -19,6 +19,7 @@ Etapa temprana. Definidos: visión, alcance, requisitos de producto (PRD) y hoja
 | [`docs/04-modelo-de-datos.md`](docs/04-modelo-de-datos.md) | Modelo de datos (schema Postgres/Supabase) |
 | [`docs/05-api.md`](docs/05-api.md) | API y contratos (endpoints + realtime) |
 | [`docs/06-reglas-y-estados.md`](docs/06-reglas-y-estados.md) | Reglas de negocio y máquinas de estado |
+| [`design-artifacts/tubi-wireframes.pen`](design-artifacts/tubi-wireframes.pen) | Wireframes P0 (Pencil) |
 
 ## Roadmap (resumen)
 
@@ -33,4 +34,4 @@ Etapa temprana. Definidos: visión, alcance, requisitos de producto (PRD) y hoja
 
 ## Convenciones de trabajo
 
-Ver [`AGENTS.md`](AGENTS.md). Para un agente que retoma el proyecto sin contexto, ver [`HANDOFF.md`](HANDOFF.md).
+Ver [`AGENTS.md`](AGENTS.md). Handoff: [`HANDOFF.md`](HANDOFF.md). Prompts: [`PROMPT-AGENTE.md`](docs/PROMPT-AGENTE.md) · [`PROMPT-UI-PENCIL.md`](docs/PROMPT-UI-PENCIL.md) · [`PROMPT-IMPLEMENTACION.md`](docs/PROMPT-IMPLEMENTACION.md).

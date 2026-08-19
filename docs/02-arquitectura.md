@@ -137,6 +137,12 @@ Cada decisión: **Binds** (qué gobierna), **Prevents** (qué divergencia evita)
 - **Prevents:** repos separados que desincronizan tipos y lógica de dominio compartida.
 - **Rule:** un monorepo (workspaces de npm/bun) con `apps/web`, `supabase/` (migraciones y funciones) y `packages/` (tipos y dominio compartidos). Paquete manager: **npm** (Node 22 ya instalado; bun es alternativa compatible si se instala).
 
+### AD-15 — UI con shadcn/ui
+
+- **Binds:** toda la capa de presentación.
+- **Prevents:** estilos y componentes a mano; inconsistencias visuales entre pantallas; UI propia difícil de mantener.
+- **Rule:** la interfaz se construye con **shadcn/ui** (componentes sobre Tailwind CSS + Radix). No se escriben botones, inputs, cards, dialogs ni toasts a mano donde shadcn ya los tenga. El tema se configura vía **tokens CSS** (Tailwind 4), centralizados para poder reemplazar la paleta cuando se defina la marca (fase 8).
+
 ---
 
 ## Convenciones de consistencia
@@ -150,6 +156,7 @@ Cada decisión: **Binds** (qué gobierna), **Prevents** (qué divergencia evita)
 | Config | nunca constantes de negocio en código; siempre settings (AD-5) |
 | Estado | transiciones solo vía la máquina de estados (AD-12) |
 | Auth/RLS | toda query con RLS; roles `pasajero` / `conductor` / `operador` |
+| UI | componentes shadcn/ui; tema por tokens CSS (AD-15) |
 
 ---
 

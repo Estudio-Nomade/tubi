@@ -1,0 +1,6 @@
+{
+  "name": "tubi",
+  "private": true,
+  "workspaces": ["apps/*", "packages/*"],
+  "engines": { "node": ">=22" }
+}

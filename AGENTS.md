@@ -8,7 +8,7 @@ Plataforma de viajes compartidos interurbanos programados (tramo principal Tandi
 
 - **Fuente de verdad de producto:** `docs/01-prd.md`
 - **Orden de trabajo:** `docs/00-roadmap.md`
-- El proyecto **no tiene nombre/marca definidos**: usar el placeholder "la plataforma" hasta la fase 8 (marca).
+- El producto se llama **Tubi**. Paleta, dominio y logo se definen en la fase 8.
 
 ## Idioma
 
