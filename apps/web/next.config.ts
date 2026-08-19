@@ -8,4 +8,7 @@ const withSerwist = withSerwistInit({
 
 export default withSerwist({
   reactStrictMode: true,
+  async redirects() {
+    return [{ source: "/", destination: "/demo.html", permanent: false }];
+  },
 });
