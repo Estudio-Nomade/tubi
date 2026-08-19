@@ -1,0 +1,40 @@
+# Dependencias
+node_modules/
+
+# Builds y artefactos
+.next/
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Environment (secretos — NUNCA commitear)
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing / coverage
+coverage/
+test-results/
+playwright-report/
+
+# Runtime local
+node_modules/.cache/
+.pnpm-store/
