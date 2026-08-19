@@ -1,5 +1,5 @@
 {
-  "version": "2.15",
+  "version": "2.14",
   "variables": {
     "surface": {
       "type": "color",
@@ -153,9 +153,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -539,9 +537,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -971,9 +967,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -1382,9 +1376,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -1734,9 +1726,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -2050,9 +2040,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -2491,9 +2479,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -2725,9 +2711,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -3111,9 +3095,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -3348,9 +3330,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -3678,9 +3658,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -3923,9 +3901,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -4231,9 +4207,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -4551,9 +4525,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -4845,9 +4817,7 @@
           "height": 56,
           "fill": "#FFFFFF",
           "stroke": "$border",
-          "strokeWidth": {
-            "bottom": 1
-          }
+          "strokeWidth": 1
         },
         {
           "type": "frame",
@@ -4922,9 +4892,7 @@
                   "height": 52,
                   "fill": "$card",
                   "stroke": "$border",
-                  "strokeWidth": {
-                    "bottom": 1
-                  }
+                  "strokeWidth": 1
                 },
                 {
                   "type": "frame",
@@ -4968,9 +4936,7 @@
                   "height": 52,
                   "fill": "$card",
                   "stroke": "$border",
-                  "strokeWidth": {
-                    "bottom": 1
-                  }
+                  "strokeWidth": 1
                 },
                 {
                   "type": "frame",
@@ -5014,9 +4980,7 @@
                   "height": 52,
                   "fill": "$card",
                   "stroke": "$border",
-                  "strokeWidth": {
-                    "bottom": 1
-                  }
+                  "strokeWidth": 1
                 },
                 {
                   "type": "frame",
@@ -5060,9 +5024,7 @@
                   "height": 52,
                   "fill": "$card",
                   "stroke": "$border",
-                  "strokeWidth": {
-                    "bottom": 1
-                  }
+                  "strokeWidth": 1
                 },
                 {
                   "type": "frame",
@@ -5106,9 +5068,7 @@
                   "height": 52,
                   "fill": "$card",
                   "stroke": "$border",
-                  "strokeWidth": {
-                    "bottom": 1
-                  }
+                  "strokeWidth": 1
                 },
                 {
                   "type": "frame",
@@ -5152,9 +5112,7 @@
                   "height": 52,
                   "fill": "$card",
                   "stroke": "$border",
-                  "strokeWidth": {
-                    "bottom": 1
-                  }
+                  "strokeWidth": 1
                 },
                 {
                   "type": "frame",
@@ -5198,9 +5156,7 @@
                   "height": 52,
                   "fill": "$card",
                   "stroke": "$border",
-                  "strokeWidth": {
-                    "bottom": 1
-                  }
+                  "strokeWidth": 1
                 },
                 {
                   "type": "frame",
@@ -5244,9 +5200,7 @@
                   "height": 52,
                   "fill": "$card",
                   "stroke": "$border",
-                  "strokeWidth": {
-                    "bottom": 1
-                  }
+                  "strokeWidth": 1
                 }
               ],
               "width": "fill_container",
@@ -5309,5 +5263,6 @@
       "x": 2626,
       "y": 992
     }
-  ]
+  ],
+  "fileToken": "bc698bc7-4e7b-4be9-903a-7b41a848a282"
 }
