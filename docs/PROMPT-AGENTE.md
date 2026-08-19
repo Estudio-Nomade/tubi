@@ -87,7 +87,8 @@ Hay **dos ejes de “fase”**: roadmap 0–11 = desarrollo. En el PRD, “fase 
 | `docs/superpowers/plans/2026-08-18-tubi-wireframes.md` | Plan de wireframes (ya ejecutado). |
 | `design-artifacts/tubi-wireframes.pen` | Pencil 2.14, 15 frames. |
 | `design-artifacts/previews/01-…15-….png` | Capturas para revisar sin Pencil. |
-| `docs/PROMPT-AGENTE.md` | Este archivo. |
+| `docs/PROMPT-AGENTE.md` | Este archivo (orquestación). |
+| `docs/PROMPT-IMPLEMENTACION.md` | Prompt para el agente que implementa el MVP (fase 9). |
 
 **P0 recortado (15 pantallas, no 19):** sin historial pasajero, sin incidentes, sin dashboard/gestión operador, sin verificación DNI. Sí: confirmación de seña y settings (son P0).
 
@@ -98,7 +99,7 @@ Hay **dos ejes de “fase”**: roadmap 0–11 = desarrollo. En el PRD, “fase 
 3. Preguntá al usuario: ¿los wireframes están OK? (mirá `design-artifacts/previews/`).
 4. Si OK → ejecutá **fase 8**: `docs/07-marca.md` (dominio ~$12–20k ARS/año, paleta, tipografía, dirección de logo). El nombre ya es Tubi.
 5. Después fase 7 (design system alineado a la marca y a los 15 frames).
-6. Recién después fase 9: MVP por partes, TDD si hay tests, settings + puertos siempre.
+6. Recién después fase 9: pegá `docs/PROMPT-IMPLEMENTACION.md` al agente implementador (MVP por partes, settings + puertos siempre, TDD si hay tests).
 
 Al terminar cada fase: mostrá el entregable y **esperá OK**.
 
