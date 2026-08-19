@@ -3,494 +3,1145 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Tubi — demo de flujo</title>
+  <title>Tubi</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --bg: #FFFFFF;
-      --surface: #F4F4F5;
-      --ink: #18181B;
-      --muted: #71717A;
-      --border: #E4E4E7;
-      --card: #FFFFFF;
-      --primary: #0D9488;
-      --primary-soft: #F0FDFA;
-      --chip: #CCFBF1;
-      --error: #B91C1C;
-      --error-soft: #FEF2F2;
+      --bg: #F7F3EC;
+      --surface: #FFFCF7;
+      --surface-2: #EFE8DC;
+      --ink: #1C1917;
+      --muted: #78716C;
+      --border: #E7E0D4;
+      --accent: #C45C26;
+      --accent-soft: #F3E0D4;
+      --on-accent: #FFFCF7;
+      --sage: #5F7A61;
+      --sage-soft: #E4EDE5;
+      --danger: #B42318;
+      --danger-soft: #FCEBEA;
       --phone-w: 375px;
       --phone-h: 812px;
+      --shadow: 0 4px 16px rgba(28, 25, 23, 0.06);
+      --font-ui: "DM Sans", system-ui, sans-serif;
+      --font-display: "Fraunces", Georgia, serif;
     }
     * { box-sizing: border-box; }
     html, body { margin: 0; height: 100%; }
     body {
-      font-family: Inter, system-ui, sans-serif;
-      background: #e4e4e7;
+      font-family: var(--font-ui);
+      background: #d6cfc3;
       color: var(--ink);
+      -webkit-font-smoothing: antialiased;
     }
+    button, input, select { font: inherit; color: inherit; }
+    button { cursor: pointer; border: 0; background: none; }
     .stage {
       min-height: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 16px;
-      padding: 20px 12px 32px;
+      display: grid;
+      place-items: center;
+      padding: 16px;
     }
-    .guide {
-      width: min(920px, 100%);
-      background: #fff;
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 16px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .guide h1 { font-size: 16px; margin: 0; }
-    .guide p { margin: 2px 0 0; font-size: 13px; color: var(--muted); }
-    .guide-actions { display: flex; flex-wrap: wrap; gap: 8px; }
-    .ghost, .next {
-      border: 0; border-radius: 8px; height: 36px; padding: 0 12px;
-      font: 600 13px Inter, sans-serif; cursor: pointer;
-    }
-    .ghost { background: var(--surface); color: var(--ink); }
-    .next { background: var(--primary); color: #fff; }
-    .ghost:disabled, .next:disabled { opacity: .4; cursor: not-allowed; }
     .phone {
-      width: var(--phone-w);
-      height: var(--phone-h);
+      width: min(100vw, var(--phone-w));
+      height: min(100dvh, var(--phone-h));
+      max-height: 100dvh;
       background: var(--bg);
       border-radius: 28px;
-      box-shadow: 0 20px 50px rgba(24,24,27,.18);
+      box-shadow: 0 24px 60px rgba(28, 25, 23, 0.22);
       overflow: hidden;
       position: relative;
       display: flex;
       flex-direction: column;
     }
-    .status {
-      height: 44px; background: #fff; display: flex; align-items: center;
-      justify-content: space-between; padding: 0 20px; font-size: 14px; font-weight: 600;
+    @media (max-width: 420px) {
+      .stage { padding: 0; }
+      .phone {
+        width: 100vw;
+        height: 100dvh;
+        border-radius: 0;
+        box-shadow: none;
+      }
     }
-    .header {
-      height: 56px; background: #fff; border-bottom: 1px solid var(--border);
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 16px; flex-shrink: 0;
+    .screen {
+      display: none;
+      flex: 1;
+      flex-direction: column;
+      min-height: 0;
+      background: var(--bg);
     }
-    .brand { color: var(--primary); font-weight: 700; font-size: 22px; }
-    .role { font-size: 13px; color: var(--muted); font-weight: 500; }
-    .screen { display: none; flex: 1; flex-direction: column; min-height: 0; }
     .screen.on { display: flex; }
-    .body { flex: 1; overflow: auto; padding: 20px; display: flex; flex-direction: column; gap: 20px; }
-    .foot { padding: 20px 20px 24px; display: flex; flex-direction: column; gap: 10px; background: var(--surface); }
-    h2 { margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.01em; }
-    label { display: block; font-size: 13px; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
-    input, select {
-      width: 100%; height: 48px; border: 1px solid var(--border); border-radius: 8px;
-      padding: 0 14px; font: 400 16px Inter, sans-serif; background: #fff; color: var(--ink);
+    .header {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 16px 20px 8px;
+      min-height: 52px;
     }
-    input:focus, select:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
-    .field { display: flex; flex-direction: column; }
+    .header .back {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--surface-2);
+      display: grid; place-items: center;
+      color: var(--ink); font-size: 18px; line-height: 1;
+    }
+    .header .back.ghost { opacity: 0; pointer-events: none; }
+    .brand {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 20px;
+      color: var(--ink);
+    }
+    .role-chip {
+      font-size: 12px; font-weight: 500; color: var(--muted);
+      background: var(--surface-2); border-radius: 999px;
+      padding: 6px 10px;
+    }
+    .body {
+      flex: 1;
+      overflow: auto;
+      padding: 8px 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      min-height: 0;
+    }
+    .body.center { align-items: center; text-align: center; }
+    .foot {
+      flex-shrink: 0;
+      padding: 12px 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      background: var(--bg);
+    }
+    .tabs {
+      flex-shrink: 0;
+      height: 64px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: stretch;
+      justify-content: space-around;
+      padding: 6px 4px 8px;
+    }
+    .tabs button {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .tabs button.on { color: var(--accent); font-weight: 600; }
+    .tabs button svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.75; }
+    h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 28px;
+      font-weight: 600;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+    h1.sm { font-size: 22px; }
+    .sub { margin: 0; font-size: 14px; color: var(--muted); font-weight: 500; line-height: 1.4; }
+    .field { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+    .field label { font-size: 12px; font-weight: 500; color: var(--muted); }
+    .field input, .field select {
+      width: 100%; height: 52px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 0 14px;
+      background: var(--surface-2);
+      font-size: 16px; font-weight: 500;
+    }
+    .field input:focus, .field select:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 0;
+      background: var(--surface);
+    }
     .btn {
-      width: 100%; height: 48px; border: 0; border-radius: 8px;
-      background: var(--primary); color: #fff; font: 600 16px Inter, sans-serif; cursor: pointer;
+      width: 100%; height: 52px; border-radius: 14px;
+      background: var(--accent); color: var(--on-accent);
+      font-size: 17px; font-weight: 600;
+      display: grid; place-items: center;
     }
-    .btn.danger { background: var(--error); }
-    .btn.outline {
-      background: #fff; color: var(--ink); border: 1px solid var(--border);
+    .btn:active { transform: scale(0.99); }
+    .btn.secondary {
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--border);
     }
-    .btn.outline.danger { color: var(--error); border-color: var(--error); }
+    .btn.danger {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+    .btn.ghost {
+      background: transparent;
+      color: var(--accent);
+      height: auto;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 8px;
+    }
+    .btn.ghost.danger { color: var(--danger); }
     .link {
-      background: none; border: 0; color: var(--primary); font: 500 15px Inter, sans-serif;
-      cursor: pointer; text-align: center;
+      text-align: center;
+      color: var(--accent);
+      font-size: 14px;
+      font-weight: 500;
+      padding: 4px;
     }
     .card {
-      background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-      padding: 16px; display: flex; flex-direction: column; gap: 8px;
-      box-shadow: 0 1px 2px rgba(24,24,27,.05), 0 4px 16px rgba(24,24,27,.06);
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      box-shadow: var(--shadow);
+      text-align: left;
     }
     .card.tap { cursor: pointer; }
-    .row { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-    .muted { color: var(--muted); font-size: 14px; }
-    .strong { font-weight: 700; font-size: 17px; }
+    .card.tap:active { transform: scale(0.995); }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+    }
+    .muted { color: var(--muted); font-size: 14px; font-weight: 500; }
+    .tiny { color: var(--muted); font-size: 12px; font-weight: 500; line-height: 1.4; }
+    .strong { font-weight: 600; font-size: 16px; }
+    .display {
+      font-family: var(--font-display);
+      font-weight: 600;
+      font-size: 22px;
+      line-height: 1.2;
+    }
+    .display.lg { font-size: 28px; }
+    .display.xl { font-size: 40px; line-height: 1; }
+    .pill {
+      align-self: flex-start;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .pill.ok { background: var(--sage-soft); color: var(--sage); }
+    .pill.wait { background: var(--accent-soft); color: var(--accent); }
+    .pill.neutral { background: var(--surface-2); color: var(--ink); }
+    .pill.bad { background: var(--danger-soft); color: var(--danger); }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
     .chip {
-      align-self: flex-start; background: var(--chip); color: var(--primary);
-      font-size: 13px; font-weight: 600; border-radius: 999px; padding: 5px 12px;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: var(--surface-2);
+      color: var(--ink);
+      font-size: 14px;
+      font-weight: 500;
+      border: 1px solid transparent;
     }
-    .banner {
-      background: var(--primary-soft); border: 1px solid var(--primary);
-      border-radius: 12px; padding: 14px; font-size: 14px;
+    .chip.on {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: transparent;
+      font-weight: 600;
     }
-    .banner.bad { background: var(--error-soft); border-color: var(--error); color: var(--error); font-weight: 600; }
-    .banner.ok { color: var(--primary); font-weight: 600; }
+    .dots { display: flex; gap: 8px; justify-content: center; padding: 4px 0; }
+    .dots i {
+      width: 8px; height: 8px; border-radius: 999px;
+      background: var(--border); display: block;
+    }
+    .dots i.on { background: var(--accent); }
+    .spacer { flex: 1; min-height: 8px; }
+    .info {
+      display: flex; gap: 12px; align-items: center; width: 100%;
+    }
+    .info .ic {
+      width: 40px; height: 40px; border-radius: 12px;
+      background: var(--surface-2); display: grid; place-items: center;
+      color: var(--muted); font-size: 16px; flex-shrink: 0;
+    }
+    .info .lab { font-size: 12px; color: var(--muted); font-weight: 500; }
+    .info .val { font-size: 15px; font-weight: 500; }
+    .timeline { display: flex; flex-direction: column; gap: 0; width: 100%; padding-left: 4px; }
+    .tl-item {
+      display: grid; grid-template-columns: 16px 1fr; gap: 12px;
+      min-height: 36px;
+    }
+    .tl-item .dotcol {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .tl-item .d {
+      width: 10px; height: 10px; border-radius: 999px;
+      background: var(--accent); margin-top: 4px; flex-shrink: 0;
+    }
+    .tl-item .d.soft { background: var(--border); }
+    .tl-item .line {
+      width: 2px; flex: 1; background: var(--border); margin: 4px 0;
+    }
+    .tl-item .lab { font-size: 14px; font-weight: 500; padding-bottom: 12px; }
     .drop {
-      height: 88px; border: 1px dashed var(--border); border-radius: 12px;
-      display: grid; place-items: center; font-size: 14px; color: var(--muted); background: #fff;
+      height: 96px; border: 1.5px dashed var(--border); border-radius: 16px;
+      display: grid; place-items: center; font-size: 14px; color: var(--muted);
+      background: var(--surface); font-weight: 500;
+    }
+    .drop.done { border-style: solid; color: var(--sage); background: var(--sage-soft); }
+    .qr-wrap {
+      width: 100%; max-width: 300px; margin: 0 auto;
+      background: var(--surface); border-radius: 16px; padding: 20px;
+      box-shadow: var(--shadow); border: 1px solid var(--border);
+      display: flex; flex-direction: column; align-items: center; gap: 14px;
     }
     .qr {
-      width: 220px; height: 220px; margin: 0 auto; background: #fff;
-      border: 3px solid var(--primary); border-radius: 12px;
+      width: 200px; height: 200px; background: var(--surface-2);
+      border-radius: 12px;
       display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; padding: 16px;
     }
     .qr i { background: var(--ink); border-radius: 2px; }
     .qr i.off { background: transparent; }
     .map {
-      height: 280px; background: #e4e4e7; border-radius: 12px; position: relative; overflow: hidden;
-    }
-    .map::before {
-      content: ""; position: absolute; inset: 40px 30px;
-      border: 2px dashed #a1a1aa; border-radius: 40% 20% 50% 30%;
-    }
-    .dot {
-      position: absolute; width: 16px; height: 16px; background: var(--primary);
-      border-radius: 50%; box-shadow: 0 0 0 6px rgba(13,148,136,.25);
-      left: 22%; top: 58%; animation: ride 8s ease-in-out infinite alternate;
-    }
-    .pin { position: absolute; width: 10px; height: 10px; background: var(--ink); border-radius: 50%; right: 22%; top: 22%; }
-    @keyframes ride { to { left: 68%; top: 28%; } }
-    .timer {
-      background: #fff; border: 2px solid var(--primary); border-radius: 12px;
-      text-align: center; padding: 12px;
-    }
-    .timer b { display: block; font-size: 30px; color: var(--primary); }
-    .finder {
-      height: 280px; background: #18181b; border-radius: 12px;
+      height: 280px; width: 100%; border-radius: 16px;
+      background: var(--surface-2); position: relative; overflow: hidden;
       display: grid; place-items: center;
     }
-    .hole { width: 180px; height: 180px; border: 3px solid var(--primary); border-radius: 8px; }
-    .methods { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .pick {
-      height: 56px; border-radius: 8px; border: 1px solid var(--border); background: #fff;
-      font: 600 15px Inter, sans-serif; cursor: pointer;
+    .map .pin {
+      width: 48px; height: 48px; border-radius: 999px;
+      background: var(--accent-soft); color: var(--accent);
+      display: grid; place-items: center; font-size: 22px;
+      box-shadow: var(--shadow);
     }
-    .pick.on { background: var(--primary); color: #fff; border-color: var(--primary); }
-    .comp {
-      height: 140px; background: #e4e4e7; border-radius: 12px;
-      display: grid; place-items: center; color: var(--muted); font-size: 13px;
+    .map .road {
+      position: absolute; inset: 48px 40px;
+      border: 2px dashed #c4b8a8; border-radius: 40% 20% 50% 30%;
+      pointer-events: none;
     }
-    .split { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .settings { background: #fff; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
-    .settings .row {
-      height: 56px; padding: 0 16px; border-bottom: 1px solid var(--border); font-size: 15px;
+    .timer {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      padding: 12px 0;
     }
-    .settings .row:last-child { border-bottom: 0; }
-    .settings b { color: var(--primary); font-size: 15px; }
-    .home-grid { display: grid; gap: 10px; }
-    .tiny { font-size: 13px; color: var(--muted); text-align: center; }
-    @media (max-width: 420px) {
-      .stage { padding: 0; }
-      .guide { border-radius: 0; width: 100%; }
-      .phone { width: 100%; height: calc(100dvh - 92px); border-radius: 0; box-shadow: none; }
+    .seg {
+      display: flex; gap: 4px; padding: 4px; background: var(--surface-2);
+      border-radius: 12px; width: 100%;
+    }
+    .seg button {
+      flex: 1; height: 40px; border-radius: 10px;
+      font-size: 14px; font-weight: 500; color: var(--muted);
+    }
+    .seg button.on {
+      background: var(--surface); color: var(--ink); font-weight: 600;
+      box-shadow: var(--shadow);
+    }
+    .split { display: flex; gap: 12px; width: 100%; }
+    .split .btn { flex: 1; }
+    .finder {
+      flex: 1; min-height: 280px; background: #292524; border-radius: 16px;
+      position: relative; display: grid; place-items: center;
+    }
+    .finder .hole {
+      width: 220px; height: 220px; border-radius: 16px;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 0 999px rgba(0,0,0,.35);
+    }
+    .badge {
+      width: 72px; height: 72px; border-radius: 999px;
+      display: grid; place-items: center; font-size: 32px;
+    }
+    .badge.ok { background: var(--sage-soft); color: var(--sage); }
+    .badge.bad { background: var(--danger-soft); color: var(--danger); }
+    .list-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden;
+    }
+    .list-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 14px 16px; gap: 12px;
+    }
+    .list-row + .list-row { border-top: 1px solid var(--border); }
+    .avatar {
+      width: 56px; height: 56px; border-radius: 999px;
+      background: var(--accent-soft); color: var(--accent);
+      display: grid; place-items: center;
+      font-family: var(--font-display); font-size: 22px; font-weight: 600;
+      flex-shrink: 0;
+    }
+    .who { display: flex; gap: 14px; align-items: center; width: 100%; }
+    .chooser {
+      display: flex; flex-direction: column; gap: 12px; width: 100%; margin-top: 8px;
+    }
+    .chooser .btn { height: 56px; }
+    .banner {
+      width: 100%; border-radius: 12px; padding: 14px;
+      font-size: 13px; font-weight: 500; line-height: 1.4; text-align: left;
+    }
+    .banner.ok { background: var(--sage-soft); color: var(--sage); }
+    .banner.wait { background: var(--accent-soft); color: var(--accent); }
+    .banner.bad { background: var(--danger-soft); color: var(--danger); }
+    .settings-group { width: 100%; }
+    .settings-group h3 {
+      margin: 0 0 8px; font-size: 12px; font-weight: 600;
+      color: var(--muted); text-transform: none; letter-spacing: 0.02em;
     }
   </style>
 </head>
 <body>
   <div class="stage">
-    <div class="guide">
-      <div>
-        <h1>Tubi — demo de flujo</h1>
-        <p id="step-label">Inicio · elegí un rol o recorré el flujo feliz</p>
-      </div>
-      <div class="guide-actions">
-        <button class="ghost" type="button" onclick="go('home')">Inicio</button>
-        <button class="ghost" type="button" id="prev-btn" onclick="step(-1)" disabled>Anterior</button>
-        <button class="next" type="button" id="next-btn" onclick="startTour()">Ver flujo feliz</button>
-      </div>
-    </div>
+    <div class="phone" id="app">
 
-    <div class="phone">
-      <div class="status"><span>9:41</span><span>▮▮▮</span></div>
-      <div class="header"><span class="brand">Tubi</span><span class="role" id="role">Demo</span></div>
-
-      <section class="screen on" id="home">
-        <div class="body">
-          <h2>¿Quién sos?</h2>
-          <p class="muted">Prototipo clickeable. Los montos son de ejemplo (settings).</p>
-          <div class="home-grid">
-            <button class="btn" type="button" onclick="go('p-reg')">Soy pasajero</button>
-            <button class="btn outline" type="button" onclick="go('c-reg')">Soy conductor</button>
-            <button class="btn outline" type="button" onclick="go('o-sena')">Soy operador</button>
+      <!-- ===== GATE ===== -->
+      <section class="screen on" id="gate">
+        <div class="body" style="padding-top:48px; justify-content:center;">
+          <div style="font-family:var(--font-display);font-size:40px;font-weight:600;margin-bottom:4px;">Tubi</div>
+          <p class="sub" style="margin-bottom:24px;">Viajes compartidos Tandil ↔ Buenos Aires</p>
+          <div class="chooser">
+            <button class="btn" type="button" data-go="p-login">Soy pasajero</button>
+            <button class="btn secondary" type="button" data-go="c-login">Soy conductor</button>
+            <button class="btn secondary" type="button" data-go="o-sena">Soy operador</button>
           </div>
+          <p class="tiny" style="margin-top:24px;text-align:center;">Demo interactiva · tocá la UI para avanzar</p>
+        </div>
+      </section>
+
+      <!-- ===== PASAJERO ===== -->
+      <section class="screen" id="p-login">
+        <header class="header">
+          <button class="back" type="button" data-go="gate" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Pasajero</span>
+        </header>
+        <div class="body">
+          <h1>Ingresá a Tubi</h1>
+          <p class="sub">Usá tu email o teléfono</p>
+          <div class="field">
+            <label>Email o teléfono</label>
+            <input value="ana@mail.com" autocomplete="off" />
+          </div>
+          <div class="spacer"></div>
+        </div>
+        <div class="foot">
+          <button class="btn" type="button" data-go="p-home-empty">Continuar</button>
+          <button class="link" type="button" data-go="p-reg">Crear cuenta</button>
         </div>
       </section>
 
       <section class="screen" id="p-reg">
+        <header class="header">
+          <button class="back" type="button" data-go="p-login" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Pasajero</span>
+        </header>
         <div class="body">
-          <h2>Creá tu cuenta</h2>
-          <div class="field"><label>Nombre</label><input value="Ana Pérez" /></div>
-          <div class="field"><label>DNI</label><input value="32.456.789" /></div>
-          <div class="field"><label>Contacto</label><input value="11 5555-1234" /></div>
+          <div class="dots" aria-hidden="true"><i class="on"></i><i></i><i></i></div>
+          <h1>¿Cómo te llamás?</h1>
+          <div class="field">
+            <label>Nombre</label>
+            <input value="Ana Pérez" />
+          </div>
+          <div class="spacer"></div>
         </div>
         <div class="foot">
-          <button class="btn" type="button" onclick="go('p-search')">Crear cuenta</button>
-          <button class="link" type="button" onclick="go('p-search')">Ya tengo cuenta</button>
+          <button class="btn" type="button" data-go="p-home-empty">Continuar</button>
+          <button class="link" type="button" data-go="p-login">Ya tengo cuenta</button>
         </div>
+      </section>
+
+      <section class="screen" id="p-home-empty">
+        <header class="header">
+          <span class="back ghost">‹</span>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Pasajero</span>
+        </header>
+        <div class="body center" style="padding-top:32px;">
+          <h1 class="sm">Hola, Ana</h1>
+          <p class="sub">Todavía no tenés un viaje</p>
+          <div class="spacer"></div>
+          <button class="btn" type="button" data-go="p-search" style="max-width:100%;">Buscar viaje</button>
+          <div class="spacer"></div>
+        </div>
+        <nav class="tabs" data-role="p" data-active="home"></nav>
+      </section>
+
+      <section class="screen" id="p-home">
+        <header class="header">
+          <span class="back ghost">‹</span>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Pasajero</span>
+        </header>
+        <div class="body">
+          <h1 class="sm">Hola, Ana</h1>
+          <p class="sub">Tu próximo viaje</p>
+          <article class="card">
+            <span class="pill ok" id="home-pill">Confirmada</span>
+            <div class="display">Tandil → Bs.As.</div>
+            <div class="muted">Martes 25 ago · 07:00 · Tandil centro</div>
+            <button class="btn" type="button" id="home-cta" data-go="p-qr" style="margin-top:8px;">Ver mi QR</button>
+          </article>
+          <button class="link" type="button" data-go="p-search">Buscar otro viaje</button>
+          <div class="spacer"></div>
+        </div>
+        <nav class="tabs" data-role="p" data-active="home"></nav>
       </section>
 
       <section class="screen" id="p-search">
+        <header class="header">
+          <button class="back" type="button" data-go="p-home-empty" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Pasajero</span>
+        </header>
         <div class="body">
-          <h2>Buscar viaje</h2>
-          <div class="field"><label>Origen</label><select><option>Tandil</option><option>Buenos Aires</option></select></div>
-          <div class="field"><label>Destino</label><select><option>Buenos Aires</option><option>Tandil</option></select></div>
-          <div class="field"><label>Fecha</label><input value="Martes 25 ago" /></div>
-          <div class="field"><label>Horario</label><select><option>Mañana</option><option>Tarde</option></select></div>
+          <h1>¿A dónde vas?</h1>
+          <article class="card" style="gap:12px;">
+            <div class="field">
+              <label>Origen</label>
+              <select><option>Tandil</option><option>Buenos Aires</option></select>
+            </div>
+            <div class="field">
+              <label>Destino</label>
+              <select><option>Buenos Aires</option><option>Tandil</option></select>
+            </div>
+          </article>
+          <div>
+            <div class="tiny" style="margin-bottom:8px;">Fecha</div>
+            <div class="chips" id="date-chips">
+              <button class="chip on" type="button">Hoy</button>
+              <button class="chip" type="button">Mañana</button>
+              <button class="chip" type="button">25 ago</button>
+            </div>
+          </div>
+          <div class="field">
+            <label>Horario</label>
+            <select><option>07:00</option><option>09:30</option><option>14:00</option></select>
+          </div>
+          <div class="spacer"></div>
         </div>
-        <div class="foot"><button class="btn" type="button" onclick="go('p-results')">Buscar</button></div>
+        <div class="foot">
+          <button class="btn" type="button" data-go="p-results">Buscar</button>
+        </div>
+        <nav class="tabs" data-role="p" data-active="search"></nav>
       </section>
 
       <section class="screen" id="p-results">
+        <header class="header">
+          <button class="back" type="button" data-go="p-search" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Pasajero</span>
+        </header>
         <div class="body">
-          <h2>Martes 25 ago</h2>
-          <article class="card tap" onclick="go('p-detail')">
+          <h1 class="sm">Martes 25 ago</h1>
+          <p class="sub">3 viajes disponibles</p>
+          <article class="card tap" data-go="p-detail">
             <div class="row">
               <div>
-                <div class="strong">07:00 → 12:30</div>
-                <div class="muted">Tandil → Buenos Aires</div>
-                <div class="muted">3 asientos · precio según ruta</div>
+                <div class="display" style="font-size:18px;">Tandil → Bs.As.</div>
+                <div class="muted">07:00 · 3 asientos</div>
               </div>
-              <span style="color:var(--primary)">›</span>
+              <div style="text-align:right;">
+                <div class="strong">$18.000</div>
+                <div class="tiny">›</div>
+              </div>
             </div>
           </article>
           <article class="card">
-            <div class="strong">14:00 → 19:20</div>
-            <div class="muted">Tandil → Buenos Aires · 1 asiento</div>
+            <div class="row">
+              <div>
+                <div class="display" style="font-size:18px;">Tandil → Bs.As.</div>
+                <div class="muted">09:30 · 1 asiento</div>
+              </div>
+              <div class="strong">$18.000</div>
+            </div>
           </article>
           <article class="card">
-            <div class="strong">18:30 → 23:45</div>
-            <div class="muted">Tandil → Buenos Aires · 4 asientos</div>
+            <div class="row">
+              <div>
+                <div class="display" style="font-size:18px;">Tandil → Bs.As.</div>
+                <div class="muted">14:00 · 4 asientos</div>
+              </div>
+              <div class="strong">$18.000</div>
+            </div>
           </article>
         </div>
+        <nav class="tabs" data-role="p" data-active="search"></nav>
       </section>
 
       <section class="screen" id="p-detail">
+        <header class="header">
+          <button class="back" type="button" data-go="p-results" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Pasajero</span>
+        </header>
         <div class="body">
-          <h2>Detalle del viaje</h2>
-          <article class="card"><div class="strong">María López</div><div class="muted">Conductora</div></article>
-          <article class="card"><div class="strong">AB 123 CD</div><div class="muted">Fiat Cronos blanco · 4 asientos</div></article>
-          <article class="card"><div class="strong">Tandil → Rauch → Flores → Bs.As.</div><div class="muted">Salida 07:00</div></article>
-          <div class="row"><span class="muted">Precio del asiento</span><b style="color:var(--primary);font-size:15px">según settings</b></div>
-        </div>
-        <div class="foot"><button class="btn" type="button" onclick="go('p-sena')">Reservar asiento</button></div>
-      </section>
-
-      <section class="screen" id="p-sena">
-        <div class="body">
-          <h2>Pagar seña</h2>
-          <div class="banner">Transferí la seña y subí el comprobante. Te confirmamos a mano.</div>
-          <article class="card">
-            <div class="muted">Alias / CBU</div>
-            <div class="strong">tubi.viajes</div>
-            <div style="color:var(--primary);font-size:15px">Seña $5.000 (settings)</div>
-          </article>
-          <div class="drop" id="drop">Subir comprobante</div>
-        </div>
-        <div class="foot"><button class="btn" type="button" onclick="sentReceipt()">Enviar comprobante</button></div>
-      </section>
-
-      <section class="screen" id="p-wait">
-        <div class="body">
-          <h2>Seña enviada</h2>
-          <div class="chip">Pendiente de seña</div>
-          <p>El operador tiene que confirmar el comprobante. Después te habilitamos el QR.</p>
-        </div>
-        <div class="foot">
-          <button class="btn" type="button" onclick="go('o-sena')">Ir al operador</button>
-        </div>
-      </section>
-
-      <section class="screen" id="o-sena">
-        <div class="body">
-          <h2>Confirmar seña</h2>
-          <article class="card">
-            <div class="strong">Ana Pérez · 07:00 Tandil→Bs.As.</div>
-            <div class="muted">Comprobante pendiente de revisión</div>
-          </article>
-          <div class="comp">Comprobante (demo)</div>
-        </div>
-        <div class="foot">
-          <div class="split">
-            <button class="btn outline danger" type="button" onclick="alert('En la demo seguimos por el camino feliz.')">Rechazar</button>
-            <button class="btn" type="button" onclick="confirmSena()">Confirmar</button>
+          <h1 class="sm">Tandil → Buenos Aires</h1>
+          <p class="sub">07:00 · lleg. ~12:30</p>
+          <div class="info">
+            <div class="ic">👤</div>
+            <div><div class="lab">Conductora</div><div class="val">María López</div></div>
           </div>
+          <div class="info">
+            <div class="ic">🚗</div>
+            <div><div class="lab">Vehículo</div><div class="val">AB 123 CD · Fiat Cronos blanco</div></div>
+          </div>
+          <div>
+            <div class="tiny" style="margin-bottom:8px;">Paradas</div>
+            <div class="timeline">
+              <div class="tl-item"><div class="dotcol"><span class="d"></span><span class="line"></span></div><div class="lab">Tandil</div></div>
+              <div class="tl-item"><div class="dotcol"><span class="d soft"></span><span class="line"></span></div><div class="lab">Rauch</div></div>
+              <div class="tl-item"><div class="dotcol"><span class="d soft"></span><span class="line"></span></div><div class="lab">Flores</div></div>
+              <div class="tl-item"><div class="dotcol"><span class="d soft"></span></div><div class="lab">Buenos Aires</div></div>
+            </div>
+          </div>
+          <div class="spacer"></div>
+        </div>
+        <div class="foot">
+          <div class="row" style="margin-bottom:4px;">
+            <span class="muted">Precio del asiento</span>
+            <span class="display" style="font-size:20px;">$18.000</span>
+          </div>
+          <button class="btn" type="button" data-go="p-checkout">Reservar</button>
+        </div>
+      </section>
+
+      <section class="screen" id="p-checkout">
+        <header class="header">
+          <button class="back" type="button" data-go="p-detail" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Pasajero</span>
+        </header>
+        <div class="body">
+          <div class="dots" aria-hidden="true"><i></i><i class="on"></i><i></i></div>
+          <h1 class="sm">Seña de compromiso</h1>
+          <div class="display xl">$5.000</div>
+          <p class="tiny">ejemplo · según settings</p>
+          <article class="card">
+            <div class="lab muted" style="font-size:12px;">Alias / CBU</div>
+            <div class="strong">tubi.viajes</div>
+            <div class="muted">Transferí y subí el comprobante</div>
+          </article>
+          <div class="drop" id="drop">Tocá para adjuntar comprobante</div>
+          <p class="tiny">Transferí la seña y subí el comprobante. Te confirmamos a mano.</p>
+          <div class="spacer"></div>
+        </div>
+        <div class="foot">
+          <button class="btn" type="button" id="send-sena">Enviar comprobante</button>
+        </div>
+      </section>
+
+      <section class="screen" id="p-sena-wait">
+        <header class="header">
+          <button class="back" type="button" data-go="p-home" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Pasajero</span>
+        </header>
+        <div class="body center" style="padding-top:24px;">
+          <span class="pill wait">Pendiente</span>
+          <h1 class="sm">Tu seña está en revisión</h1>
+          <p class="sub">Recibimos el comprobante. Te confirmamos a mano en cuanto lo revisemos.</p>
+          <article class="card">
+            <div class="display" style="font-size:20px;">Tandil → Bs.As.</div>
+            <div class="muted">Martes 25 ago · 07:00</div>
+            <div class="row" style="margin-top:8px;">
+              <span class="muted">Seña enviada</span>
+              <span class="display" style="font-size:28px;">$5.000</span>
+            </div>
+            <p class="tiny">Confirmación estimada: hoy · según operación</p>
+          </article>
+          <div class="spacer"></div>
+          <button class="btn" type="button" data-go="o-sena">Ir al operador (demo)</button>
+          <button class="btn ghost" type="button" data-go="p-home">Ir al inicio</button>
+          <p class="tiny">Te avisamos cuando esté confirmada y tengas el QR.</p>
         </div>
       </section>
 
       <section class="screen" id="p-qr">
+        <header class="header">
+          <button class="back" type="button" data-go="p-home" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Pasajero</span>
+        </header>
+        <div class="body center">
+          <div class="qr-wrap">
+            <span class="pill ok">Confirmada</span>
+            <div class="display">Tandil → Bs.As.</div>
+            <div class="muted">07:00 · Ana Pérez</div>
+            <div class="qr" id="qr"></div>
+            <p class="tiny">Mostralo al conductor. No compartas esta pantalla.</p>
+          </div>
+          <div class="spacer"></div>
+          <button class="btn ghost danger" type="button" id="cancel-res">Cancelar reserva</button>
+          <p class="tiny">Devolución según antelación</p>
+        </div>
+        <nav class="tabs" data-role="p" data-active="qr"></nav>
+      </section>
+
+      <section class="screen" id="p-track">
+        <header class="header">
+          <button class="back" type="button" data-go="p-home" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Pasajero</span>
+        </header>
+        <div class="body" style="padding-bottom:0;">
+          <div class="map">
+            <div class="road"></div>
+            <div class="pin">📍</div>
+          </div>
+          <article class="card" style="margin-top:4px;">
+            <div class="display lg">ETA 12 min</div>
+            <div class="muted">Próxima parada · Rauch</div>
+            <div class="info" style="margin-top:8px;">
+              <div class="ic">🚗</div>
+              <div><div class="lab">Conductora</div><div class="val">María López · AB 123 CD</div></div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="screen" id="p-account">
+        <header class="header">
+          <span class="back ghost">‹</span>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Pasajero</span>
+        </header>
         <div class="body">
-          <h2>Tu reserva</h2>
-          <div class="chip" id="qr-chip">Confirmada</div>
-          <div class="qr" id="qr"></div>
-          <p class="tiny">Mostralo al conductor. No compartas esta pantalla.</p>
+          <h1 class="sm">Tu cuenta</h1>
+          <div class="who">
+            <div class="avatar">A</div>
+            <div>
+              <div class="strong" style="font-size:17px;">Ana Pérez</div>
+              <div class="muted">Pasajera</div>
+            </div>
+          </div>
+          <div class="list-card">
+            <div class="list-row"><span class="muted">DNI</span><span class="strong" style="font-size:14px;">32.456.789</span></div>
+            <div class="list-row"><span class="muted">Contacto</span><span class="strong" style="font-size:14px;">11 5555-1234</span></div>
+            <div class="list-row"><span class="muted">Email</span><span class="strong" style="font-size:14px;">ana@mail.com</span></div>
+          </div>
+          <div class="spacer"></div>
+          <button class="btn secondary" type="button" data-go="gate" style="color:var(--danger);">Cerrar sesión</button>
+        </div>
+        <nav class="tabs" data-role="p" data-active="account"></nav>
+      </section>
+
+      <!-- ===== CONDUCTOR ===== -->
+      <section class="screen" id="c-login">
+        <header class="header">
+          <button class="back" type="button" data-go="gate" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Conductor</span>
+        </header>
+        <div class="body">
+          <h1>Ingresá a Tubi</h1>
+          <p class="sub">Teléfono del conductor</p>
+          <div class="field">
+            <label>Teléfono</label>
+            <input value="11 4444-9876" />
+          </div>
+          <div class="spacer"></div>
         </div>
         <div class="foot">
-          <button class="link" style="color:var(--error)" type="button" onclick="alert('Devolución según antelación (settings).')">Cancelar reserva</button>
-          <div class="tiny">Devolución según antelación</div>
+          <button class="btn" type="button" data-go="c-home">Continuar</button>
+          <button class="link" type="button" data-go="c-reg">Crear cuenta</button>
         </div>
       </section>
 
       <section class="screen" id="c-reg">
+        <header class="header">
+          <button class="back" type="button" data-go="c-login" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Conductor</span>
+        </header>
         <div class="body">
-          <h2>Registro conductor</h2>
+          <div class="dots"><i class="on"></i><i></i><i></i></div>
+          <h1>¿Cómo te llamás?</h1>
           <div class="field"><label>Nombre</label><input value="Carlos" /></div>
-          <div class="field"><label>Apellido</label><input value="Gómez" /></div>
-          <div class="field"><label>Teléfono</label><input value="11 4444-7788" /></div>
+          <div class="spacer"></div>
         </div>
         <div class="foot">
-          <button class="btn" type="button" onclick="go('c-trips')">Crear cuenta</button>
-          <button class="link" type="button" onclick="go('c-trips')">Ya tengo cuenta</button>
+          <button class="btn" type="button" data-go="c-home">Continuar</button>
         </div>
+      </section>
+
+      <section class="screen" id="c-home">
+        <header class="header">
+          <span class="back ghost">‹</span>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Conductor</span>
+        </header>
+        <div class="body">
+          <h1 class="sm">Hola, Carlos</h1>
+          <p class="sub">Tu viaje de hoy</p>
+          <article class="card">
+            <div class="muted">Hoy · 07:00</div>
+            <div class="display">Tandil → Bs.As.</div>
+            <div class="muted">3/4 asientos · AB 123 CD · Gris</div>
+            <button class="btn" type="button" data-go="c-pick" style="margin-top:8px;">Empezar recogida</button>
+          </article>
+          <div>
+            <div class="tiny" style="margin-bottom:8px;">Pasajeros</div>
+            <div class="list-card">
+              <div class="list-row"><span>Ana Pérez</span><span class="muted">Tandil centro</span></div>
+              <div class="list-row"><span>Luis Ríos</span><span class="muted">Av. Colón 800</span></div>
+              <div class="list-row"><span>Sofía Díaz</span><span class="muted">Rauch</span></div>
+            </div>
+          </div>
+          <div class="spacer"></div>
+        </div>
+        <nav class="tabs" data-role="c" data-active="home"></nav>
       </section>
 
       <section class="screen" id="c-trips">
+        <header class="header">
+          <span class="back ghost">‹</span>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Conductor</span>
+        </header>
         <div class="body">
-          <h2>Viajes de hoy</h2>
-          <article class="card tap" onclick="go('c-pick')">
-            <div class="strong">07:00 · Tandil → Buenos Aires</div>
-            <div class="muted">3 / 4 asientos · programado</div>
+          <h1 class="sm">Tus viajes de hoy</h1>
+          <article class="card tap" data-go="c-pick">
+            <div class="row">
+              <div>
+                <div class="display" style="font-size:18px;">Tandil → Bs.As.</div>
+                <div class="muted">07:00 · 3/4 asientos</div>
+              </div>
+              <span class="muted">›</span>
+            </div>
           </article>
           <article class="card">
-            <div class="strong">18:30 · Buenos Aires → Tandil</div>
-            <div class="muted">1 / 4 asientos · programado</div>
+            <div class="display" style="font-size:18px;">Bs.As. → Tandil</div>
+            <div class="muted">18:30 · 1/4 asientos</div>
           </article>
         </div>
+        <nav class="tabs" data-role="c" data-active="trips"></nav>
       </section>
 
       <section class="screen" id="c-pick">
+        <header class="header">
+          <button class="back" type="button" data-go="c-home" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Conductor</span>
+        </header>
         <div class="body">
-          <h2>Recogida</h2>
+          <h1 class="sm">1 · Tandil centro</h1>
+          <p class="sub" style="font-size:16px;color:var(--ink);">Ana Pérez</p>
+          <p class="tiny">Espera máxima 5 min. Si no llega, no-show y seguís.</p>
+          <div class="timer">
+            <div class="display xl" id="clock">04:12</div>
+            <span class="muted">tiempo de espera</span>
+          </div>
           <article class="card">
-            <div class="strong">1 · Tandil centro</div>
-            <div>Ana Pérez</div>
-            <div class="muted">Espera máxima 5 min. Si no llega, no-show y seguís.</div>
+            <div class="muted">Siguiente</div>
+            <div class="strong">2 · Av. Colón 800</div>
           </article>
-          <div class="timer"><b id="clock">04:12</b><span class="muted">tiempo de espera</span></div>
-          <article class="card"><div class="muted">Siguiente</div><div class="strong" style="font-size:15px">2 · Av. Colón 800</div></article>
+          <div class="spacer"></div>
         </div>
         <div class="foot">
-          <button class="btn" type="button" onclick="go('c-scan')">Llegó · escanear QR</button>
-          <button class="btn danger" type="button" onclick="alert('No-show. Seña retenida (settings). El viaje sigue.')">Marcar no-show</button>
+          <button class="btn" type="button" data-go="c-scan">Escanear QR</button>
+          <button class="btn danger" type="button" id="noshow">Marcar no-show</button>
         </div>
       </section>
 
       <section class="screen" id="c-scan">
+        <header class="header">
+          <button class="back" type="button" data-go="c-pick" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Conductor</span>
+        </header>
         <div class="body">
-          <h2>Escanear QR</h2>
+          <div class="banner ok">Listo para escanear</div>
           <div class="finder"><div class="hole"></div></div>
-          <div class="banner ok" id="scan-ok" hidden>Reserva válida · Ana Pérez · este viaje</div>
-          <div class="banner bad" hidden>QR de otro viaje · no subir</div>
+          <p class="tiny" style="text-align:center;">Apuntá al código del pasajero</p>
+          <div class="spacer"></div>
         </div>
-        <div class="foot"><button class="btn" type="button" onclick="scanOk()">Simular escaneo válido</button></div>
+        <div class="foot">
+          <button class="btn" type="button" data-go="c-scan-ok">Simular QR válido</button>
+          <button class="btn secondary" type="button" data-go="c-scan-fail">Simular QR inválido</button>
+        </div>
+      </section>
+
+      <section class="screen" id="c-scan-ok">
+        <header class="header">
+          <button class="back" type="button" data-go="c-scan" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Conductor</span>
+        </header>
+        <div class="body center" style="padding-top:32px;">
+          <div class="badge ok">✓</div>
+          <h1 class="sm">Reserva válida</h1>
+          <span class="pill ok">Confirmada</span>
+          <article class="card">
+            <div class="display" style="font-size:22px;">Ana Pérez</div>
+            <div class="info">
+              <div class="ic">📍</div>
+              <div><div class="lab">Parada</div><div class="val">Tandil centro</div></div>
+            </div>
+            <div class="muted">07:00 · Tandil → Bs.As. · seña OK</div>
+          </article>
+          <div class="spacer"></div>
+        </div>
+        <div class="foot">
+          <button class="btn" type="button" data-go="c-pay">Confirmar abordado</button>
+          <p class="tiny" style="text-align:center;">Después registrás el saldo del pasajero.</p>
+        </div>
+      </section>
+
+      <section class="screen" id="c-scan-fail">
+        <header class="header">
+          <button class="back" type="button" data-go="c-scan" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Conductor</span>
+        </header>
+        <div class="body center" style="padding-top:32px;">
+          <div class="badge bad">✕</div>
+          <h1 class="sm">QR inválido</h1>
+          <p class="sub">Esta reserva no corresponde a este viaje, conductor o vehículo. El pasajero no sube.</p>
+          <div class="banner bad">
+            <strong>No autorizado.</strong> Pedile que abra el QR de esta reserva en Tubi.
+          </div>
+          <div class="spacer"></div>
+        </div>
+        <div class="foot">
+          <button class="btn" type="button" data-go="c-scan">Escanear de nuevo</button>
+          <button class="btn secondary" type="button" data-go="c-pick">Volver a recogida</button>
+        </div>
       </section>
 
       <section class="screen" id="c-pay">
+        <header class="header">
+          <button class="back" type="button" data-go="c-scan-ok" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Conductor</span>
+        </header>
         <div class="body">
-          <h2>Registrar saldo</h2>
-          <article class="card">
-            <div class="strong">Ana Pérez</div>
-            <div class="muted">Saldo = precio − seña (settings)</div>
-          </article>
-          <div class="methods">
-            <button class="pick on" type="button" data-pay="efectivo">Efectivo</button>
-            <button class="pick" type="button" data-pay="transferencia">Transferencia</button>
+          <h1 class="sm">Registrar saldo</h1>
+          <p class="sub">Ana Pérez</p>
+          <div class="display xl">$13.000</div>
+          <p class="tiny">ejemplo · precio − seña (settings)</p>
+          <div class="seg" id="pay-seg">
+            <button type="button" class="on" data-pay="efectivo">Efectivo</button>
+            <button type="button" data-pay="transferencia">Transferencia</button>
           </div>
+          <div class="spacer"></div>
         </div>
-        <div class="foot"><button class="btn" type="button" onclick="go('c-route')">Marcar abordado</button></div>
+        <div class="foot">
+          <button class="btn" type="button" data-go="c-route">Confirmar abordado</button>
+        </div>
       </section>
 
       <section class="screen" id="c-route">
+        <header class="header">
+          <button class="back" type="button" data-go="c-home" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Conductor</span>
+        </header>
         <div class="body">
-          <h2>En ruta</h2>
-          <div class="chip">GPS activo</div>
-          <article class="card">
-            <div class="muted">Estado del viaje</div>
-            <div class="strong" style="color:var(--primary)">en curso</div>
-            <div class="muted">programado → recogida → en curso → completado</div>
-          </article>
-          <article class="card"><div class="muted">A bordo</div><div class="strong" style="font-size:15px">2 pasajeros · 1 pendiente</div></article>
+          <div class="map" style="height:220px;">
+            <div class="road"></div>
+            <div class="pin">📍</div>
+          </div>
+          <span class="pill ok">GPS activo</span>
+          <div class="list-card">
+            <div class="list-row"><span>Ana Pérez</span><span class="pill ok" style="padding:4px 8px;">a bordo</span></div>
+            <div class="list-row"><span>Luis Ríos</span><span class="muted">pendiente</span></div>
+            <div class="list-row"><span>Sofía Díaz</span><span class="muted">pendiente</span></div>
+          </div>
+          <div class="spacer"></div>
         </div>
         <div class="foot">
-          <button class="btn outline" type="button" onclick="go('p-track')">Ver mapa del pasajero</button>
-          <button class="btn" type="button" onclick="go('done')">Completar viaje</button>
+          <button class="btn secondary" type="button" data-go="p-track">Ver vista pasajero</button>
+          <button class="btn" type="button" data-go="done">Finalizar viaje</button>
         </div>
       </section>
 
-      <section class="screen" id="p-track">
+      <section class="screen" id="c-account">
+        <header class="header">
+          <span class="back ghost">‹</span>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Conductor</span>
+        </header>
         <div class="body">
-          <h2>En camino</h2>
-          <div class="map"><span class="dot"></span><span class="pin"></span></div>
+          <h1 class="sm">Tu cuenta</h1>
+          <div class="who">
+            <div class="avatar">C</div>
+            <div>
+              <div class="strong" style="font-size:17px;">Carlos Gómez</div>
+              <div class="muted">Conductor</div>
+            </div>
+          </div>
+          <div class="list-card">
+            <div class="list-row"><span class="muted">Teléfono</span><span class="strong" style="font-size:14px;">11 4444-9876</span></div>
+            <div class="list-row"><span class="muted">Vehículo</span><span class="strong" style="font-size:14px;">AB 123 CD · Gris</span></div>
+            <div class="list-row"><span class="muted">Modelo</span><span class="strong" style="font-size:14px;">Toyota Corolla</span></div>
+          </div>
+          <p class="tiny">Los datos del vehículo los carga el operador.</p>
+          <div class="spacer"></div>
+          <button class="btn secondary" type="button" data-go="gate" style="color:var(--danger);">Cerrar sesión</button>
+        </div>
+        <nav class="tabs" data-role="c" data-active="account"></nav>
+      </section>
+
+      <!-- ===== OPERADOR ===== -->
+      <section class="screen" id="o-sena">
+        <header class="header">
+          <button class="back" type="button" data-go="gate" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Operador</span>
+        </header>
+        <div class="body">
+          <h1 class="sm">Confirmar seña</h1>
           <article class="card">
-            <div class="strong">ETA Rauch · 08:40</div>
-            <div class="muted">AB 123 CD · María López</div>
+            <div class="row">
+              <div class="strong">Ana Pérez · 07:00 Tandil→Bs.As.</div>
+              <span class="pill wait">Pendiente</span>
+            </div>
+            <div class="muted">Comprobante pendiente de revisión</div>
           </article>
+          <div class="drop done" style="height:160px;">Comprobante · demo.png</div>
+          <div class="spacer"></div>
+        </div>
+        <div class="foot">
+          <div class="split">
+            <button class="btn danger" type="button" id="reject-sena">Rechazar</button>
+            <button class="btn" type="button" id="confirm-sena">Confirmar</button>
+          </div>
+          <button class="btn ghost" type="button" data-go="o-set">Settings</button>
         </div>
       </section>
 
       <section class="screen" id="o-set">
+        <header class="header">
+          <button class="back" type="button" data-go="o-sena" aria-label="Volver">‹</button>
+          <span class="brand">Tubi</span>
+          <span class="role-chip">Operador</span>
+        </header>
         <div class="body">
-          <h2>Settings</h2>
-          <div class="settings">
-            <div class="row"><span>tarifa.base</span><b>a definir</b></div>
-            <div class="row"><span>comision.plataforma_pct</span><b>15</b></div>
-            <div class="row"><span>reserva.sena_monto</span><b>5000</b></div>
-            <div class="row"><span>reserva.espera_max_min</span><b>5</b></div>
-            <div class="row"><span>devolucion &gt;24h</span><b>100%</b></div>
-            <div class="row"><span>devolucion 12–24h</span><b>50%</b></div>
-            <div class="row"><span>devolucion &lt;12h</span><b>0%</b></div>
-            <div class="row"><span>feature.ratings</span><b>off</b></div>
+          <h1 class="sm">Configuración</h1>
+          <div class="settings-group">
+            <h3>Tarifas</h3>
+            <div class="list-card">
+              <div class="list-row"><span class="muted">Precio base</span><span class="strong" style="font-size:14px;">a definir</span></div>
+              <div class="list-row"><span class="muted">Comisión</span><span class="strong" style="font-size:14px;">15%</span></div>
+            </div>
           </div>
+          <div class="settings-group">
+            <h3>Seña y espera</h3>
+            <div class="list-card">
+              <div class="list-row"><span class="muted">Monto seña</span><span class="strong" style="font-size:14px;">$5.000</span></div>
+              <div class="list-row"><span class="muted">Espera máx.</span><span class="strong" style="font-size:14px;">5 min</span></div>
+            </div>
+          </div>
+          <div class="settings-group">
+            <h3>Devolución</h3>
+            <div class="list-card">
+              <div class="list-row"><span class="muted">&gt;24h</span><span class="strong" style="font-size:14px;">100%</span></div>
+              <div class="list-row"><span class="muted">12–24h</span><span class="strong" style="font-size:14px;">50%</span></div>
+              <div class="list-row"><span class="muted">&lt;12h / no-show</span><span class="strong" style="font-size:14px;">0%</span></div>
+            </div>
+          </div>
+          <div class="settings-group">
+            <h3>Flags</h3>
+            <div class="list-card">
+              <div class="list-row"><span class="muted">Ratings</span><span class="strong" style="font-size:14px;">off</span></div>
+            </div>
+          </div>
+          <div class="spacer"></div>
         </div>
-        <div class="foot"><button class="btn" type="button" onclick="go('home')">Guardar</button></div>
+        <div class="foot">
+          <button class="btn" type="button" data-go="gate">Listo</button>
+        </div>
       </section>
 
       <section class="screen" id="done">
-        <div class="body">
-          <h2>Viaje completado</h2>
-          <p>Ese es el flujo feliz de Tubi: buscar → seña → confirmar → QR → escanear → saldo → GPS.</p>
-        </div>
-        <div class="foot">
-          <button class="btn" type="button" onclick="startTour()">Repetir flujo</button>
-          <button class="btn outline" type="button" onclick="go('o-set')">Ver settings</button>
+        <div class="body center" style="justify-content:center;padding:40px 20px;">
+          <div class="badge ok">✓</div>
+          <h1 class="sm">Viaje completado</h1>
+          <p class="sub">Ese es el flujo de Tubi: buscar → seña → confirmar → QR → escanear → saldo → en ruta.</p>
+          <div class="spacer" style="flex:0;height:24px;"></div>
+          <button class="btn" type="button" data-go="gate">Volver al inicio</button>
+          <button class="btn secondary" type="button" data-go="p-home">Home pasajero</button>
         </div>
       </section>
+
     </div>
   </div>
 
   <script>
-    const roles = {
-      home: "Demo", "p-reg": "Pasajero", "p-search": "Pasajero", "p-results": "Pasajero",
-      "p-detail": "Pasajero", "p-sena": "Pasajero", "p-wait": "Pasajero", "p-qr": "Pasajero",
-      "p-track": "Pasajero", "c-reg": "Conductor", "c-trips": "Conductor", "c-pick": "Conductor",
-      "c-scan": "Conductor", "c-pay": "Conductor", "c-route": "Conductor",
-      "o-sena": "Operador", "o-set": "Operador", done: "Demo"
+    const tabSvg = {
+      home: '<svg viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V20a1 1 0 0 1-1 1h-5v-6H10v6H5a1 1 0 0 1-1-1v-9.5z"/></svg>',
+      search: '<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>',
+      qr: '<svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z"/></svg>',
+      user: '<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 20a7 7 0 0 1 14 0"/></svg>',
+      cal: '<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>'
     };
-    const labels = {
-      home: "Inicio · elegí un rol o recorré el flujo feliz",
-      "p-reg": "1 · Pasajero se registra",
-      "p-search": "2 · Busca Tandil → Buenos Aires",
-      "p-results": "3 · Elige un viaje",
-      "p-detail": "4 · Ve conductor, auto y ruta",
-      "p-sena": "5 · Transfiere la seña",
-      "p-wait": "5b · Espera confirmación manual",
-      "o-sena": "6 · Operador confirma el comprobante",
-      "p-qr": "7 · QR habilitado",
-      "c-reg": "Conductor · registro",
-      "c-trips": "8 · Viajes del día",
-      "c-pick": "9 · Recogida + espera 5 min",
-      "c-scan": "10 · Escanea el QR",
-      "c-pay": "11 · Cobra el saldo",
-      "c-route": "12 · Viaje en curso + GPS",
-      "p-track": "13 · El pasajero sigue el auto",
-      "o-set": "Operador · settings de negocio",
-      done: "Cierre del flujo feliz"
-    };
-    const tour = ["p-reg","p-search","p-results","p-detail","p-sena","p-wait","o-sena","p-qr","c-trips","c-pick","c-scan","c-pay","c-route","p-track","done"];
-    let tourI = -1;
+
+    function buildTabs() {
+      document.querySelectorAll("nav.tabs").forEach((nav) => {
+        const role = nav.dataset.role;
+        const active = nav.dataset.active;
+        if (role === "p") {
+          nav.innerHTML = [
+            tabBtn("home", "Inicio", "p-home-or-empty", active),
+            tabBtn("search", "Buscar", "p-search", active),
+            tabBtn("qr", "QR", "p-qr-or-home", active),
+            tabBtn("user", "Cuenta", "p-account", active)
+          ].join("");
+        } else {
+          nav.innerHTML = [
+            tabBtn("home", "Inicio", "c-home", active),
+            tabBtn("cal", "Viajes", "c-trips", active),
+            tabBtn("user", "Cuenta", "c-account", active)
+          ].join("");
+        }
+      });
+    }
+    function tabBtn(icon, label, target, activeKey) {
+      const key = { home: "home", search: "search", qr: "qr", user: "account", cal: "trips" }[icon];
+      const on = key === activeKey ? " on" : "";
+      return `<button type="button" class="${on.trim()}" data-tab="${target}">${tabSvg[icon]}<span>${label}</span></button>`;
+    }
+
+    let senaConfirmed = false;
+
+    function go(id) {
+      if (id === "p-home-or-empty") id = senaConfirmed ? "p-home" : "p-home-empty";
+      if (id === "p-qr-or-home") id = senaConfirmed ? "p-qr" : "p-home-empty";
+      if (id === "p-home" && !senaConfirmed) {
+        // still allow explicit go to p-home after wait state with pending pill
+      }
+      if (id === "p-qr" && !senaConfirmed) {
+        // open wait instead if not confirmed
+        id = "p-sena-wait";
+      }
+      document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("on", s.id === id));
+      // update home CTA state
+      const pill = document.getElementById("home-pill");
+      const cta = document.getElementById("home-cta");
+      if (pill && cta) {
+        if (senaConfirmed) {
+          pill.textContent = "Confirmada";
+          pill.className = "pill ok";
+          cta.textContent = "Ver mi QR";
+          cta.dataset.go = "p-qr";
+        } else {
+          pill.textContent = "Pendiente seña";
+          pill.className = "pill wait";
+          cta.textContent = "Ver estado de seña";
+          cta.dataset.go = "p-sena-wait";
+        }
+      }
+      window.scrollTo(0, 0);
+    }
 
     function qrPattern() {
       const box = document.getElementById("qr");
+      if (!box) return;
       box.innerHTML = "";
       for (let i = 0; i < 49; i++) {
         const cell = document.createElement("i");
@@ -500,46 +1151,75 @@
         box.appendChild(cell);
       }
     }
-    qrPattern();
 
-    function go(id) {
-      document.querySelectorAll(".screen").forEach((s) => s.classList.toggle("on", s.id === id));
-      document.getElementById("role").textContent = roles[id] || "Demo";
-      document.getElementById("step-label").textContent = labels[id] || id;
-      tourI = tour.indexOf(id);
-      document.getElementById("prev-btn").disabled = tourI <= 0;
-      const next = document.getElementById("next-btn");
-      next.disabled = false;
-      next.textContent = tourI < 0 ? "Ver flujo feliz" : tourI === tour.length - 1 ? "Reiniciar" : "Siguiente";
-      if (id === "c-scan") document.getElementById("scan-ok").hidden = true;
-    }
-    function startTour() {
-      if (tourI === tour.length - 1 || tourI < 0) { go(tour[0]); return; }
-      step(1);
-    }
-    function step(d) {
-      if (tourI < 0) { go(tour[0]); return; }
-      const n = tourI + d;
-      if (n >= 0 && n < tour.length) go(tour[n]);
-    }
-    function sentReceipt() {
-      document.getElementById("drop").textContent = "comprobante-ana.png";
-      go("p-wait");
-    }
-    function confirmSena() {
-      document.getElementById("qr-chip").textContent = "Confirmada";
-      go("p-qr");
-    }
-    function scanOk() {
-      document.getElementById("scan-ok").hidden = false;
-      setTimeout(() => go("c-pay"), 700);
-    }
-    document.querySelectorAll(".pick").forEach((b) => {
-      b.addEventListener("click", () => {
-        document.querySelectorAll(".pick").forEach((x) => x.classList.remove("on"));
-        b.classList.add("on");
-      });
+    document.getElementById("app").addEventListener("click", (e) => {
+      const tab = e.target.closest("[data-tab]");
+      if (tab) { go(tab.dataset.tab); return; }
+      const el = e.target.closest("[data-go]");
+      if (el) { go(el.dataset.go); return; }
     });
+
+    document.getElementById("date-chips")?.addEventListener("click", (e) => {
+      const chip = e.target.closest(".chip");
+      if (!chip) return;
+      document.querySelectorAll("#date-chips .chip").forEach((c) => c.classList.remove("on"));
+      chip.classList.add("on");
+    });
+
+    document.getElementById("pay-seg")?.addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      document.querySelectorAll("#pay-seg button").forEach((x) => x.classList.remove("on"));
+      b.classList.add("on");
+    });
+
+    document.getElementById("drop")?.addEventListener("click", () => {
+      const d = document.getElementById("drop");
+      d.textContent = "comprobante-ana.png";
+      d.classList.add("done");
+    });
+
+    document.getElementById("send-sena")?.addEventListener("click", () => {
+      senaConfirmed = false;
+      const d = document.getElementById("drop");
+      if (d && !d.classList.contains("done")) {
+        d.textContent = "comprobante-ana.png";
+        d.classList.add("done");
+      }
+      go("p-sena-wait");
+    });
+
+    document.getElementById("confirm-sena")?.addEventListener("click", () => {
+      senaConfirmed = true;
+      go("p-qr");
+    });
+
+    document.getElementById("reject-sena")?.addEventListener("click", () => {
+      go("p-sena-wait");
+    });
+
+    document.getElementById("noshow")?.addEventListener("click", () => {
+      go("c-home");
+    });
+
+    document.getElementById("cancel-res")?.addEventListener("click", () => {
+      senaConfirmed = false;
+      go("p-home-empty");
+    });
+
+    // fake countdown
+    let secs = 4 * 60 + 12;
+    setInterval(() => {
+      const el = document.getElementById("clock");
+      if (!el || !document.getElementById("c-pick")?.classList.contains("on")) return;
+      if (secs > 0) secs--;
+      const m = String(Math.floor(secs / 60)).padStart(2, "0");
+      const s = String(secs % 60).padStart(2, "0");
+      el.textContent = m + ":" + s;
+    }, 1000);
+
+    buildTabs();
+    qrPattern();
   </script>
 </body>
 </html>
