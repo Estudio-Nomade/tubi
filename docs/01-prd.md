@@ -1,9 +1,9 @@
 # PRD — Plataforma de Viajes Compartidos Interurbanos
 
-**Producto:** plataforma de viajes compartidos interurbanos (tramo principal Tandil ↔ Buenos Aires).
+**Producto:** Tubi — viajes compartidos interurbanos (tramo principal Tandil ↔ Buenos Aires).
 **Documento:** 01-prd.md · Requisitos de producto.
 **Estado:** borrador inicial (etapa de conceptualización).
-**Nota:** el proyecto aún no tiene nombre ni marca definidos. En todo el documento se usa el placeholder neutro "la plataforma".
+**Producto:** Tubi. Paleta, dominio y logo se definen en la fase 8.
 
 ---
 

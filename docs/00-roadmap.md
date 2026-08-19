@@ -137,7 +137,7 @@ REGLAS DE TRABAJO:
 - Al terminar cada fase, mostrame el entregable y esperá mi OK antes de seguir.
 - No hardcodees valores de negocio: siempre settings.
 - La IA es herramienta de implementación; el criterio técnico y las decisiones son mías.
-- No definas nombre/marca hasta la fase 8 (usá placeholder "la plataforma" hasta entonces).
+- Nombre cerrado: **Tubi**. Paleta, dominio y logo se definen en la fase 8.
 - Respondé en español argentino, concreto, sin relleno.
 
 Decime qué fase querés arrancar (o si arranco por la 0) y avanzá.

@@ -12,7 +12,7 @@ Plataforma para organizar **viajes compartidos interurbanos programados**, tramo
 
 **Actores:** pasajero · conductor · operador.
 **Equipo:** Nóbel (tech) · Martina (socia) · Ariel (idea y operación) · José (consulta, 30+ años en el rubro).
-**Sin nombre/marca aún** — usar el placeholder "la plataforma" hasta la fase 8 (marca).
+**Nombre:** Tubi. Paleta, dominio y logo quedan para la fase 8.
 
 ---
 
@@ -114,6 +114,6 @@ Base `/api`, auth Supabase JWT, envelope `{ data }` / `{ error: { code, message 
 
 1. **Arrancá por la fase 6** (wireframes) salvo que te indiquen otra. Una fase a la vez: terminá el entregable y esperá OK antes de pasar a la siguiente.
 2. **Respetá las decisiones cerradas** (sección 3). Si algo te parece mal, no lo cambies por tu cuenta: señalalo y preguntá.
-3. **No re-decidas** nombre/marca (fase 8), stack, ni modelo de pago (efectivo/transferencia, sin pasarela).
+3. **No re-decidas** el nombre (Tubi), stack, ni modelo de pago (efectivo/transferencia, sin pasarela). Paleta/dominio/logo siguen en fase 8.
 4. Antes de implementar (fase 9), releé `docs/02` (ADs), `docs/04` (schema), `docs/06` (reglas). La configuración en dos capas y las interfaces de providers se respetan en TODO el código.
 5. Respondé en español argentino, concreto, sin relleno. La IA es herramienta de implementación; el criterio técnico y las decisiones son del equipo.
