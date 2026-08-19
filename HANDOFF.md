@@ -91,5 +91,5 @@ Ver `AGENTS.md`. BMAD en `~/Documentos/Estudio Nomade/Tumo/_bmad`. LIFTY es otro
 1. Empezá por el OK de wireframes o, si ya está, por **fase 8 (marca)**. Una fase a la vez.
 2. No re-decidas nombre, stack ni pagos.
 3. Antes de código: `docs/02`, `docs/04`, `docs/06`.
-4. Prompt de orquestación: `docs/PROMPT-AGENTE.md`. Prompt de implementación: `docs/PROMPT-IMPLEMENTACION.md`.
+4. Prompts: `docs/PROMPT-AGENTE.md` · `docs/PROMPT-UI-PENCIL.md` · `docs/PROMPT-IMPLEMENTACION.md`.
 5. Español argentino, concreto. Esperá OK al cerrar cada entregable.
