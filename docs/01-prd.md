@@ -54,8 +54,8 @@ El modelo se apoya en **parámetros configurables** (ver sección 10). Los valor
 
 - **Precio del viaje:** precio base por ruta, definido por el operador. Modelo de tarifa **fijo por ruta** (el más simple; la tarifa por km queda fuera del MVP).
 - **Comisión de la plataforma:** **15%** (rango configurable 0–15%) sobre el precio del viaje.
-- **Seña de compromiso:** **$5.000** al reservar. No se exige el pago total anticipado (una plataforma nueva y desconocida generaría desconfianza). La seña compromete al pasajero: si cambia de decisión o no se presenta bajo ciertas condiciones, puede perderla.
-- **Saldo:** se paga **al subir al vehículo**, a través de la plataforma (o por transferencia/otro medio contemplado).
+- **Seña de compromiso:** **$5.000** al reservar, pagada por **transferencia** (con comprobante y confirmación manual del operador). No se exige el pago total anticipado (una plataforma nueva y desconocida generaría desconfianza). La seña compromete al pasajero: si cambia de decisión o no se presenta bajo ciertas condiciones, puede perderla.
+- **Saldo:** se paga **al subir al vehículo**, en **efectivo** o por **transferencia**.
 - **Retención por cancelación/no-show:** según la política de devolución de seña (sección 7), la seña retenida es ingreso para el negocio y compensa combustible, peajes, tiempo del conductor y costos operativos.
 - **Etapa inicial a pérdida:** en una primera etapa, si hay un solo pasajero reservado el viaje se realiza igual, asumiendo pérdidas operativas como costo inicial de poner en funcionamiento el servicio y generar confianza y demanda.
 
@@ -68,7 +68,7 @@ El modelo se apoya en **parámetros configurables** (ver sección 10). Los valor
 1. El pasajero ingresa a la plataforma y busca viajes por **origen, destino, fecha y horario**.
 2. Ve las opciones disponibles y el detalle de cada viaje: conductor, vehículo (patente, marca, modelo, color), ruta, horario aproximado y paradas.
 3. Selecciona un viaje y reserva un asiento.
-4. Paga la **seña** mediante la pasarela (MercadoPago, detrás de `PaymentProvider`).
+4. Paga la **seña** por **transferencia** y envía el comprobante; el operador la confirma.
 5. La reserva queda asociada inequívocamente a un **viaje, un pasajero y (eventualmente) un asiento** concretos.
 6. El pasajero recibe un **QR de reserva**.
 
@@ -76,7 +76,7 @@ El modelo se apoya en **parámetros configurables** (ver sección 10). Los valor
 
 1. Al llegar al punto de recogida, el pasajero muestra su **QR** al conductor.
 2. El conductor lo **escanea**. El sistema verifica que la reserva pertenece al **viaje concreto, al conductor concreto y al vehículo** correspondiente.
-3. Si la verificación es válida, el pasajero **paga el saldo** (a través de la plataforma o por transferencia/otro medio contemplado) y sube.
+3. Si la verificación es válida, el pasajero **paga el saldo** (en **efectivo** o por **transferencia**) y sube.
 4. La reserva queda marcada como verificada/abordada.
 
 ### 5.3 Recogida de pasajeros (conductor)
@@ -112,14 +112,14 @@ El modelo se apoya en **parámetros configurables** (ver sección 10). Los valor
 | Entidad | Atributos principales | Notas |
 |---|---|---|
 | **Pasajero** | id, nombre, DNI, contacto (teléfono/email), estado de verificación de identidad | Registro mínimo: nombre + DNI + contacto |
-| **Conductor** | id, nombre, DNI, contacto, estado | El operador puede ser también conductor |
+| **Conductor** | id, nombre, apellido, teléfono, estado | Registro: nombre + apellido + teléfono. El operador puede ser también conductor |
 | **Vehículo** | id, patente, marca, modelo, color, capacidad, conductor responsable | Información visible para el pasajero antes de subir |
 | **Ruta** | id, nombre, origen, destino, tramos | Ruta principal Tandil ↔ Buenos Aires; contempla tramos/intermedios |
 | **Parada** | id, ruta, nombre/ciudad, coordenadas, orden, tipo (origen / intermedio / destino) | Puntos de recogida o paso (Rauch, Flores, etc.) |
 | **Viaje** | id, ruta, conductor, vehículo, fecha y horario de salida, horario estimado de llegada, precio, estado | Estados: programado → recogida → en curso → completado / cancelado |
 | **Asiento** | id, vehículo, número/posición, estado | En el MVP puede operarse como contador de capacidad; la reserva *puede* referenciar un asiento concreto |
 | **Reserva** | id, pasajero, viaje, asiento (opcional), estado, monto de seña, QR, fecha, política de cancelación aplicada | Vínculo inequívoco pasajero ↔ viaje ↔ conductor ↔ vehículo |
-| **Pago** | id, reserva, tipo (seña / saldo), monto, método, estado (pendiente / confirmado / rechazado), referencia de pasarela, fecha | Seña vía pasarela; saldo al subir |
+| **Pago** | id, reserva, tipo (seña / saldo), monto, método (efectivo / transferencia), estado (pendiente / confirmado / rechazado), comprobante, fecha | Seña por transferencia; saldo en efectivo o transferencia |
 | **Evento de seguimiento GPS** | id, viaje, latitud, longitud, precisión, timestamp, origen (conductor), sincronizado | Permite cola offline en tramos sin cobertura |
 | **Setting** | clave, valor, tipo, descripción, actualizado_por, fecha | Parámetros de negocio editables por el operador |
 
@@ -139,7 +139,7 @@ El modelo se apoya en **parámetros configurables** (ver sección 10). Los valor
 Las reglas se expresan en función de los **settings** (sección 10). Los valores citados son los defaults.
 
 - **RN-01 — Seña:** al reservar, el pasajero abona la seña (`reserva.sena_monto`, default **$5.000**). El asiento queda comprometido.
-- **RN-02 — Saldo al subir:** el saldo (precio − seña − lo que corresponda según comisión) se paga al subir al vehículo, por plataforma o transferencia/otro medio contemplado.
+- **RN-02 — Saldo al subir:** el saldo (precio − seña − lo que corresponda según comisión) se paga al subir al vehículo, en **efectivo** o por **transferencia**.
 - **RN-03 — Devolución de seña por cancelación del pasajero:**
   - Antelación **> 24 h** → devolución **100%** (`reserva.devolucion_24h_pct`).
   - Antelación **12–24 h** → devolución **50%** (`reserva.devolucion_12_24h_pct`).
@@ -163,7 +163,7 @@ Prioridad: **P0** = MVP / demo de la primera semana · **P1** = inmediato post-M
 - **FR-02 — Detalle de viaje.** El sistema debe mostrar, antes de reservar: conductor, vehículo (patente, marca, modelo, color), ruta, horario aproximado y paradas. *Testeable:* el detalle de un viaje muestra los campos obligatorios completos.
 - **FR-03 — Registro de pasajero.** El sistema debe registrar al pasajero con nombre, DNI y contacto (teléfono/email) como mínimo. *Testeable:* un registro sin DNI es rechazado.
 - **FR-04 — Reserva de asiento.** El sistema debe crear una reserva asociada inequívocamente a un viaje, un pasajero y (eventualmente) un asiento. *Testeable:* la reserva creada referencia viaje y pasajero correctos.
-- **FR-05 — Pago de seña.** El sistema debe cobrar la seña a través de la pasarela (`PaymentProvider`, default MercadoPago). *Testeable:* al confirmar el pago, la reserva pasa a estado "seña pagada".
+- **FR-05 — Pago de seña.** El sistema debe registrar el pago de la seña por **transferencia** (comprobante + confirmación manual del operador). *Testeable:* al confirmar el comprobante, la reserva pasa a estado "seña pagada".
 - **FR-06 — Generación de QR.** El sistema debe generar un QR único asociado a cada reserva. *Testeable:* dos reservas distintas generan QR distintos.
 - **FR-07 — Verificación por QR (conductor).** El sistema debe permitir al conductor escanear el QR y verificar que la reserva pertenece al viaje, al conductor y al vehículo correctos. *Testeable:* un QR de otro viaje es rechazado; un QR válido es aceptado.
 - **FR-08 — Pago del saldo al subir.** El sistema debe permitir registrar/confirmar el pago del saldo al momento de subir. *Testeable:* tras registrar el saldo, la reserva queda "abordada/pagada".
@@ -202,7 +202,7 @@ Prioridad: **P0** = MVP / demo de la primera semana · **P1** = inmediato post-M
 - **NFR-04 — Privacidad del DNI.** El DNI y los datos personales deben tratarse como datos personales protegidos (Ley 25.326 de Protección de Datos Personales, Argentina): acceso restringido, cifrado en tránsito y en reposo, y minimización (el conductor solo ve lo necesario para verificar, no necesariamente el número completo).
 - **NFR-05 — Performance mobile-first.** La interfaz debe ser usable en celular (ancho de referencia 375px) y cargar de forma razonable en redes móviles de cobertura limitada.
 - **NFR-06 — Trazabilidad.** Toda transición de estado de viaje, reserva, pago y verificación QR debe quedar registrada con timestamp y actor.
-- **NFR-07 — Integraciones desacopladas.** Pagos, mapas/GPS y verificación de identidad deben quedar detrás de interfaces (`PaymentProvider`, `MapsProvider`, `IdentityVerifier`) para poder cambiar de proveedor sin reescribir la lógica de negocio.
+- **NFR-07 — Integraciones desacopladas.** Pagos, mapas/GPS y verificación de identidad deben quedar detrás de interfaces (`PaymentProvider`, `MapsProvider`, `IdentityVerifier`) para poder cambiar de métodos/proveedores sin reescribir la lógica de negocio.
 
 ---
 
@@ -214,7 +214,6 @@ Dos capas. **`.env`** = secretos e infraestructura estática. **Tabla de setting
 
 | Parámetro | Descripción |
 |---|---|
-| `MERCADOPAGO_PUBLIC_KEY` / `MERCADOPAGO_ACCESS_TOKEN` | Credenciales de la pasarela de pago |
 | `SUPABASE_URL` / `SUPABASE_ANON_KEY` / `SUPABASE_SERVICE_ROLE_KEY` | Conexión a la base/backend |
 | `GOOGLE_MAPS_API_KEY` | Credencial del proveedor de mapas/GPS |
 | `JWT_SECRET` (o equivalente) | Firma de sesiones/tokens |
@@ -232,7 +231,7 @@ Dos capas. **`.env`** = secretos e infraestructura estática. **Tabla de setting
 | `reserva.devolucion_24h_pct` | `100` | 0–100 | Devolución de seña con antelación >24 h |
 | `reserva.devolucion_12_24h_pct` | `50` | 0–100 | Devolución de seña con antelación 12–24 h |
 | `reserva.devolucion_menos_12h_pct` | `0` | 0–100 | Devolución de seña con <12 h o no-show |
-| `pagos.proveedor` | `mercadopago` | (referencia a `.env`) | Proveedor activo detrás de `PaymentProvider` |
+| `pagos.metodos` | `efectivo,transferencia` | `efectivo` / `transferencia` | Métodos de pago habilitados |
 | `mapas.proveedor` | `google_maps` | (referencia a `.env`) | Proveedor activo detrás de `MapsProvider` |
 | `verificacion.dni_modo` | `manual` | `manual` (fase 1) | Modo de verificación detrás de `IdentityVerifier` |
 | `feature.ratings_habilitado` | `false` | boolean | Feature flag de ratings/reputación (fase 2) |
@@ -247,7 +246,7 @@ Dos capas. **`.env`** = secretos e infraestructura estática. **Tabla de setting
 |---|---|
 | Cobertura celular nula/intermitente en tramos de la ruta | Cola local de posiciones con sincronización al recuperar conexión (NFR-01). |
 | Transmisión de posición en background limitada en web pura | Resolver en arquitectura (web vs PWA vs app); no es decisión de este documento. |
-| Integración con MercadoPago y cobro de seña | Abstraer detrás de `PaymentProvider`; validar flujo en la demo. |
+| Cobro manual de la seña por transferencia (comprobante + confirmación) | Flujo de confirmación claro; el operador verifica el comprobante antes de confirmar la reserva. |
 | Calidad/precisión de la ubicación GPS | Filtrar/validar eventos GPS; contemplar precisión reportada. |
 
 ### Legales y regulatorios

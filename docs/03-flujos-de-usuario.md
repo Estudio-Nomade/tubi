@@ -42,8 +42,8 @@ flowchart TD
     E --> F["Ver opciones disponibles"]
     F --> G["Ver detalle: conductor, vehículo, ruta, paradas, horario, precio"]
     G --> H["Seleccionar viaje y asiento"]
-    H --> I["Pagar seña vía MercadoPago"]
-    I --> J{"¿Pago confirmado?"}
+    H --> I["Pagar seña por transferencia y enviar comprobante"]
+    I --> J{"¿Operador confirmó la seña?"}
     J -- "No" --> I
     J -- "Sí" --> K["Reserva confirmada + QR generado"]
     K --> L["Recibe notificaciones del viaje"]
@@ -61,7 +61,7 @@ flowchart TD
     F --> G["Conductor escanea y verifica"]
     G --> H{"¿QR válido?"}
     H -- "No" --> X["Rechazado: no sube"]
-    H -- "Sí" --> I["Pagar saldo al subir"]
+    H -- "Sí" --> I["Pagar saldo en efectivo o transferencia"]
     I --> J["Abordar"]
     J --> K["Seguir vehículo en vivo en el mapa"]
     K --> L["Llegada a destino"]
@@ -73,7 +73,8 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    A["Login conductor"] --> B["Ver viajes programados del día"]
+    REG["Registro: nombre + apellido + teléfono"] --> A["Login conductor"]
+    A --> B["Ver viajes programados del día"]
     B --> C["Ver secuencia ordenada de paradas de recogida"]
     C --> D["Iniciar recogida y transmitir GPS"]
     D --> E["Llegar a la parada"]
@@ -143,18 +144,21 @@ Cada fila es una pantalla que habrá que wireframear en la fase 6. Todas mobile-
 
 | Actor | Pantalla | Flujo que cubre |
 |---|---|---|
+| Pasajero | Registro / Login | nombre + DNI + contacto |
 | Pasajero | Búsqueda de viajes | origen, destino, fecha, horario |
 | Pasajero | Resultados de búsqueda | opciones disponibles |
 | Pasajero | Detalle de viaje | conductor, vehículo, ruta, paradas, horario, precio |
-| Pasajero | Checkout de seña | pago MercadoPago |
+| Pasajero | Checkout de seña | pago por transferencia (comprobante) |
 | Pasajero | Confirmación + QR | reserva confirmada, QR para mostrar |
 | Pasajero | Mis reservas / historial | listado, cancelación |
 | Pasajero | Seguimiento en vivo | mapa, posición, ETA |
+| Conductor | Registro / Login | nombre + apellido + teléfono |
 | Conductor | Viajes del día | viajes programados |
 | Conductor | Recogida / navegación | secuencia de paradas ordenadas |
 | Conductor | Escaneo de QR | verificación de reserva |
-| Conductor | Abordado / saldo | registrar pago, marcar abordado |
+| Conductor | Abordado / saldo | registrar pago (efectivo/transferencia), marcar abordado |
 | Conductor | En ruta | GPS, estados, reportar incidente |
+| Operador | Confirmación de seña | verificar comprobante de transferencia |
 | Operador | Dashboard | viajes del día, estados, tracking |
 | Operador | Gestión | conductores, vehículos, rutas, paradas |
 | Operador | Settings | parámetros de negocio |

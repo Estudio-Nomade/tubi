@@ -8,7 +8,7 @@ Plataforma de viajes compartidos interurbanos programados (tramo principal Tandi
 
 - **Fuente de verdad de producto:** `docs/01-prd.md`
 - **Orden de trabajo:** `docs/00-roadmap.md`
-- El proyecto **no tiene nombre/marca definidos**: usar el placeholder "la plataforma" hasta la fase 7 (marca).
+- El proyecto **no tiene nombre/marca definidos**: usar el placeholder "la plataforma" hasta la fase 8 (marca).
 
 ## Idioma
 
@@ -23,16 +23,17 @@ Responder y documentar en **español argentino**, formal pero claro, concreto y 
 - Seguimiento GPS en vivo con cola offline para tramos sin cobertura.
 - Política de espera en recogida (default 5 min) y recogida secuencial tipo Uber.
 - Registro mínimo de pasajero: nombre + DNI + contacto.
+- Registro de conductor: nombre + apellido + teléfono.
 - Vehículo: patente, marca, modelo, color, capacidad.
 - Viajes programados todos los días, incluso con un solo pasajero al inicio.
 
 ## Configuración (transversal, aplicar en TODO el código)
 
 - **Dos capas, nunca mezclar:**
-  - `.env` → secretos e infraestructura (keys de MercadoPago, URL de Supabase, API keys de mapas, JWT).
+  - `.env` → secretos e infraestructura (URL de Supabase, API key de mapas, JWT).
   - **Tabla de `settings` en DB** → parámetros de negocio editables por el operador sin redeploy (tarifa base, comisión, monto de seña, tiempo de espera, política de devolución, feature flags).
 - **Nunca hardcodear valores de negocio**: siempre leerlos de settings.
-- Proveedores siempre detrás de interfaces: `PaymentProvider` (MercadoPago), `MapsProvider` (Google Maps), `IdentityVerifier` (DNI manual fase 1). No acoplar la lógica de negocio a un proveedor.
+- Proveedores siempre detrás de interfaces: `PaymentProvider` (pagos en efectivo y transferencia, confirmación manual), `MapsProvider` (Google Maps), `IdentityVerifier` (DNI manual fase 1). No acoplar la lógica de negocio a un proveedor.
 - `.env` está ignorado y **nunca se commitea**; no leer, imprimir ni guardar secretos.
 
 ## Metodología

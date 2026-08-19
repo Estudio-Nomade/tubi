@@ -35,12 +35,12 @@
 | Monto de seña | $5.000 |
 | Tiempo máx. espera | 5 min |
 | Devolución de seña | >24h → 100%, 12–24h → 50%, <12h o no-show → 0% |
-| Pasarela de pago | MercadoPago (detrás de `PaymentProvider`) |
+| Método de pago | efectivo + transferencia (sin pasarela) |
 | Mapas/GPS | Google Maps (detrás de `MapsProvider`) |
 | Verificación DNI | manual fase 1 (detrás de `IdentityVerifier`) |
 | Ratings | deshabilitado (fase 2, feature flag) |
 
-**Configuración en dos capas:** `.env` (secretos: keys MercadoPago, URL Supabase) + tabla de `settings` en DB (parámetros de negocio editables sin redeploy).
+**Configuración en dos capas:** `.env` (secretos: URL Supabase, API key de mapas) + tabla de `settings` en DB (parámetros de negocio editables sin redeploy).
 
 **Requisito no funcional clave:** el dispositivo del conductor debe transmitir posición en background (pantalla apagada) y encolar posiciones offline sincronizando al recuperar conexión. *La implementación (web vs PWA vs app) se decide en arquitectura, no en producto.*
 
@@ -102,10 +102,10 @@ DECISIONES CERRADAS (no las discutas, incorporalas):
 PARÁMETROS DE NEGOCIO CONFIGURABLES (modelar como settings editables por el operador, no constantes):
 precio base por ruta (a definir) · tarifa fija por ruta · comisión 15% (0–15%) ·
 seña $5.000 · espera máx 5 min · devolución de seña (>24h 100%, 12–24h 50%, <12h/no-show 0%) ·
-pasarela MercadoPago (detrás de PaymentProvider) · mapas Google Maps (detrás de MapsProvider) ·
+pago en efectivo y transferencia (sin pasarela) · mapas Google Maps (detrás de MapsProvider) ·
 verificación de DNI manual fase 1 (detrás de IdentityVerifier) · ratings deshabilitado (fase 2, feature flag).
 
-CONFIGURACIÓN EN DOS CAPAS: .env (secretos: keys MercadoPago, URL Supabase) +
+CONFIGURACIÓN EN DOS CAPAS: .env (secretos: URL Supabase, API key de mapas) +
 tabla de settings en DB (negocio, editable sin redeploy).
 
 REQUISITO NO FUNCIONAL CLAVE: el dispositivo del conductor transmite posición en background

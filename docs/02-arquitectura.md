@@ -20,7 +20,7 @@
 
 **Monolito modular por capas, con puertos y adaptadores (ports & adapters) para los proveedores externos.**
 
-Un solo deploy (no microservicios) dividido en módulos por dominio, con una regla de dependencia estricta: **el núcleo (dominio + aplicación) no depende de ningún framework ni proveedor externo**; los proveedores (MercadoPago, Google Maps, verificación de identidad, Supabase) entran solo por **puertos** (interfaces) implementados por **adaptadores**.
+Un solo deploy (no microservicios) dividido en módulos por dominio, con una regla de dependencia estricta: **el núcleo (dominio + aplicación) no depende de ningún framework ni proveedor externo**; los proveedores (Google Maps, verificación de identidad, Supabase) y los métodos de pago (efectivo/transferencia) entran solo por **puertos** (interfaces) implementados por **adaptadores**.
 
 ```mermaid
 flowchart LR
@@ -30,7 +30,7 @@ flowchart LR
         PORTS["Puertos: interfaces PaymentProvider · MapsProvider · IdentityVerifier · Notifier"]
     end
     subgraph Borde["Borde (implementaciones)"]
-        ADAPT["Adaptadores: MercadoPago · Google Maps · verificación manual · Supabase"]
+        ADAPT["Adaptadores: Google Maps · verificación manual · Supabase · pagos (efectivo/transferencia)"]
     end
     UI["Presentación (Next.js / PWA)"] --> APP
     APP --> DOM
@@ -95,11 +95,11 @@ Cada decisión: **Binds** (qué gobierna), **Prevents** (qué divergencia evita)
 - **Prevents:** perder posiciones en tramos sin señal; reordenar eventos al sincronizar.
 - **Rule:** el dispositivo del conductor encola cada posición (lat, lng, timestamp, precisión) en **IndexedDB**. Al recuperar conectividad (`online`), hace flush **ordenado por timestamp** hacia la API/DB. La cola no descarta eventos sin confirmación de escritura.
 
-### AD-8 — Pagos detrás de `PaymentProvider` `[ADOPTED]`
+### AD-8 — Pagos en efectivo y transferencia, detrás de `PaymentProvider` `[ADOPTED]`
 
 - **Binds:** seña, saldo, devoluciones (FR-05, FR-08, FR-17).
-- **Prevents:** acoplar la lógica de reserva/devolución al SDK de una pasarela.
-- **Rule:** el dominio solo conoce `PaymentProvider` (crear intención de seña, confirmar pago vía webhook, devolver seña). MercadoPago es el adaptador MVP. La confirmación de pago es **server-side** (webhook), nunca se confía en el cliente.
+- **Prevents:** acoplar la lógica de reserva/devolución a un proveedor o pasarela específica.
+- **Rule:** el dominio solo conoce `PaymentProvider` (registrar seña, confirmar seña, registrar saldo, devolver seña). Los métodos son **efectivo** y **transferencia**; no hay pasarela digital ni webhooks. La confirmación es **manual**: el operador confirma el comprobante de la transferencia y el conductor/operador marcan el efectivo al subir.
 
 ### AD-9 — Mapas detrás de `MapsProvider` `[ADOPTED]`
 
@@ -165,7 +165,7 @@ Las versiones exactas las fija el lockfile en la implementación; acá se fijan 
 | PWA | **Serwist** (`@serwist/next`) | instalable + offline (cache de shell) |
 | Base de datos | **Supabase (Postgres)** + RLS | Auth, Realtime, Storage, Edge Functions incluidas |
 | SDK | `@supabase/supabase-js` 2.x | cliente del frontend |
-| Pagos | MercadoPago (adaptador) | SDK `mercadopago` 3.x en Edge Function |
+| Pagos | Efectivo + transferencia (manual) | sin pasarela; CBU/alias de la cuenta en settings, confirmación manual |
 | Mapas | Google Maps (adaptador) | clave en `.env` |
 | Validación | Zod | schemas de entrada/contratos |
 | Package manager | npm (Node 22) | bun como alternativa si se instala |
@@ -178,10 +178,9 @@ Las versiones exactas las fija el lockfile en la implementación; acá se fijan 
 
 ```mermaid
 flowchart LR
-    PAS[Pasajero<br/>celular] -->|busca, reserva, paga seña, sigue viaje| PLAT[Plataforma]
+    PAS[Pasajero<br/>celular] -->|busca, reserva, paga seña (transferencia), sigue viaje| PLAT[Plataforma]
     CON[Conductor<br/>celular] -->|opera viajes, escanea QR, transmite GPS| PLAT
     OPE[Operador<br/>web] -->|configura settings, administra, verifica DNI| PLAT
-    PLAT -->|cobra seña / saldo| MP[MercadoPago]
     PLAT -->|mapas, geocodificación, ETA| GM[Google Maps]
 ```
 
@@ -203,7 +202,6 @@ flowchart LR
     WEB <--> AUTH
     WEB <-->|canal de posición| RT
     WEB -->|QR, fotos| ST
-    FN -->|webhooks + cobros| MP["MercadoPago"]
     FN -->|geocodificación / ETA| GM["Google Maps"]
     DB --> RT
 ```
@@ -238,7 +236,7 @@ tubi/
             domain/     # entidades + reglas (sin deps externas)
             application/# casos de uso
             ports/      # interfaces de proveedores
-            adapters/   # implementaciones (MercadoPago, Google Maps, supabase)
+            adapters/   # implementaciones (Google Maps, supabase, pagos efectivo/transferencia)
         lib/            # cliente supabase, settings cache, qr, auth
   supabase/
     migrations/         # schema SQL (tablas, RLS, enums de estado)
@@ -299,7 +297,7 @@ Los estados que aparecen en los flujos son los de AD-12; los valores de negocio 
 
 - **Hosting/producción** (Vercel vs Cloudflare vs self-host, dominio) → fase 10.
 - **Método de auth** (email+password vs OTP por SMS, que tiene costo) → implementación; default email+password.
-- **Mecánica fina de MercadoPago** (Checkout Pro vs Wallet) → al implementar pagos.
+- **Mecánica de confirmación manual de pagos** (comprobante de transferencia, CBU/alias, registro de efectivo) → al implementar pagos.
 - **Retención/poda de `tracking_events`** (cada cuánto se archiva) → cuando haya volumen.
 - **Ratings/reputación** → fase 2, feature flag ya contemplado.
 - **Tarifa por kilómetro** → fuera del MVP.
