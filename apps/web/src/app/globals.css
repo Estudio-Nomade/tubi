@@ -50,7 +50,7 @@
 
 :root {
   --radius: 0.625rem;
-  --background: #F4F4F5;
+  --background: #FFFFFF;
   --foreground: #18181B;
   --card: #FFFFFF;
   --card-foreground: #18181B;
@@ -66,8 +66,8 @@
   --accent-foreground: #18181B;
   --destructive: #B91C1C;
   --destructive-foreground: #FFFFFF;
-  --border: #D4D4D8;
-  --input: #D4D4D8;
+  --border: #E4E4E7;
+  --input: #E4E4E7;
   --ring: #0D9488;
 }
 
