@@ -33,4 +33,4 @@ Etapa temprana. Definidos: visión, alcance, requisitos de producto (PRD) y hoja
 
 ## Convenciones de trabajo
 
-Ver [`AGENTS.md`](AGENTS.md).
+Ver [`AGENTS.md`](AGENTS.md). Para un agente que retoma el proyecto sin contexto, ver [`HANDOFF.md`](HANDOFF.md).

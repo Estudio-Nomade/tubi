@@ -30,7 +30,6 @@ erDiagram
     viaje ||--o{ reserva : "recibe"
     viaje ||--o{ tracking_events : "registra"
     reserva ||--o{ pago : "genera"
-    settings ||--o{ settings : ""
 ```
 
 > **Nota de modelado:** `pasajero` y `conductor` son **roles** de `profiles`, no tablas separadas (una persona puede ser ambos; ver *Decisiones*). `asiento` no es tabla: en el MVP la capacidad vive en `vehiculo.capacidad` y la ocupación se calcula contando reservas activas del viaje.

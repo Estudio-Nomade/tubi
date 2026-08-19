@@ -295,7 +295,7 @@ Los estados que aparecen en los flujos son los de AD-12; los valores de negocio 
 
 ## Deferred (decisiones que este doc no toma)
 
-- **Hosting/producción** (Vercel vs Cloudflare vs self-host, dominio) → fase 10.
+- **Hosting/producción** (Vercel vs Cloudflare vs self-host, dominio) → fase 11.
 - **Método de auth** (email+password vs OTP por SMS, que tiene costo) → implementación; default email+password.
 - **Mecánica de confirmación manual de pagos** (comprobante de transferencia, CBU/alias, registro de efectivo) → al implementar pagos.
 - **Retención/poda de `tracking_events`** (cada cuánto se archiva) → cuando haya volumen.

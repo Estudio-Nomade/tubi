@@ -17,7 +17,7 @@ Responder y documentar en **español argentino**, formal pero claro, concreto y 
 ## Reglas de producto (no negociables)
 
 - Web app mobile-first (375px), no apps nativas.
-- Seña de compromiso al reservar; saldo al subir al vehículo.
+- Seña de compromiso al reservar (por transferencia); saldo al subir (efectivo o transferencia).
 - Identificación del pasajero por QR escaneado por el conductor.
 - Estados del viaje: programado → recogida → en curso → completado / cancelado.
 - Seguimiento GPS en vivo con cola offline para tramos sin cobertura.

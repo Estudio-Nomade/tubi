@@ -162,6 +162,7 @@ Prioridad: **P0** = MVP / demo de la primera semana · **P1** = inmediato post-M
 - **FR-01 — Búsqueda de viajes.** El sistema debe permitir buscar viajes por origen, destino, fecha y horario. *Testeable:* dada una búsqueda Tandil→Buenos Aires para una fecha con viaje programado, el resultado incluye ese viaje.
 - **FR-02 — Detalle de viaje.** El sistema debe mostrar, antes de reservar: conductor, vehículo (patente, marca, modelo, color), ruta, horario aproximado y paradas. *Testeable:* el detalle de un viaje muestra los campos obligatorios completos.
 - **FR-03 — Registro de pasajero.** El sistema debe registrar al pasajero con nombre, DNI y contacto (teléfono/email) como mínimo. *Testeable:* un registro sin DNI es rechazado.
+- **FR-03b — Registro de conductor.** El sistema debe registrar al conductor con nombre, apellido y teléfono como mínimo. *Testeable:* un registro de conductor sin teléfono es rechazado.
 - **FR-04 — Reserva de asiento.** El sistema debe crear una reserva asociada inequívocamente a un viaje, un pasajero y (eventualmente) un asiento. *Testeable:* la reserva creada referencia viaje y pasajero correctos.
 - **FR-05 — Pago de seña.** El sistema debe registrar el pago de la seña por **transferencia** (comprobante + confirmación manual del operador). *Testeable:* al confirmar el comprobante, la reserva pasa a estado "seña pagada".
 - **FR-06 — Generación de QR.** El sistema debe generar un QR único asociado a cada reserva. *Testeable:* dos reservas distintas generan QR distintos.

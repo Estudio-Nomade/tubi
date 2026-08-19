@@ -56,6 +56,8 @@
 
 El criterio de orden: **primero definir (arquitectura, flujos y datos), después diseñar (UX y marca), recién después construir.** Los flujos de usuario van antes de los wireframes: definen el contrato de pantallas. La marca va al final porque el nombre, el dominio y la paleta dependen de lo que la plataforma *sea* y *haga*, no al revés.
 
+> **Aclaración de "fases":** este roadmap usa **fase 0–11** para el *desarrollo*. En el PRD, "fase 1" y "fase 2" se refieren a **etapas del producto** (fase 1 = MVP / verificación manual; fase 2 = post-MVP / ratings). No confundir ambos ejes.
+
 | # | Fase | Entregable | Por qué en este orden |
 |---|---|---|---|
 | 0 | Setup del repo | git init, `.gitignore`, `README.md`, `AGENTS.md`, repo en GitHub | Todo lo demás vive acá; sin esto no hay trazabilidad |
