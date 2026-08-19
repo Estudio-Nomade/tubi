@@ -38,3 +38,13 @@ playwright-report/
 # Runtime local
 node_modules/.cache/
 .pnpm-store/
+
+node_modules/
+.next/
+out/
+.env
+.env.*
+!.env.example
+*.local
+supabase/.branches/
+supabase/.temp/
