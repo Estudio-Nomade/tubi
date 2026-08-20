@@ -8,4 +8,6 @@ const withSerwist = withSerwistInit({
 
 export default withSerwist({
   reactStrictMode: true,
+  // Serwist injects webpack config; empty turbopack keeps Next 16 default happy in dev.
+  turbopack: {},
 });

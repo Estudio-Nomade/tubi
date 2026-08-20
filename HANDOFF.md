@@ -18,7 +18,7 @@
 
 ## 2. Estado del proyecto
 
-**Hecho (definir + wireframes P0):**
+**Hecho (definir + wireframes P0 + base código Slice 0.5):**
 
 | Doc / artefacto | Contenido |
 |---|---|
@@ -29,22 +29,27 @@
 | `docs/04-modelo-de-datos.md` | Schema + RLS + migración |
 | `docs/05-api.md` | REST + realtime |
 | `docs/06-reglas-y-estados.md` | Máquinas de estado |
+| `docs/07-slice-0.5-status.md` | **Base Next/Supabase/settings lista** |
+| `docs/08-slice-1-auth-status.md` | **Auth + roles + login/registro** |
 | `docs/superpowers/specs/2026-08-18-tubi-wireframes-design.md` | Spec de 15 frames |
 | `design-artifacts/tubi-wireframes.pen` | Pencil 2.14 |
 | `design-artifacts/previews/*.png` | Capturas 01–15 |
+| `apps/web` | Next 16 app: supabase clients, middleware, settings layers, PWA shell |
+| `supabase/migrations` | 0001–0004 (schema, seed settings, SELECT policies + grants) |
 
 **Pendiente:**
 
 | Fase | Qué | Nota |
 |---|---|---|
 | 6 | OK visual de wireframes | Entregable existe; falta OK del usuario |
-| 8 | Marca | Nombre ya cerrado. Falta `docs/07-marca.md` (dominio, paleta, tipo, logo) |
-| 7 | UI / design system | Después de marca |
-| 9 | Código MVP | No hay app todavía |
+| 8 | Marca | Nombre ya cerrado. Falta doc de marca (dominio, paleta, tipo, logo) |
+| 7 | UI / design system | Después de marca (tokens definitivos) |
+| 9 | Código MVP | **Slice 0.5 + Slice 1 (auth) cerrados** → sigue reservas, QR, tracking |
 | 10 | Demo Ariel (+ José) | |
 | 11 | Deploy | |
 
-**Orden acordado:** OK wireframes → marca (8) → UI (7) → código (9).
+**Código (Slice 0.5):** base sólida para features. Detalle en `docs/07-slice-0.5-status.md`.  
+**Siguiente implementación sugerida:** Auth + login, o flujo de reservas.
 
 Roadmap 0–11 = desarrollo. PRD “fase 1/2” = etapas de producto. No confundir.
 
@@ -88,8 +93,8 @@ Ver `AGENTS.md`. BMAD en `~/Documentos/Estudio Nomade/Tumo/_bmad`. LIFTY es otro
 
 ## 9. Instrucciones para el agente
 
-1. Empezá por el OK de wireframes o, si ya está, por **fase 8 (marca)**. Una fase a la vez.
-2. No re-decidas nombre, stack ni pagos.
-3. Antes de código: `docs/02`, `docs/04`, `docs/06`.
+1. La base de código Slice 0.5 ya está: leé `docs/07-slice-0.5-status.md` antes de features.
+2. No re-decidas nombre, stack ni pagos. Nunca hardcodees negocio: usá `settings`.
+3. Antes de features: `docs/02`, `docs/04`, `docs/06` + capas en `apps/web/src/{domain,application,adapters}`.
 4. Prompts: `docs/PROMPT-AGENTE.md` · `docs/PROMPT-UI-PENCIL.md` · `docs/PROMPT-IMPLEMENTACION.md`.
 5. Español argentino, concreto. Esperá OK al cerrar cada entregable.

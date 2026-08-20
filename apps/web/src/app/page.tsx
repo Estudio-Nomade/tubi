@@ -1,17 +1,40 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { redirect } from "next/navigation";
 
-export default function Home() {
+import { getCurrentProfile, homePathForRol } from "@/application/auth";
+import { AppHeader, BtnPrimary } from "@/components/design";
+
+export default async function Home() {
+  const profile = await getCurrentProfile();
+  if (profile) {
+    redirect(homePathForRol(profile.rol));
+  }
+
   return (
-    <main className="max-w-[375px] mx-auto p-4 space-y-4">
-      <h1 className="text-2xl font-semibold">Tubi</h1>
-      <Card>
-        <CardHeader><CardTitle>Slice 0 listo</CardTitle></CardHeader>
-        <CardContent className="space-y-2">
-          <p className="text-sm text-muted-foreground">shadcn + tema provisional funcionando.</p>
-          <Button size="lg" className="w-full">Continuar</Button>
-        </CardContent>
-      </Card>
-    </main>
+    <div className="mx-auto flex min-h-screen max-w-[375px] flex-col bg-background">
+      <AppHeader />
+      <main className="flex flex-1 flex-col gap-6 px-5 py-6">
+        <div className="flex flex-col gap-2">
+          <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">
+            Tubi
+          </h1>
+          <p className="text-sm font-medium text-muted-foreground">
+            Viajes compartidos interurbanos · Tandil ↔ Buenos Aires
+          </p>
+        </div>
+
+        <div className="mt-auto flex flex-col items-center gap-4">
+          <BtnPrimary asChild>
+            <Link href="/login">Ingresar</Link>
+          </BtnPrimary>
+          <Link
+            href="/registro"
+            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+          >
+            Crear cuenta
+          </Link>
+        </div>
+      </main>
+    </div>
   );
 }

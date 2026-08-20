@@ -1,42 +1,70 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import { Toaster } from "@/components/ui/sonner";
-import { ThemeProvider } from "@/components/theme-provider";
+import { DM_Sans, Fraunces } from "next/font/google";
+
+import { getSettings } from "@/application/settings";
 import { PwaRegister } from "@/components/pwa-register";
+import { SettingsProvider } from "@/components/settings-provider";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
+import type { Setting } from "@/domain/settings";
+
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
 });
 
 export const metadata: Metadata = {
-  title: "Tubi",
+  title: {
+    default: "Tubi",
+    template: "%s · Tubi",
+  },
   description: "Viajes compartidos interurbanos Tandil ↔ Buenos Aires.",
+  applicationName: "Tubi",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+async function loadSettingsForLayout(): Promise<{
+  items: Setting[];
+  error: string | null;
+}> {
+  try {
+    const items = await getSettings();
+    return { items, error: null };
+  } catch (error) {
+    return {
+      items: [],
+      error: error instanceof Error ? error.message : "No se pudieron cargar settings",
+    };
+  }
+}
+
+export default async function RootLayout({ children }: LayoutProps<"/">) {
+  const { items, error } = await loadSettingsForLayout();
+
   return (
     <html
-      lang="es"
+      lang="es-AR"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${dmSans.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="flex min-h-full flex-col">
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
           enableSystem={false}
           disableTransitionOnChange
         >
-          {children}
-          <PwaRegister />
-          <Toaster />
+          <SettingsProvider items={items} error={error}>
+            {children}
+            <PwaRegister />
+            <Toaster />
+          </SettingsProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,6 +1,9 @@
 # Dependencias
 node_modules/
 
+# Turborepo
+.turbo/
+
 # Builds y artefactos
 .next/
 dist/
