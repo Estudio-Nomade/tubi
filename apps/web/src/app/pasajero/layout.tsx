@@ -1,3 +1,4 @@
+import { SessionProvider } from "@/components/auth/session-provider";
 import { requireProfile } from "@/lib/auth/require-profile";
 
 export default async function PasajeroLayout({
@@ -5,6 +6,10 @@ export default async function PasajeroLayout({
 }: {
   children: React.ReactNode;
 }) {
-  await requireProfile(["pasajero", "operador"]);
-  return children;
+  const profile = await requireProfile(["pasajero", "operador"]);
+  return (
+    <SessionProvider key={profile.id} profile={profile}>
+      {children}
+    </SessionProvider>
+  );
 }
