@@ -1,8 +1,7 @@
-import Link from "next/link";
-
+import { AppHeader, BtnSecondary, EmptyHint, TabBar } from "@/components/design";
 import { requireProfile } from "@/lib/auth/require-profile";
-import { AppHeader } from "@/components/design";
 
+/** Pencil C2 · Home empty (Slice 1 stub — no viajes assigned yet). */
 export default async function ConductorPage() {
   const profile = await requireProfile(["conductor", "operador"]);
   const displayName = [profile.nombre, profile.apellido]
@@ -10,31 +9,33 @@ export default async function ConductorPage() {
     .join(" ");
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-[375px] flex-col bg-background">
-      <AppHeader roleLabel="Conductor" />
-      <main className="flex flex-1 flex-col gap-6 px-5 py-6">
+    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
+      <AppHeader />
+      <main className="flex flex-1 flex-col gap-5 px-5 pt-4">
         <div className="flex flex-col gap-3">
           <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">
-            Hola, {displayName}
+            Hola, {displayName || profile.nombre}
           </h1>
-          <span className="inline-flex w-fit items-center rounded-full bg-muted px-3 py-1 text-xs font-medium text-muted-foreground">
+          <span className="inline-flex w-fit items-center rounded-full bg-muted px-2.5 py-1.5 text-xs font-medium text-muted-foreground">
             Conductor
           </span>
         </div>
 
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-          <p className="text-sm font-medium text-muted-foreground">
-            No tenés viajes programados por ahora
-          </p>
+        <div className="rounded-2xl border border-border bg-card px-4 py-2 shadow-sm">
+          <EmptyHint message="No hay viajes asignados hoy" />
         </div>
 
-        <Link
-          href="/cuenta"
-          className="text-center text-sm font-medium text-primary underline-offset-4 hover:underline"
-        >
-          Tu cuenta
-        </Link>
+        <p className="text-sm text-muted-foreground">
+          Coordiná con el operador si creés que falta uno
+        </p>
+
+        <BtnSecondary disabled title="Próximamente">
+          Ver agenda
+        </BtnSecondary>
+
+        <div className="flex-1" aria-hidden />
       </main>
+      <TabBar variant="conductor" active="inicio" />
     </div>
   );
 }

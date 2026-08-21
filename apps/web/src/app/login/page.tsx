@@ -7,9 +7,10 @@ export const metadata: Metadata = {
   title: "Ingresar",
 };
 
+/** Pencil P10 · Login */
 export default function LoginPage() {
   return (
-    <div className="mx-auto flex min-h-screen max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
       <AppHeader showBack backHref="/" />
       <LoginForm />
     </div>

@@ -20,7 +20,8 @@
 | Homes stub `/pasajero`, `/conductor`, `/operador` | OK |
 | `/cuenta` + logout | OK |
 | Root `/` redirect si hay sesión / landing auth | OK |
-| AuthProvider client | Omitido (YAGNI, server-first) |
+| SessionProvider + `useCurrentProfile()` | OK (perfil seed desde RSC; sin fetch client al montar) |
+| TabBar + EmptyHint (homes empty / cuenta) | OK (stub Slice 1) |
 
 ## Rutas
 

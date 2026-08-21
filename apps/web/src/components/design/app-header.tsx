@@ -10,6 +10,7 @@ type AppHeaderProps = {
   className?: string
 }
 
+/** Pencil zJbea — wordmark Tubi, optional back (44) + role chip. */
 export function AppHeader({
   showBack = false,
   backHref = "/",
@@ -19,32 +20,36 @@ export function AppHeader({
   return (
     <header
       className={cn(
-        "sticky top-0 z-40 flex h-14 items-center border-b border-border bg-background px-5",
+        "sticky top-0 z-40 flex items-center justify-between gap-2 bg-background px-5 pb-2 pt-4",
         className
       )}
     >
-      <div className="flex w-10 shrink-0 items-center justify-start">
+      <div className="flex w-11 shrink-0 items-center justify-start">
         {showBack ? (
           <Link
             href={backHref}
-            className="inline-flex size-9 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-muted"
+            className="inline-flex size-11 items-center justify-center rounded-xl bg-muted text-foreground transition-colors hover:bg-muted/80"
             aria-label="Volver"
           >
             <ChevronLeft className="size-5" />
           </Link>
-        ) : null}
+        ) : (
+          <span className="size-11" aria-hidden />
+        )}
       </div>
 
       <p className="font-heading flex-1 text-center text-xl font-semibold tracking-tight text-foreground">
         Tubi
       </p>
 
-      <div className="flex w-10 shrink-0 items-center justify-end">
+      <div className="flex min-w-11 shrink-0 items-center justify-end">
         {roleLabel ? (
-          <span className="text-xs text-muted-foreground whitespace-nowrap">
+          <span className="rounded-full bg-muted px-2.5 py-1.5 text-xs font-medium text-muted-foreground whitespace-nowrap">
             {roleLabel}
           </span>
-        ) : null}
+        ) : (
+          <span className="size-11" aria-hidden />
+        )}
       </div>
     </header>
   )

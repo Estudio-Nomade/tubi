@@ -17,6 +17,7 @@ async function loginAction(
   return result ?? null;
 }
 
+/** Pencil P10 — title, sub, fields, spacer, CTA, create link. */
 export function LoginForm() {
   const [state, formAction, pending] = useActionState(loginAction, null);
 
@@ -62,21 +63,21 @@ export function LoginForm() {
 
       <div className="flex-1" aria-hidden />
 
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col gap-4">
         <BtnPrimary type="submit" disabled={pending}>
           {pending ? "Ingresando…" : "Continuar"}
         </BtnPrimary>
 
         <Link
           href="/registro"
-          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+          className="text-center text-sm font-medium text-primary"
         >
           Crear cuenta
         </Link>
 
         <Link
           href="/registro/conductor"
-          className="text-xs font-medium text-muted-foreground underline-offset-4 hover:underline"
+          className="text-center text-xs font-medium text-muted-foreground"
         >
           Soy conductor
         </Link>

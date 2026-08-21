@@ -20,7 +20,7 @@ export function BtnPrimary({
       data-slot="btn-primary"
       type={asChild ? undefined : type}
       className={cn(
-        "inline-flex h-13 w-full shrink-0 items-center justify-center rounded-xl bg-primary px-4 text-sm font-medium text-primary-foreground transition-all outline-none select-none hover:bg-primary/90 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex h-13 w-full shrink-0 items-center justify-center rounded-[14px] bg-primary px-4 text-[17px] font-semibold text-primary-foreground transition-all outline-none select-none hover:bg-primary/90 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:translate-y-px disabled:pointer-events-none disabled:opacity-50",
         className
       )}
       {...props}

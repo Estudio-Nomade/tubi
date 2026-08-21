@@ -14,7 +14,8 @@ export function Field({
   className,
   ...props
 }: FieldProps) {
-  const inputId = id ?? React.useId()
+  const generatedId = React.useId()
+  const inputId = id ?? generatedId
   const errorId = error ? `${inputId}-error` : undefined
 
   return (
@@ -31,7 +32,7 @@ export function Field({
         aria-invalid={error ? true : undefined}
         aria-describedby={errorId}
         className={cn(
-          "h-13 w-full min-w-0 rounded-xl border border-border bg-muted px-3.5 text-base text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20",
+          "h-13 w-full min-w-0 rounded-xl border border-border bg-muted px-3.5 text-base font-medium text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-3 aria-invalid:ring-destructive/20",
           className
         )}
         {...props}

@@ -27,6 +27,7 @@ const STEP_TITLES = [
   "Creá tu cuenta",
 ] as const;
 
+/** Pencil C1 — same shell as P1; no “Ya tengo cuenta” in frame (we keep it for UX). */
 export function RegisterConductorWizard() {
   const [step, setStep] = useState(1);
   const [nombre, setNombre] = useState("");
@@ -98,7 +99,7 @@ export function RegisterConductorWizard() {
     <form
       action={step === TOTAL_STEPS ? formAction : undefined}
       onSubmit={handleSubmit}
-      className="flex flex-1 flex-col gap-6 px-5 py-6"
+      className="flex flex-1 flex-col gap-6 px-5 pb-6 pt-3"
     >
       <input type="hidden" name="nombre" value={nombre} />
       <input type="hidden" name="apellido" value={apellido} />
@@ -186,24 +187,26 @@ export function RegisterConductorWizard() {
 
       <div className="flex-1" aria-hidden />
 
-      <div className="flex flex-col items-center gap-4">
+      <div className="flex flex-col gap-4">
         <BtnPrimary type="submit" disabled={pending}>
           {ctaLabel}
         </BtnPrimary>
 
         <Link
           href="/login"
-          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+          className="text-center text-sm font-medium text-primary"
         >
           Ya tengo cuenta
         </Link>
 
-        <Link
-          href="/registro"
-          className="text-xs font-medium text-muted-foreground underline-offset-4 hover:underline"
-        >
-          Soy pasajero
-        </Link>
+        {step === 1 ? (
+          <Link
+            href="/registro"
+            className="text-center text-xs font-medium text-muted-foreground"
+          >
+            Soy pasajero
+          </Link>
+        ) : null}
       </div>
     </form>
   );
