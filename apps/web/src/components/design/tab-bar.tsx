@@ -15,8 +15,8 @@ type TabItem = {
 
 const PASAJERO_TABS: TabItem[] = [
   { key: "inicio", label: "Inicio", href: "/pasajero", icon: House },
-  { key: "buscar", label: "Buscar", href: "/pasajero", icon: Search },
-  { key: "qr", label: "QR", href: "/pasajero", icon: QrCode },
+  { key: "buscar", label: "Buscar", href: "/pasajero/buscar", icon: Search },
+  { key: "qr", label: "QR", href: "/pasajero/pase", icon: QrCode },
   { key: "cuenta", label: "Cuenta", href: "/cuenta", icon: User },
 ]
 
