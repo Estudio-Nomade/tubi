@@ -13,6 +13,10 @@ export const SETTING_KEYS = {
   RESERVA_DEVOLUCION_12_24H_PCT: "reserva.devolucion_12_24h_pct",
   RESERVA_DEVOLUCION_MENOS_12H_PCT: "reserva.devolucion_menos_12h_pct",
   PAGOS_METODOS: "pagos.metodos",
+  PAGOS_TRANSFERENCIA_BANCO: "pagos.transferencia_banco",
+  PAGOS_TRANSFERENCIA_ALIAS: "pagos.transferencia_alias",
+  PAGOS_TRANSFERENCIA_CBU: "pagos.transferencia_cbu",
+  PAGOS_TRANSFERENCIA_TITULAR: "pagos.transferencia_titular",
   VERIFICACION_DNI_MODO: "verificacion.dni_modo",
   FEATURE_RATINGS_HABILITADO: "feature.ratings_habilitado",
 } as const;

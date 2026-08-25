@@ -48,3 +48,26 @@ export type BoardingPassSummary = {
   destino: string;
   fechaSalida: string;
 };
+
+/** Row for passenger reservation list at /pasajero/reservas. */
+export type ReservaListItem = {
+  reservaId: string;
+  estado: EstadoReserva;
+  origen: string;
+  destino: string;
+  fechaSalida: string;
+  montoSena: number;
+  precioViaje?: number;
+  politicaCancelacion?: PoliticaCancelacionSnapshot;
+};
+
+/** Result of cancelar_reserva RPC. */
+export type CancelReservaResult = {
+  ok: true;
+  reservaId: string;
+  viajeId: string;
+  estado: "cancelada";
+  devolucionPct: number;
+  montoDevolucion: number;
+  canceladaEn: string;
+};

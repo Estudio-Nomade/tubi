@@ -10,6 +10,15 @@ export {
   canViewBoardingPass,
 } from "./boarding";
 export {
+  assertCanCancelReserva,
+  canCancelReserva,
+  computeRefundAmount,
+  computeRefundPct,
+  formatRefundHint,
+  previewRefund,
+  type RefundPreview,
+} from "./cancel";
+export {
   buildPoliticaCancelacion,
   readSenaMonto,
   type PoliticaCancelacionSnapshot,
@@ -17,9 +26,11 @@ export {
 export type {
   BoardingPass,
   BoardingPassSummary,
+  CancelReservaResult,
   EstadoReserva,
   Reserva,
   ReservaActivaSummary,
+  ReservaListItem,
 } from "./types";
 export type { ReservasRepository } from "./ports";
 export {

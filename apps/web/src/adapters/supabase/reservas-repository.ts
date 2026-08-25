@@ -8,10 +8,12 @@ import {
   RESERVA_ESTADOS_OCUPAN,
   type BoardingPass,
   type BoardingPassSummary,
+  type CancelReservaResult,
   type EstadoReserva,
   type PoliticaCancelacionSnapshot,
   type Reserva,
   type ReservaActivaSummary,
+  type ReservaListItem,
   type ReservasRepository,
 } from "@/domain/reservas";
 import type { Database, Json } from "@/lib/supabase/types";
@@ -73,7 +75,41 @@ function mapRpcError(message: string): Error {
   if (message.includes("TRANSICION_INVALIDA")) {
     return new Error("TRANSICION_INVALIDA");
   }
+  if (message.includes("RESERVA_POLITICA_INVALIDA")) {
+    return new Error("RESERVA_POLITICA_INVALIDA");
+  }
   return new Error(message);
+}
+
+function mapCancelResult(raw: Json): CancelReservaResult {
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+    throw new Error("CANCEL_RESULT_INVALID");
+  }
+  const obj = raw as Record<string, unknown>;
+  const reservaId = String(obj.reserva_id ?? "");
+  const viajeId = String(obj.viaje_id ?? "");
+  const estado = obj.estado;
+  const devolucionPct = Number(obj.devolucion_pct);
+  const montoDevolucion = Number(obj.monto_devolucion);
+  const canceladaEn = String(obj.cancelada_en ?? "");
+  if (
+    !reservaId ||
+    !viajeId ||
+    estado !== "cancelada" ||
+    !Number.isFinite(devolucionPct) ||
+    !Number.isFinite(montoDevolucion)
+  ) {
+    throw new Error("CANCEL_RESULT_INVALID");
+  }
+  return {
+    ok: true,
+    reservaId,
+    viajeId,
+    estado: "cancelada",
+    devolucionPct,
+    montoDevolucion,
+    canceladaEn,
+  };
 }
 
 export function createSupabaseReservasRepository(
@@ -240,6 +276,56 @@ export function createSupabaseReservasRepository(
       );
       return items;
     },
+
+    async listForPassenger(pasajeroId: string): Promise<ReservaListItem[]> {
+      const { data, error } = await client
+        .from("reserva")
+        .select(
+          `
+          id,
+          estado,
+          monto_sena,
+          politica_cancelacion,
+          viaje!inner (
+            fecha_salida,
+            precio,
+            ruta!inner ( origen, destino )
+          )
+        `,
+        )
+        .eq("pasajero_id", pasajeroId)
+        .order("created_at", { ascending: false });
+
+      if (error) {
+        throw new Error(`reservas.listForPassenger failed: ${error.message}`);
+      }
+      if (!data?.length) return [];
+
+      const items: ReservaListItem[] = [];
+      for (const row of data) {
+        const mapped = mapListItem(row);
+        if (mapped) items.push(mapped);
+      }
+      items.sort(
+        (a, b) =>
+          new Date(b.fechaSalida).getTime() - new Date(a.fechaSalida).getTime(),
+      );
+      return items;
+    },
+
+    async cancelForPassenger(reservaId: string): Promise<CancelReservaResult> {
+      const { data, error } = await client.rpc("cancelar_reserva", {
+        p_reserva_id: reservaId,
+      });
+
+      if (error) {
+        throw mapRpcError(error.message);
+      }
+      if (data == null) {
+        throw new Error("CANCEL_RESULT_EMPTY");
+      }
+      return mapCancelResult(data as Json);
+    },
   };
 }
 
@@ -389,5 +475,57 @@ function mapBoardingSummary(data: unknown): BoardingPassSummary | null {
     origen: ruta.origen,
     destino: ruta.destino,
     fechaSalida: viaje.fecha_salida,
+  };
+}
+
+function mapListItem(data: unknown): ReservaListItem | null {
+  const row = data as {
+    id: string;
+    estado: string;
+    monto_sena: number | string;
+    politica_cancelacion?: Json;
+    viaje:
+      | {
+          fecha_salida: string;
+          precio: number | string;
+          ruta:
+            | { origen: string; destino: string }
+            | { origen: string; destino: string }[]
+            | null;
+        }
+      | {
+          fecha_salida: string;
+          precio: number | string;
+          ruta:
+            | { origen: string; destino: string }
+            | { origen: string; destino: string }[]
+            | null;
+        }[]
+      | null;
+  };
+
+  const viaje = one(row.viaje);
+  if (!viaje) return null;
+  const ruta = one(viaje.ruta);
+  if (!ruta) return null;
+
+  let politicaCancelacion: PoliticaCancelacionSnapshot | undefined;
+  if (row.politica_cancelacion != null) {
+    try {
+      politicaCancelacion = parsePolitica(row.politica_cancelacion);
+    } catch {
+      politicaCancelacion = undefined;
+    }
+  }
+
+  return {
+    reservaId: row.id,
+    estado: row.estado as EstadoReserva,
+    origen: ruta.origen,
+    destino: ruta.destino,
+    fechaSalida: viaje.fecha_salida,
+    montoSena: Number(row.monto_sena),
+    precioViaje: Number(viaje.precio),
+    politicaCancelacion,
   };
 }

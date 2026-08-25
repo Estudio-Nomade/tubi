@@ -30,11 +30,20 @@ type TabBarProps = {
   variant: "pasajero" | "conductor"
   active: string
   className?: string
+  /** Conductor "viajes" tab target; defaults to `/conductor`. */
+  viajesHref?: string
 }
 
 /** Pencil alqrj — 64px bar, top border, icon 22 + label 11. */
-export function TabBar({ variant, active, className }: TabBarProps) {
-  const tabs = variant === "pasajero" ? PASAJERO_TABS : CONDUCTOR_TABS
+export function TabBar({ variant, active, className, viajesHref }: TabBarProps) {
+  const tabs =
+    variant === "pasajero"
+      ? PASAJERO_TABS
+      : CONDUCTOR_TABS.map((tab) =>
+          tab.key === "viajes" && viajesHref
+            ? { ...tab, href: viajesHref }
+            : tab
+        )
 
   return (
     <nav

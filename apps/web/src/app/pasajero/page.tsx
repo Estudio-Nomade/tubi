@@ -37,6 +37,8 @@ export default async function PasajeroPage({ searchParams }: PageProps) {
     : null;
 
   const isConfirmada = active?.reserva.estado === "confirmada";
+  const isVerificada = active?.reserva.estado === "verificada";
+  const isAbordada = active?.reserva.estado === "abordada";
   const isPendienteSena = active?.reserva.estado === "pendiente_sena";
   const senaRechazada = senaPago?.estado === "rechazado";
   const senaEnRevision = senaPago?.estado === "pendiente";
@@ -66,16 +68,20 @@ export default async function PasajeroPage({ searchParams }: PageProps) {
           <section className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-[0_4px_16px_rgba(28,25,23,0.06)]">
             <StatusPill
               label={
-                isConfirmada
-                  ? "Confirmada"
-                  : senaRechazada
-                    ? "Seña rechazada"
-                    : senaEnRevision
-                      ? "Seña en revisión"
-                      : "Pendiente de seña"
+                isAbordada
+                  ? "A bordo"
+                  : isVerificada
+                    ? "Verificada"
+                    : isConfirmada
+                      ? "Confirmada"
+                      : senaRechazada
+                        ? "Seña rechazada"
+                        : senaEnRevision
+                          ? "Seña en revisión"
+                          : "Pendiente de seña"
               }
               variant={
-                isConfirmada
+                isAbordada || isVerificada || isConfirmada
                   ? "ok"
                   : senaRechazada
                     ? "danger"
@@ -120,7 +126,19 @@ export default async function PasajeroPage({ searchParams }: PageProps) {
               </p>
             ) : null}
 
-            {hasConfirmedPass ? (
+            {isAbordada ? (
+              <p className="text-sm font-medium text-muted-foreground">
+                Ya estás a bordo. Buen viaje.
+              </p>
+            ) : null}
+
+            {isVerificada ? (
+              <p className="text-sm font-medium text-muted-foreground">
+                El conductor ya escaneó tu QR. Pagá el saldo al subir.
+              </p>
+            ) : null}
+
+            {hasConfirmedPass && !isAbordada ? (
               <BtnPrimary asChild>
                 <Link href="/pasajero/pase">Ver mi QR</Link>
               </BtnPrimary>
@@ -154,6 +172,13 @@ export default async function PasajeroPage({ searchParams }: PageProps) {
             </BtnPrimary>
           </>
         )}
+
+        <Link
+          href="/pasajero/reservas"
+          className="text-center text-sm font-medium text-primary underline-offset-4 hover:underline"
+        >
+          Ver todas mis reservas
+        </Link>
 
         {active ? (
           <Link

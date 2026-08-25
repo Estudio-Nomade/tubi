@@ -1,8 +1,10 @@
 import type {
   BoardingPass,
   BoardingPassSummary,
+  CancelReservaResult,
   Reserva,
   ReservaActivaSummary,
+  ReservaListItem,
 } from "./types";
 
 export interface ReservasRepository {
@@ -28,4 +30,8 @@ export interface ReservasRepository {
   listConfirmedBoardingSummaries(
     pasajeroId: string,
   ): Promise<BoardingPassSummary[]>;
+  /** All reservations for passenger, departure descending. */
+  listForPassenger(pasajeroId: string): Promise<ReservaListItem[]>;
+  /** Cancel own reserva via RPC (RN-03). */
+  cancelForPassenger(reservaId: string): Promise<CancelReservaResult>;
 }

@@ -1,9 +1,30 @@
 /**
- * Minimal Database stub aligned with supabase/migrations/0001_init.sql.
+ * Minimal Database stub aligned with supabase/migrations.
  * Replace with `supabase gen types typescript` once the project is linked.
  */
 
 export type Rol = "pasajero" | "conductor" | "operador";
+
+export type EstadoViaje =
+  | "programado"
+  | "recogida"
+  | "en_curso"
+  | "completado"
+  | "cancelado";
+
+export type TipoParada = "origen" | "intermedio" | "destino";
+
+export type EstadoReserva =
+  | "pendiente_sena"
+  | "confirmada"
+  | "verificada"
+  | "abordada"
+  | "cancelada"
+  | "no_show";
+
+export type TipoPago = "sena" | "saldo";
+export type MetodoPago = "efectivo" | "transferencia";
+export type EstadoPago = "pendiente" | "confirmado" | "rechazado";
 
 export type Json =
   | string
@@ -79,11 +100,263 @@ export type Database = {
         };
         Relationships: [];
       };
+      ruta: {
+        Row: {
+          id: string;
+          nombre: string;
+          origen: string;
+          destino: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          nombre: string;
+          origen: string;
+          destino: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          nombre?: string;
+          origen?: string;
+          destino?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      parada: {
+        Row: {
+          id: string;
+          ruta_id: string;
+          nombre: string;
+          ciudad: string;
+          lat: number;
+          lng: number;
+          orden: number;
+          tipo: TipoParada;
+        };
+        Insert: {
+          id?: string;
+          ruta_id: string;
+          nombre: string;
+          ciudad: string;
+          lat: number;
+          lng: number;
+          orden: number;
+          tipo?: TipoParada;
+        };
+        Update: {
+          id?: string;
+          ruta_id?: string;
+          nombre?: string;
+          ciudad?: string;
+          lat?: number;
+          lng?: number;
+          orden?: number;
+          tipo?: TipoParada;
+        };
+        Relationships: [];
+      };
+      vehiculo: {
+        Row: {
+          id: string;
+          conductor_id: string;
+          patente: string;
+          marca: string;
+          modelo: string;
+          color: string;
+          capacidad: number;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          conductor_id: string;
+          patente: string;
+          marca: string;
+          modelo: string;
+          color: string;
+          capacidad: number;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          conductor_id?: string;
+          patente?: string;
+          marca?: string;
+          modelo?: string;
+          color?: string;
+          capacidad?: number;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      viaje: {
+        Row: {
+          id: string;
+          ruta_id: string;
+          conductor_id: string;
+          vehiculo_id: string;
+          fecha_salida: string;
+          eta_llegada: string | null;
+          precio: number;
+          estado: EstadoViaje;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          ruta_id: string;
+          conductor_id: string;
+          vehiculo_id: string;
+          fecha_salida: string;
+          eta_llegada?: string | null;
+          precio: number;
+          estado?: EstadoViaje;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          ruta_id?: string;
+          conductor_id?: string;
+          vehiculo_id?: string;
+          fecha_salida?: string;
+          eta_llegada?: string | null;
+          precio?: number;
+          estado?: EstadoViaje;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      reserva: {
+        Row: {
+          id: string;
+          viaje_id: string;
+          pasajero_id: string;
+          asiento_num: number | null;
+          estado: EstadoReserva;
+          monto_sena: number;
+          qr_token: string;
+          politica_cancelacion: Json;
+          cancelada_en: string | null;
+          monto_devolucion: number | null;
+          devolucion_pct: number | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          viaje_id: string;
+          pasajero_id: string;
+          asiento_num?: number | null;
+          estado?: EstadoReserva;
+          monto_sena: number;
+          qr_token: string;
+          politica_cancelacion: Json;
+          cancelada_en?: string | null;
+          monto_devolucion?: number | null;
+          devolucion_pct?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          viaje_id?: string;
+          pasajero_id?: string;
+          asiento_num?: number | null;
+          estado?: EstadoReserva;
+          monto_sena?: number;
+          qr_token?: string;
+          politica_cancelacion?: Json;
+          cancelada_en?: string | null;
+          monto_devolucion?: number | null;
+          devolucion_pct?: number | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      pago: {
+        Row: {
+          id: string;
+          reserva_id: string;
+          tipo: TipoPago;
+          monto: number;
+          metodo: MetodoPago;
+          estado: EstadoPago;
+          comprobante: string | null;
+          confirmado_por: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          reserva_id: string;
+          tipo: TipoPago;
+          monto: number;
+          metodo: MetodoPago;
+          estado?: EstadoPago;
+          comprobante?: string | null;
+          confirmado_por?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          reserva_id?: string;
+          tipo?: TipoPago;
+          monto?: number;
+          metodo?: MetodoPago;
+          estado?: EstadoPago;
+          comprobante?: string | null;
+          confirmado_por?: string | null;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      crear_reserva: {
+        Args: { p_viaje_id: string };
+        Returns: Database["public"]["Tables"]["reserva"]["Row"];
+      };
+      asientos_libres_viaje: {
+        Args: { p_viaje_id: string };
+        Returns: number;
+      };
+      resolver_sena: {
+        Args: { p_pago_id: string; p_accion: string };
+        Returns: Json;
+      };
+      iniciar_recogida: {
+        Args: { p_viaje_id: string };
+        Returns: Database["public"]["Tables"]["viaje"]["Row"];
+      };
+      verificar_reserva_qr: {
+        Args: { p_viaje_id: string; p_qr_token: string };
+        Returns: Json;
+      };
+      registrar_saldo_y_abordar: {
+        Args: { p_reserva_id: string; p_metodo: string };
+        Returns: Json;
+      };
+      cancelar_reserva: {
+        Args: { p_reserva_id: string };
+        Returns: Json;
+      };
+      marcar_no_show: {
+        Args: { p_reserva_id: string };
+        Returns: Json;
+      };
+    };
     Enums: {
       rol: Rol;
+      estado_viaje: EstadoViaje;
+      tipo_parada: TipoParada;
+      estado_reserva: EstadoReserva;
+      tipo_pago: TipoPago;
+      metodo_pago: MetodoPago;
+      estado_pago: EstadoPago;
     };
     CompositeTypes: Record<string, never>;
   };

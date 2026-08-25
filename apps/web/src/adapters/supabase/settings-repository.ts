@@ -62,5 +62,38 @@ export function createSupabaseSettingsRepository(
       if (!data) return null;
       return toSetting(settingRowSchema.parse(data));
     },
+
+    async update(input) {
+      const patch: Database["public"]["Tables"]["settings"]["Update"] = {
+        valor: input.valor as Database["public"]["Tables"]["settings"]["Update"]["valor"],
+        updated_at: new Date().toISOString(),
+      };
+      if (input.updatedBy !== undefined) {
+        patch.actualizado_por = input.updatedBy;
+      }
+
+      const { data, error } = await client
+        .from("settings")
+        .update(patch)
+        .eq("clave", input.clave)
+        .select("clave, valor, tipo, descripcion, updated_at")
+        .maybeSingle();
+
+      if (error) {
+        throw new Error(`settings.update(${input.clave}) failed: ${error.message}`);
+      }
+      if (!data) {
+        throw new Error(`settings.update(${input.clave}) failed: not found`);
+      }
+      return toSetting(settingRowSchema.parse(data));
+    },
+
+    async updateMany(inputs) {
+      const results = [];
+      for (const input of inputs) {
+        results.push(await this.update(input));
+      }
+      return results;
+    },
   };
 }
