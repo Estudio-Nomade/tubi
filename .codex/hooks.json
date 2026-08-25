@@ -1,0 +1,24 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /home/imn0p/tubi/tubi/.bmad-loop/bmad_loop_hook.py SessionStart"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 /home/imn0p/tubi/tubi/.bmad-loop/bmad_loop_hook.py Stop"
+          }
+        ]
+      }
+    ]
+  }
+}
