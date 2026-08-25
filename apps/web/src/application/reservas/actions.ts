@@ -26,7 +26,7 @@ export async function createReservaAction(
   viajeId: string,
 ): Promise<CreateReservaResult | void> {
   if (!viajeId || typeof viajeId !== "string") {
-    return { error: "Viaje inválido." };
+    return { error: "Ese viaje no es válido." };
   }
 
   await requireProfile(["pasajero", "operador"]);
@@ -54,7 +54,7 @@ export async function createReservaAction(
     if (message === "TRANSICION_INVALIDA") {
       return { error: "Ese viaje ya no se puede reservar." };
     }
-    return { error: "No se pudo crear la reserva." };
+    return { error: "No se pudo crear la reserva. Probá de nuevo." };
   }
 }
 
@@ -62,7 +62,7 @@ export async function cancelReservaAction(
   reservaId: string,
 ): Promise<CancelReservaActionResult | void> {
   if (!reservaId || typeof reservaId !== "string") {
-    return { error: "Reserva inválida." };
+    return { error: "Esa reserva no es válida." };
   }
 
   await requireProfile(["pasajero", "operador"]);
@@ -92,6 +92,6 @@ export async function cancelReservaAction(
     if (message === "TRANSICION_INVALIDA") {
       return { error: "Esta reserva ya no se puede cancelar." };
     }
-    return { error: "No se pudo cancelar la reserva." };
+    return { error: "No se pudo cancelar la reserva. Probá de nuevo." };
   }
 }

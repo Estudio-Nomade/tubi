@@ -25,7 +25,7 @@ async function resolve(
   pagoId: string,
   accion: "confirmar" | "rechazar",
 ): Promise<ResolveSenaResult | void> {
-  if (!pagoId) return { error: "Pago inválido." };
+  if (!pagoId) return { error: "Ese pago no es válido." };
 
   await requireProfile(["operador"]);
   const supabase = await createClient();
@@ -49,7 +49,7 @@ async function resolve(
     if (msg === "NO_ENCONTRADO") {
       return { error: "No encontramos ese pago." };
     }
-    return { error: "No se pudo resolver la seña." };
+    return { error: "No se pudo resolver la seña. Probá de nuevo." };
   }
 
   revalidatePath("/operador");
