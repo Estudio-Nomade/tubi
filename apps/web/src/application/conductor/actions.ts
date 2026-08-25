@@ -8,6 +8,10 @@ import {
   mapNoShowErrorMessage,
   noShowErrorUserMessage,
 } from "@/domain/conductor";
+import {
+  completeTripErrorUserMessage,
+  mapCompleteTripErrorMessage,
+} from "@/domain/viajes";
 import { saldoErrorUserMessage, type MetodoPago } from "@/domain/pagos";
 import { requireProfile } from "@/lib/auth/require-profile";
 import { createClient } from "@/lib/supabase/server";
@@ -29,7 +33,7 @@ function isNextRedirect(err: unknown): boolean {
 export async function startPickupAction(
   viajeId: string,
 ): Promise<ActionError | void> {
-  if (!viajeId) return { error: "Viaje inválido." };
+  if (!viajeId) return { error: "Ese viaje no es válido." };
 
   await requireProfile(["conductor", "operador"]);
   const supabase = await createClient();
@@ -48,7 +52,7 @@ export async function startPickupAction(
     if (msg === "TRANSICION_INVALIDA") {
       return { error: "Este viaje no puede iniciar recogida ahora." };
     }
-    return { error: "No se pudo iniciar la recogida." };
+    return { error: "No se pudo iniciar la recogida. Probá de nuevo." };
   }
 
   revalidatePath("/conductor");
@@ -60,9 +64,9 @@ export async function verifyQrAction(
   viajeId: string,
   qrToken: string,
 ): Promise<ActionError | void> {
-  if (!viajeId) return { error: "Viaje inválido." };
+  if (!viajeId) return { error: "Ese viaje no es válido." };
   const token = qrToken?.trim() ?? "";
-  if (!token) return { error: "Código vacío." };
+  if (!token) return { error: "Ingresá o escaneá el código del pasajero." };
 
   await requireProfile(["conductor", "operador"]);
   const supabase = await createClient();
@@ -96,7 +100,9 @@ export async function registerSaldoAction(
   reservaId: string,
   metodo: string,
 ): Promise<ActionError | void> {
-  if (!viajeId || !reservaId) return { error: "Datos inválidos." };
+  if (!viajeId || !reservaId) {
+    return { error: "Faltan datos del viaje o la reserva." };
+  }
   if (metodo !== "efectivo" && metodo !== "transferencia") {
     return { error: "Elegí efectivo o transferencia." };
   }
@@ -136,7 +142,7 @@ export async function registerSaldoAction(
         return { error: saldoErrorUserMessage(code) };
       }
     }
-    return { error: "No se pudo registrar el saldo." };
+    return { error: "No se pudo registrar el saldo. Probá de nuevo." };
   }
 }
 
@@ -144,7 +150,9 @@ export async function marcarNoShowAction(
   viajeId: string,
   reservaId: string,
 ): Promise<ActionError | void> {
-  if (!viajeId || !reservaId) return { error: "Datos inválidos." };
+  if (!viajeId || !reservaId) {
+    return { error: "Faltan datos del viaje o la reserva." };
+  }
 
   await requireProfile(["conductor", "operador"]);
   const supabase = await createClient();
@@ -166,4 +174,29 @@ export async function marcarNoShowAction(
     const code = mapNoShowErrorMessage(msg);
     return { error: noShowErrorUserMessage(code) };
   }
+}
+
+export async function completeTripAction(
+  viajeId: string,
+): Promise<ActionError | void> {
+  if (!viajeId) return { error: "Ese viaje no es válido." };
+
+  await requireProfile(["conductor", "operador"]);
+  const supabase = await createClient();
+  const service = createConductorService(
+    createSupabaseConductorRepository(supabase),
+  );
+
+  try {
+    await service.completeTrip(viajeId);
+  } catch (err) {
+    if (isNextRedirect(err)) throw err;
+    const msg = err instanceof Error ? err.message : "";
+    const code = mapCompleteTripErrorMessage(msg);
+    return { error: completeTripErrorUserMessage(code) };
+  }
+
+  revalidatePath("/conductor");
+  revalidatePath(`/conductor/viajes/${viajeId}`);
+  redirect(`/conductor/viajes/${viajeId}?ok=completado`);
 }

@@ -1,5 +1,6 @@
 export type { ConductorRepository } from "./ports";
 export type {
+  CompleteTripResult,
   ConductorPassengerRow,
   ConductorTripDetail,
   ConductorTripSummary,

@@ -3,11 +3,13 @@ import { notFound } from "next/navigation";
 
 import { createSupabaseConductorRepository } from "@/adapters/supabase/conductor-repository";
 import { createConductorService } from "@/application/conductor";
+import { CompleteTripButton } from "@/components/conductor/complete-trip-button";
 import { PassengerRow } from "@/components/conductor/passenger-row";
 import { StartPickupButton } from "@/components/conductor/start-pickup-button";
 import {
   AppHeader,
   BtnPrimary,
+  BtnSecondary,
   EmptyHint,
   StatusPill,
   TabBar,
@@ -34,6 +36,8 @@ function tripEstadoPill(estado: EstadoViaje): {
       return { label: "En curso", variant: "ok" };
     case "programado":
       return { label: "Programado", variant: "neutral" };
+    case "completado":
+      return { label: "Completado", variant: "ok" };
     default:
       return null;
   }
@@ -49,6 +53,7 @@ export default async function ConductorViajePage({
   const q = await searchParams;
   const okAbordada = q.ok === "abordada";
   const okNoshow = q.ok === "noshow";
+  const okCompletado = q.ok === "completado";
   const viajeEnCurso = q.viaje === "en_curso";
 
   const supabase = await createClient();
@@ -115,8 +120,29 @@ export default async function ConductorViajePage({
           </p>
         ) : null}
 
+        {okCompletado || trip.estado === "completado" ? (
+          <p
+            className="rounded-xl bg-[#E4EDE5] px-3 py-2 text-sm font-medium text-[#5F7A61]"
+            role="status"
+          >
+            {okCompletado
+              ? "Viaje finalizado. Gracias."
+              : "Este viaje ya terminó."}
+          </p>
+        ) : null}
+
         {trip.estado === "programado" ? (
           <StartPickupButton viajeId={trip.id} />
+        ) : trip.estado === "completado" ? null : trip.estado === "en_curso" &&
+          pendientes.length === 0 ? (
+          <div className="flex w-full flex-col gap-2">
+            <CompleteTripButton viajeId={trip.id} />
+            <BtnSecondary asChild>
+              <Link href={`/conductor/viajes/${trip.id}/escanear`}>
+                Escanear otro QR
+              </Link>
+            </BtnSecondary>
+          </div>
         ) : trip.estado === "en_curso" ? (
           <BtnPrimary asChild>
             <Link href={`/conductor/viajes/${trip.id}/escanear`}>

@@ -1,6 +1,7 @@
 import type { MetodoPago } from "@/domain/pagos";
 
 import type {
+  CompleteTripResult,
   ConductorTripDetail,
   ConductorTripSummary,
   MarkNoShowResult,
@@ -36,4 +37,5 @@ export interface ConductorRepository {
     options?: { isOperador?: boolean },
   ): Promise<PickupContext | null>;
   markNoShow(reservaId: string): Promise<MarkNoShowResult>;
+  completeTrip(viajeId: string): Promise<CompleteTripResult>;
 }

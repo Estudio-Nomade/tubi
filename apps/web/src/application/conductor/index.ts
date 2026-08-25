@@ -7,5 +7,6 @@ export {
   verifyQrAction,
   registerSaldoAction,
   marcarNoShowAction,
+  completeTripAction,
   type ActionError,
 } from "./actions";

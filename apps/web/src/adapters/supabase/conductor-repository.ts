@@ -6,6 +6,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import {
   mapVerifyErrorMessage,
+  type CompleteTripResult,
   type ConductorPassengerRow,
   type ConductorRepository,
   type ConductorTripDetail,
@@ -57,6 +58,9 @@ function mapRpcError(message: string): Error {
   }
   if (message.includes("TRANSICION_INVALIDA")) {
     return new Error("TRANSICION_INVALIDA");
+  }
+  if (message.includes("PENDIENTES_ACTIVOS")) {
+    return new Error("PENDIENTES_ACTIVOS");
   }
   if (message.includes("YA_NO_SHOW")) return new Error("YA_NO_SHOW");
   if (message.includes("ESTADO_INVALIDO")) return new Error("ESTADO_INVALIDO");
@@ -418,6 +422,28 @@ export function createSupabaseConductorRepository(
         estado: "no_show",
         viajeEstado: String(obj.viaje_estado ?? "recogida") as EstadoViaje,
         pasajeroNombre: String(obj.pasajero_nombre ?? ""),
+        origen: String(obj.origen ?? ""),
+        destino: String(obj.destino ?? ""),
+      };
+    },
+
+    async completeTrip(viajeId: string): Promise<CompleteTripResult> {
+      const { data, error } = await client.rpc("completar_viaje", {
+        p_viaje_id: viajeId,
+      });
+      if (error) throw mapRpcError(error.message);
+
+      const payload = data as Json;
+      if (!payload || typeof payload !== "object" || Array.isArray(payload)) {
+        throw new Error("TRANSICION_INVALIDA");
+      }
+      const obj = payload as Record<string, unknown>;
+      if (obj.ok !== true) throw new Error("TRANSICION_INVALIDA");
+
+      return {
+        ok: true,
+        viajeId: String(obj.viaje_id ?? viajeId),
+        estado: "completado",
         origen: String(obj.origen ?? ""),
         destino: String(obj.destino ?? ""),
       };
