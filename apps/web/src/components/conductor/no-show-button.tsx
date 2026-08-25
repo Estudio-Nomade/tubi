@@ -12,7 +12,7 @@ type Props = {
   timerDone: boolean;
 };
 
-/** Pencil C5 — Marcar no-show (early needs confirm). */
+/** Pencil C5 — No llegó (early needs confirm). */
 export function NoShowButton({ viajeId, reservaId, timerDone }: Props) {
   const [pending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -21,7 +21,7 @@ export function NoShowButton({ viajeId, reservaId, timerDone }: Props) {
     setError(null);
     if (!timerDone) {
       const ok = window.confirm(
-        "¿Marcar no-show antes de que termine la espera? La seña se retiene.",
+        "¿Marcar que no llegó antes de que termine la espera? Se retiene la seña y seguís con el resto.",
       );
       if (!ok) return;
     }
@@ -39,7 +39,7 @@ export function NoShowButton({ viajeId, reservaId, timerDone }: Props) {
         </div>
       ) : null}
       <BtnDanger type="button" disabled={pending} onClick={markNoShow}>
-        {pending ? "Marcando…" : "Marcar no-show"}
+        {pending ? "Marcando…" : "No llegó"}
       </BtnDanger>
     </div>
   );

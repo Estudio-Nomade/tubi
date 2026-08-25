@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import type { ReactNode } from "react";
 import { DM_Sans, Fraunces } from "next/font/google";
 
 import { getSettings } from "@/application/settings";
@@ -44,7 +45,11 @@ async function loadSettingsForLayout(): Promise<{
   }
 }
 
-export default async function RootLayout({ children }: LayoutProps<"/">) {
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const { items, error } = await loadSettingsForLayout();
 
   return (

@@ -98,3 +98,11 @@ export type MarkNoShowFailureCode =
   | "NO_AUTORIZADO"
   | "NO_ENCONTRADO"
   | "NO_AUTENTICADO";
+
+export type CompleteTripResult = {
+  ok: true;
+  viajeId: string;
+  estado: "completado";
+  origen: string;
+  destino: string;
+};

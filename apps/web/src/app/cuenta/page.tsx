@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { homePathForRol, signOutAction } from "@/application/auth";
 import {
   AppHeader,
@@ -90,6 +92,15 @@ export default async function CuentaPage() {
         ) : null}
 
         <div className="flex-1" aria-hidden />
+
+        {profile.rol === "pasajero" || profile.rol === "operador" ? (
+          <Link
+            href="/pasajero/reservas"
+            className="inline-flex h-11 w-full items-center justify-center rounded-[14px] border border-border bg-card text-sm font-semibold text-foreground"
+          >
+            Mis reservas
+          </Link>
+        ) : null}
 
         <form action={signOutAction}>
           <BtnSecondary type="submit">Cerrar sesión</BtnSecondary>

@@ -41,8 +41,14 @@ export default async function PasajeroPaseIndexPage() {
               <EmptyHint message="Todavía no tenés un pase de abordaje. Se habilita cuando la seña está confirmada." />
             </div>
             <BtnPrimary asChild>
-              <Link href="/pasajero/buscar">Buscar viaje</Link>
+              <Link href="/pasajero/reservas">Ver mis reservas</Link>
             </BtnPrimary>
+            <Link
+              href="/pasajero/buscar"
+              className="text-center text-sm font-medium text-primary underline-offset-4 hover:underline"
+            >
+              Buscar viaje
+            </Link>
           </div>
         ) : (
           <ul className="flex flex-col gap-3">

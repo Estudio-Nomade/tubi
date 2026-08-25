@@ -18,16 +18,16 @@ export function mapNoShowErrorMessage(message: string): MarkNoShowFailureCode {
 export function noShowErrorUserMessage(code: MarkNoShowFailureCode): string {
   switch (code) {
     case "YA_NO_SHOW":
-      return "Esta reserva ya está marcada como no-show.";
+      return "Este pasajero ya está marcado como que no llegó.";
     case "ESTADO_INVALIDO":
-      return "Esta reserva no se puede marcar como no-show ahora.";
+      return "No se puede marcar que no llegó en este momento.";
     case "NO_AUTORIZADO":
-      return "No tenés permiso para marcar no-show en este viaje.";
+      return "No tenés permiso para esta acción en el viaje.";
     case "NO_ENCONTRADO":
       return "No encontramos esa reserva.";
     case "NO_AUTENTICADO":
       return "Tenés que iniciar sesión.";
     default:
-      return "No se pudo marcar el no-show.";
+      return "No se pudo marcar que no llegó. Probá de nuevo.";
   }
 }

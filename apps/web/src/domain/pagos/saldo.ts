@@ -34,7 +34,7 @@ export function mapSaldoErrorMessage(message: string): SaldoErrorCode {
 export function saldoErrorUserMessage(code: SaldoErrorCode): string {
   switch (code) {
     case "YA_ABORDADA":
-      return "Este pasajero ya está abordado.";
+      return "Este pasajero ya está a bordo.";
     case "RESERVA_NO_VERIFICADA":
       return "Primero tenés que escanear el QR del pasajero.";
     case "SALDO_YA_REGISTRADO":

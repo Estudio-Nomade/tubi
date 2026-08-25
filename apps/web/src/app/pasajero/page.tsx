@@ -175,9 +175,9 @@ export default async function PasajeroPage({ searchParams }: PageProps) {
 
         <Link
           href="/pasajero/reservas"
-          className="text-center text-sm font-medium text-primary underline-offset-4 hover:underline"
+          className="inline-flex h-11 w-full items-center justify-center rounded-[14px] border border-border bg-card text-sm font-semibold text-foreground"
         >
-          Ver todas mis reservas
+          Mis reservas
         </Link>
 
         {active ? (

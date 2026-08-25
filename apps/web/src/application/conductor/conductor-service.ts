@@ -1,4 +1,5 @@
 import type {
+  CompleteTripResult,
   ConductorRepository,
   ConductorTripDetail,
   ConductorTripSummary,
@@ -52,6 +53,9 @@ export function createConductorService(repo: ConductorRepository) {
     },
     markNoShow(reservaId: string): Promise<MarkNoShowResult> {
       return repo.markNoShow(reservaId);
+    },
+    completeTrip(viajeId: string): Promise<CompleteTripResult> {
+      return repo.completeTrip(viajeId);
     },
   };
 }

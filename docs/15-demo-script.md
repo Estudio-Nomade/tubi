@@ -1,8 +1,8 @@
-# Guión de demo — Tubi (5–7 min)
+# Guión de demo — Tubi (6–8 min)
 
 **Producto:** viajes compartidos interurbanos (Tandil ↔ Buenos Aires).  
 **Público:** walkthrough operable con seed local.  
-**Prerrequisito:** migraciones Supabase aplicadas **hasta `0014_slice7_demo_pack.sql`** inclusive (`supabase db reset` o migrate up).
+**Prerrequisito:** migraciones Supabase aplicadas **hasta `0019_demo_pack_mvp_close.sql`** inclusive (`supabase db reset` o migrate up).
 
 Password de **todas** las cuentas demo: `demo-demo-1`
 
@@ -18,7 +18,7 @@ Password de **todas** las cuentas demo: `demo-demo-1`
 | Conductor | Luis Demo | `conductor.demo@tubi.local` | `demo-demo-1` |
 | Operador | Operador Demo | `operador.demo@tubi.local` | `demo-demo-1` |
 
-### Tokens QR del viaje de hoy (Plan B / sin cámara)
+### Tokens QR del viaje de recogida (Plan B / sin cámara)
 
 | Pasajero | `qr_token` (pegar en el scanner) |
 |---|---|
@@ -28,71 +28,82 @@ Password de **todas** las cuentas demo: `demo-demo-1`
 
 ### IDs fijos (debug / SQL)
 
-| Entidad | UUID |
-|---|---|
-| Viaje hoy 07:00 AR | `eeeeeeee-bbbb-cccc-dddd-000000000010` |
-| Reserva Ana | `ffffffff-bbbb-cccc-dddd-000000000010` |
-| Reserva Bruno | `ffffffff-bbbb-cccc-dddd-000000000011` |
-| Reserva Carla | `ffffffff-bbbb-cccc-dddd-000000000012` |
-| Conductor Luis | `aaaaaaaa-bbbb-cccc-dddd-000000000001` |
-| Ana | `aaaaaaaa-bbbb-cccc-dddd-000000000010` |
+| Entidad | UUID | Estado seed |
+|---|---|---|
+| Viaje A hoy 07:00 AR | `eeeeeeee-bbbb-cccc-dddd-000000000010` | `programado` · 3 confirmadas |
+| Viaje B hoy 14:00 AR | `eeeeeeee-bbbb-cccc-dddd-000000000020` | `en_curso` · listo Finalizar |
+| Viaje C mañana 09:00 AR | `eeeeeeee-bbbb-cccc-dddd-000000000030` | seña pendiente (Bruno) |
+| Reserva Ana (QR) | `ffffffff-bbbb-cccc-dddd-000000000010` | `confirmada` |
+| Conductor Luis | `aaaaaaaa-bbbb-cccc-dddd-000000000001` | — |
+| Ana | `aaaaaaaa-bbbb-cccc-dddd-000000000010` | — |
 
-Seed: 1 viaje **hoy 07:00** (AR), estado `programado`, precio $25.000, **3 reservas `confirmada`** con seña $5.000 ya confirmada.
+Seed post-0019:
+
+1. **Viaje A** hoy 07:00 · `programado` · Ana/Bruno/Carla `confirmada` + QR (recogida / C5).
+2. **Viaje B** hoy 14:00 · `en_curso` · Bruno abordada + Carla no_show → **Finalizar viaje** (sin Ana, para no tapar su home/QR).
+3. **Viaje C** mañana · Bruno `pendiente_sena` + pago `pendiente` → cola operador.
 
 ---
 
 ## Antes de empezar (30 s)
 
 1. App web levantada (mobile-first / viewport ~375px).
-2. Supabase local con migraciones **0001 → 0014**.
-3. Ventanas o perfiles: pasajero (Ana) y conductor (Luis). Operador opcional.
-4. Si la demo ya se corrió y el viaje quedó en otro estado, re-aplicar seed (`db reset`) o re-ejecutar `0014`.
+2. Supabase local con migraciones **0001 → 0019**.
+3. Ventanas o perfiles: pasajero (Ana), conductor (Luis), operador.
+4. Si la demo ya se corrió: `supabase db reset` (reaplica 0014 + 0019).
 
 ---
 
-## Guión (~6 min)
+## Guión (~7 min)
 
-### 0. Operador — skip si la cola está vacía (~30 s)
+### 0. Operador — cola de señas (~45 s)
 
 1. Login: `operador.demo@tubi.local` / `demo-demo-1`.
-2. Ir a la cola de señas pendientes.
-3. **Si está vacía** (esperado con el demo pack: las 3 señas ya vienen `confirmado`): decir en voz alta *“En producción el operador confirma transferencias; hoy el seed ya las dejó listas para no perder tiempo”* y cerrar sesión.
-4. **Si hay pendientes** de otra prueba: confirmar una y mostrar el cambio a reserva confirmada.
+2. Home: **≥1 seña pendiente** (viaje de mañana de Bruno).
+3. Abrir comprobante → **Confirmar** (o rechazar y explicar reenvío).
+4. Opcional: **Configuración** → tocar monto de seña o tiempo de espera.
+5. Cerrar sesión (o dejar pestaña).
 
-### 1. Pasajero Ana — home y reservas (~2 min)
+### 1. Pasajero Ana — Mis reservas → Ver QR (~2 min)
 
 1. Login: `pasajero.demo@tubi.local` / `demo-demo-1`.
-2. **Home:** viaje de hoy Tandil → Buenos Aires, estado de reserva confirmada.
-3. **Mis reservas:** lista con la reserva de hoy (y cualquier otra del seed histórico si aparece).
-4. Abrir el detalle / **pase QR** de Ana.
-5. Mostrar el QR en pantalla. Decir: *“El conductor escanea este token; no lleva DNI ni datos sensibles”*.
-6. Dejar la pantalla del QR visible (segundo dispositivo o split) para el paso del conductor.
+2. **Home:** viaje de hoy Tandil → Buenos Aires, reserva confirmada.
+3. **Mis reservas** (home o tab): lista con la de hoy.
+4. En la tarjeta confirmada: **Ver QR** (o entrar al pase).
+5. Mostrar el QR. Decir: *“El conductor escanea este token; no lleva DNI ni datos sensibles”*.
+6. Dejar el QR visible para el paso del conductor.
 
-### 2. Conductor Luis — recogida y 3 pasajeros (~3–4 min)
+### 2. Conductor Luis — recogida, No llegó, saldo (~3 min)
 
-1. Logout Ana (o otra ventana). Login: `conductor.demo@tubi.local` / `demo-demo-1`.
-2. **Home conductor:** viaje de hoy, 3 pasajeros confirmados, CTA para empezar.
+1. Login: `conductor.demo@tubi.local` / `demo-demo-1`.
+2. **Home:** viaje de hoy 07:00, 3 pasajeros confirmados.
 3. **Empezar recogida** (viaje → `recogida`).
-4. Abrir **Escanear QR**.
-5. Escanear el QR de Ana **o** usar Plan B (abajo).
-6. Tras verificar: **cobrar saldo** (efectivo o transferencia demo) → reserva `abordada`.
-7. Repetir con Bruno y Carla (tokens Plan B si no hay cámara):
-   - `opq_demo_b_0002`
-   - `opq_demo_c_0003`
-8. Volver al hub del viaje: mostrar **3 a bordo** / progreso completo.
+4. Abrir pasajero → pantalla C5: timer de espera + **No llegó**.
+5. **Escanear QR** de Ana (cámara o Plan B: `opq_demo_ana_0001`).
+6. Cobrar **saldo** (efectivo o transferencia) → `abordada`.
+7. En Bruno o Carla: demo **No llegó** (o escanear + saldo en los demás).
+8. Hub: progreso a bordo / no_show.
 
-### 3. Cierre (~30 s)
+### 3. Finalizar viaje (~1 min)
 
-- Recapitular flujo: seña confirmada → QR → verificar → saldo → a bordo.
-- Mencionar: política de espera, GPS y más rutas quedan fuera de este walkthrough.
+**Opción rápida (seed listo):**
+
+1. En home conductor, abrir el viaje de las **14:00** (`en_curso`).
+2. CTA **Finalizar viaje** → confirmar.
+3. Estado `completado`. Decir: *“Solo se puede cerrar cuando no quedan confirmadas/verificadas pendientes”*.
+
+**Opción larga:** terminar de abordar/no-show a todos en el viaje de las 07:00 hasta `en_curso`, luego Finalizar.
+
+### 4. Cierre (~30 s)
+
+- Flujo: seña → operador → QR → recogida → saldo / no llegó → finalizar.
+- Fuera de scope del walkthrough: GPS en vivo, multi-ruta, apps nativas.
 
 ---
 
 ## Plan B — pegar tokens (sin cámara)
 
-Si el scanner no tiene cámara, falla el permiso, o la demo es en desktop:
-
-1. En la pantalla de escaneo del conductor, usar el campo / acción de **ingreso manual de token** (si existe en la UI).
+1. En escaneo del conductor, ingreso manual de token.
 2. Pegar uno por uno:
 
 ```
@@ -101,8 +112,8 @@ opq_demo_b_0002
 opq_demo_c_0003
 ```
 
-3. Después de cada token válido: pantalla de OK → cobrar saldo → siguiente.
-4. Si un token falla (“ya usado” / estado inválido): el viaje se corrompió por una demo anterior → `supabase db reset` y reiniciar el guión.
+3. Tras cada token válido: OK → cobrar saldo → siguiente.
+4. Si falla (“ya usado”): `supabase db reset` y reiniciar.
 
 ---
 
@@ -110,18 +121,18 @@ opq_demo_c_0003
 
 | Síntoma | Qué hacer |
 |---|---|
-| No entra ningún login | Revisar Supabase Auth local y que existan los users de 0008/0011/0014 |
-| Conductor sin viaje de hoy | Migración 0014 no aplicada o `fecha_salida` del día anterior → reset |
-| Ana sin reserva | 0014 incompleto; chequear `reserva` del viaje `…0010` |
-| QR inválido | Token mal copiado; usar exactamente `opq_demo_*` de la tabla |
-| Viaje ya en `en_curso` / pasajeros `abordada` | Reset DB antes de la demo en vivo |
-| Operador con cola llena de basura | Reset o limpiar `pago` pendientes de pruebas previas |
+| No entra ningún login | Auth local + users 0008/0011/0014 |
+| Conductor sin viaje de hoy | Falta 0019 o fecha vieja → reset |
+| Ana sin QR | Reserva `…010` no `confirmada`; chequear 0014/0019 |
+| Cola operador vacía | Falta viaje C / pago `…030` pendiente |
+| Finalizar deshabilitado | Hay `confirmada`/`verificada`; usar viaje B o cerrar pendientes |
+| Viaje ya consumido por demo previa | `supabase db reset` |
 
 ---
 
 ## Notas técnicas
 
-- Migración del pack: `supabase/migrations/0014_slice7_demo_pack.sql`.
-- Depende de: ruta/vehículo/conductor (`0008`), operador (`0011`), tablas `reserva`/`pago` y RPCs de slices 2–6.
-- Conductor en seed anterior se llamaba Ariel; **0014 lo renombra a Luis**.
-- Idempotencia: re-correr 0014 actualiza viaje de hoy, reservas y pagos por PK fija.
+- Pack base: `0014_slice7_demo_pack.sql` (users + viaje A).
+- Refresh MVP: `0019_demo_pack_mvp_close.sql` (fechas hoy AR, viaje B finalizar, viaje C seña).
+- Depende de: ruta/vehículo/conductor (`0008`), operador (`0011`), RPCs slices 2–10.
+- Idempotencia: re-correr 0019 actualiza por PK fija; no recrea auth users.

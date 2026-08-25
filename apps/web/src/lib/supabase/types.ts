@@ -348,6 +348,10 @@ export type Database = {
         Args: { p_reserva_id: string };
         Returns: Json;
       };
+      completar_viaje: {
+        Args: { p_viaje_id: string };
+        Returns: Json;
+      };
     };
     Enums: {
       rol: Rol;

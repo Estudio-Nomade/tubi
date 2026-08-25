@@ -110,7 +110,7 @@ export function PassengerRow({
         {showRecogida && recogidaHref ? (
           <Link
             href={recogidaHref}
-            className="px-1 text-right text-xs font-semibold text-[#B42318]"
+            className="inline-flex h-10 w-full items-center justify-center rounded-xl bg-[#FCEBEA] text-sm font-semibold text-[#B42318]"
           >
             No llegó
           </Link>

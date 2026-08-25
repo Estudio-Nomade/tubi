@@ -27,6 +27,8 @@ function tripEstadoPill(estado: EstadoViaje): {
       return { label: "Recogida", variant: "pending" };
     case "en_curso":
       return { label: "En curso", variant: "ok" };
+    case "completado":
+      return { label: "Completado", variant: "ok" };
     case "programado":
     default:
       return { label: "Programado", variant: "neutral" };
@@ -83,7 +85,7 @@ export default async function ConductorPage() {
               <EmptyHint message="No hay viajes asignados hoy" />
             </div>
             <p className="px-2 text-center text-sm font-normal text-muted-foreground">
-              Coordiná con el operador si creés que falta uno
+              Cuando el operador te asigne un viaje, aparece acá.
             </p>
             <BtnSecondary
               disabled
@@ -125,6 +127,10 @@ export default async function ConductorPage() {
               ) : null}
               {detail.estado === "programado" ? (
                 <StartPickupButton viajeId={detail.id} />
+              ) : detail.estado === "completado" ? (
+                <BtnSecondary asChild>
+                  <Link href={hubHref!}>Ver viaje</Link>
+                </BtnSecondary>
               ) : detail.estado === "en_curso" ? (
                 <BtnPrimary asChild>
                   <Link href={hubHref!}>Ir al viaje</Link>

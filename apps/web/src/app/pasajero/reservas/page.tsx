@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
 
 import { createSupabaseReservasRepository } from "@/adapters/supabase/reservas-repository";
 import { createReservasService } from "@/application/reservas";
@@ -27,9 +26,7 @@ type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 
-function first(
-  value: string | string[] | undefined,
-): string {
+function first(value: string | string[] | undefined): string {
   if (Array.isArray(value)) return value[0] ?? "";
   return value ?? "";
 }
@@ -56,14 +53,34 @@ function statusForEstado(estado: EstadoReserva): {
   }
 }
 
-function hrefForItem(item: ReservaListItem): string | null {
-  if (item.estado === "confirmada") {
-    return `/pasajero/pase/${item.reservaId}`;
+function primaryAction(item: ReservaListItem): {
+  href: string;
+  label: string;
+} | null {
+  switch (item.estado) {
+    case "confirmada":
+      return { href: `/pasajero/pase/${item.reservaId}`, label: "Ver QR" };
+    case "pendiente_sena":
+      return {
+        href: `/pasajero/reservas/${item.reservaId}/sena`,
+        label: "Completar seña",
+      };
+    default:
+      return null;
   }
-  if (item.estado === "pendiente_sena") {
-    return `/pasajero/reservas/${item.reservaId}/sena`;
+}
+
+function secondaryCopy(estado: EstadoReserva): string | null {
+  switch (estado) {
+    case "verificada":
+      return "El conductor ya escaneó tu QR.";
+    case "abordada":
+      return "Viajaste. Gracias.";
+    case "no_show":
+      return "No te presentaste en la parada.";
+    default:
+      return null;
   }
-  return null;
 }
 
 function cancelPreview(item: ReservaListItem): {
@@ -128,7 +145,7 @@ export default async function PasajeroReservasPage({ searchParams }: PageProps) 
         {list.length === 0 ? (
           <div className="flex flex-1 flex-col items-center justify-center gap-5">
             <div className="w-full rounded-2xl border border-border bg-card px-4 py-2 shadow-[0_4px_16px_rgba(28,25,23,0.06)]">
-              <EmptyHint message="Todavía no tenés reservas" />
+              <EmptyHint message="Todavía no tenés reservas. Buscá un viaje Tandil ↔ Buenos Aires." />
             </div>
             <BtnPrimary asChild>
               <Link href="/pasajero/buscar">Buscar viaje</Link>
@@ -138,17 +155,24 @@ export default async function PasajeroReservasPage({ searchParams }: PageProps) 
           <ul className="flex flex-col gap-3">
             {list.map((item) => {
               const status = statusForEstado(item.estado);
-              const href = hrefForItem(item);
+              const action = primaryAction(item);
+              const hint = secondaryCopy(item.estado);
               const cancel = cancelPreview(item);
-              const body = (
-                <>
-                  <StatusPill
-                    label={status.label}
-                    variant={status.variant}
-                    className="self-start"
-                  />
-                  <div className="flex min-w-0 flex-1 items-center gap-3">
-                    <div className="flex min-w-0 flex-1 flex-col gap-1">
+
+              return (
+                <li key={item.reservaId} className="flex flex-col gap-2">
+                  <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-[0_4px_16px_rgba(28,25,23,0.06)]">
+                    <StatusPill
+                      label={status.label}
+                      variant={status.variant}
+                      className="self-start"
+                    />
+                    {hint ? (
+                      <p className="text-sm font-medium text-muted-foreground">
+                        {hint}
+                      </p>
+                    ) : null}
+                    <div className="flex min-w-0 flex-col gap-1">
                       <p className="font-heading text-[22px] font-semibold leading-tight text-foreground">
                         {item.origen} → {item.destino}
                       </p>
@@ -168,30 +192,12 @@ export default async function PasajeroReservasPage({ searchParams }: PageProps) 
                         </p>
                       ) : null}
                     </div>
-                    {href ? (
-                      <ChevronRight
-                        className="size-5 shrink-0 text-muted-foreground"
-                        aria-hidden
-                      />
+                    {action ? (
+                      <BtnPrimary asChild className="h-11 text-base">
+                        <Link href={action.href}>{action.label}</Link>
+                      </BtnPrimary>
                     ) : null}
                   </div>
-                </>
-              );
-
-              return (
-                <li key={item.reservaId} className="flex flex-col gap-2">
-                  {href ? (
-                    <Link
-                      href={href}
-                      className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-[0_4px_16px_rgba(28,25,23,0.06)] transition-colors hover:bg-card/80"
-                    >
-                      {body}
-                    </Link>
-                  ) : (
-                    <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-[0_4px_16px_rgba(28,25,23,0.06)]">
-                      {body}
-                    </div>
-                  )}
                   {cancel ? (
                     <CancelReservaButton
                       reservaId={item.reservaId}

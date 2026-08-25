@@ -52,7 +52,7 @@ export async function submitSenaComprobanteAction(
   const file = formData.get("comprobante");
 
   if (!reservaId) {
-    return { error: "Reserva inválida." };
+    return { error: "Esa reserva no es válida." };
   }
   if (!(file instanceof File) || file.size === 0) {
     return { error: "Subí una foto o PDF del comprobante." };
