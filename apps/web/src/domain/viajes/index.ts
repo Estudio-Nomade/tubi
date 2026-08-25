@@ -17,3 +17,13 @@ export {
   mapCompleteTripErrorMessage,
   completeTripErrorUserMessage,
 } from "./complete";
+export type {
+  CancelTripErrorCode,
+  MarkRefundErrorCode,
+} from "./cancel-trip";
+export {
+  mapCancelTripErrorMessage,
+  cancelTripErrorUserMessage,
+  mapMarkRefundErrorMessage,
+  markRefundErrorUserMessage,
+} from "./cancel-trip";

@@ -1,12 +1,17 @@
 import Link from "next/link";
 
 import { createOperadorSenasRepository } from "@/adapters/supabase/operador-senas-repository";
-import { createOperadorSenasService } from "@/application/operador";
+import { createOperadorViajesRepository } from "@/adapters/supabase/operador-viajes-repository";
+import {
+  createOperadorSenasService,
+  createOperadorViajesService,
+} from "@/application/operador";
 import {
   AppHeader,
   EmptyHint,
   StatusPill,
 } from "@/components/design";
+import { OperadorNav } from "@/components/operador/operador-nav";
 import { formatArs, formatFechaHoraAr, formatHoraAr } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
@@ -23,7 +28,13 @@ export default async function OperadorPage({ searchParams }: PageProps) {
   const service = createOperadorSenasService(
     createOperadorSenasRepository(supabase),
   );
-  const items = await service.listPending();
+  const viajes = createOperadorViajesService(
+    createOperadorViajesRepository(supabase),
+  );
+  const [items, devCount] = await Promise.all([
+    service.listPending(),
+    viajes.countDevoluciones(),
+  ]);
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
@@ -98,19 +109,8 @@ export default async function OperadorPage({ searchParams }: PageProps) {
           </ul>
         )}
 
-        <div className="mt-auto flex flex-col items-center gap-2">
-          <Link
-            href="/operador/settings"
-            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-          >
-            Configuración
-          </Link>
-          <Link
-            href="/cuenta"
-            className="text-sm font-medium text-muted-foreground underline-offset-4 hover:underline"
-          >
-            Tu cuenta
-          </Link>
+        <div className="mt-auto">
+          <OperadorNav active="senas" devolucionesCount={devCount} />
         </div>
       </main>
     </div>

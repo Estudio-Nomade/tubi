@@ -59,6 +59,8 @@ export type ReservaListItem = {
   montoSena: number;
   precioViaje?: number;
   politicaCancelacion?: PoliticaCancelacionSnapshot;
+  /** Pending refund amount after cancel (operator settles out-of-band). */
+  montoDevolucion?: number;
 };
 
 /** Result of cancelar_reserva RPC. */

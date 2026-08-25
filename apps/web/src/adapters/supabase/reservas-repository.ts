@@ -285,6 +285,7 @@ export function createSupabaseReservasRepository(
           id,
           estado,
           monto_sena,
+          monto_devolucion,
           politica_cancelacion,
           viaje!inner (
             fecha_salida,
@@ -483,6 +484,7 @@ function mapListItem(data: unknown): ReservaListItem | null {
     id: string;
     estado: string;
     monto_sena: number | string;
+    monto_devolucion?: number | string | null;
     politica_cancelacion?: Json;
     viaje:
       | {
@@ -518,6 +520,9 @@ function mapListItem(data: unknown): ReservaListItem | null {
     }
   }
 
+  const montoDev =
+    row.monto_devolucion == null ? undefined : Number(row.monto_devolucion);
+
   return {
     reservaId: row.id,
     estado: row.estado as EstadoReserva,
@@ -527,5 +532,9 @@ function mapListItem(data: unknown): ReservaListItem | null {
     montoSena: Number(row.monto_sena),
     precioViaje: Number(viaje.precio),
     politicaCancelacion,
+    montoDevolucion:
+      montoDev != null && Number.isFinite(montoDev) && montoDev > 0
+        ? montoDev
+        : undefined,
   };
 }

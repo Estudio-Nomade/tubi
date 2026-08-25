@@ -118,6 +118,8 @@ Día 6–7:   G1.final Re-smoke prod + go/no-go
 
 # Slice G1 — Entorno real + smoke (bloqueante)
 
+**Runbook:** `docs/21-go-live-runbook.md`
+
 **Esfuerzo:** 1–2 días · **Riesgo:** medio (cuentas cloud, DNS, secrets)
 
 ### Task G1.1 — Supabase staging + prod

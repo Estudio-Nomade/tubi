@@ -70,7 +70,17 @@ function primaryAction(item: ReservaListItem): {
   }
 }
 
-function secondaryCopy(estado: EstadoReserva): string | null {
+function secondaryCopy(
+  estado: EstadoReserva,
+  montoDevolucion?: number,
+): string | null {
+  if (
+    estado === "cancelada" &&
+    montoDevolucion != null &&
+    montoDevolucion > 0
+  ) {
+    return `Devolución pendiente: ${formatArs(montoDevolucion)}.`;
+  }
   switch (estado) {
     case "verificada":
       return "El conductor ya escaneó tu QR.";
@@ -78,6 +88,8 @@ function secondaryCopy(estado: EstadoReserva): string | null {
       return "Viajaste. Gracias.";
     case "no_show":
       return "No te presentaste en la parada.";
+    case "cancelada":
+      return "Reserva cancelada.";
     default:
       return null;
   }
@@ -156,7 +168,7 @@ export default async function PasajeroReservasPage({ searchParams }: PageProps) 
             {list.map((item) => {
               const status = statusForEstado(item.estado);
               const action = primaryAction(item);
-              const hint = secondaryCopy(item.estado);
+              const hint = secondaryCopy(item.estado, item.montoDevolucion);
               const cancel = cancelPreview(item);
 
               return (
