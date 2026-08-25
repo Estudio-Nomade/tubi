@@ -4,12 +4,11 @@
  * Next.js 16 renames this convention to proxy.ts internally; we keep middleware.ts
  * as the project entry name. Export must stay `middleware` for the framework.
  *
- * Strategy (Slice 0.5 — will grow):
+ * Strategy:
  * 1. Refresh the Supabase auth session on every matched request (cookie rotation).
- * 2. Public routes stay open (home, offline fallback).
- * 3. Role areas /conductor/* and /operador/* require a session; otherwise → /
- *    (temporary until /login exists).
- * 4. Role checks (profiles.rol + RLS) come later.
+ * 2. Public routes stay open (home, login, registro, auth callbacks, offline, dev smoke).
+ * 3. Role area prefixes require a session only; otherwise → /login?next=
+ * 4. Role authorization lives in area layouts via getCurrentProfile() (not edge).
  *
  * Without Supabase env vars we pass through so local UI work still works.
  */
@@ -18,14 +17,24 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { updateSession } from "@/lib/supabase/middleware";
 
-/** Path prefixes that require an authenticated user. */
-const PROTECTED_PREFIXES = ["/conductor", "/operador"] as const;
+/** Path prefixes that require an authenticated session (role checked in layouts). */
+const PROTECTED_PREFIXES = [
+  "/pasajero",
+  "/conductor",
+  "/operador",
+  "/cuenta",
+] as const;
 
 /** Paths always reachable without a session (besides static assets excluded by matcher). */
 function isPublicPath(pathname: string): boolean {
   if (pathname === "/") return true;
-  if (pathname === "/~offline" || pathname.startsWith("/~offline/")) return true;
+  if (pathname === "/login" || pathname.startsWith("/login/")) return true;
+  if (pathname === "/registro" || pathname.startsWith("/registro/")) return true;
   if (pathname.startsWith("/auth/")) return true;
+  if (pathname === "/~offline" || pathname.startsWith("/~offline/")) return true;
+  if (pathname === "/dev/settings" || pathname.startsWith("/dev/settings/")) {
+    return true;
+  }
   return false;
 }
 
@@ -51,10 +60,10 @@ export async function middleware(request: NextRequest) {
   }
 
   if (isProtectedPath(pathname) && !user && !isPublicPath(pathname)) {
-    const homeUrl = request.nextUrl.clone();
-    homeUrl.pathname = "/";
-    homeUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(homeUrl);
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   return response;
