@@ -242,6 +242,7 @@ export type Database = {
           cancelada_en: string | null;
           monto_devolucion: number | null;
           devolucion_pct: number | null;
+          devolucion_saldada_en: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -257,6 +258,7 @@ export type Database = {
           cancelada_en?: string | null;
           monto_devolucion?: number | null;
           devolucion_pct?: number | null;
+          devolucion_saldada_en?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -272,6 +274,7 @@ export type Database = {
           cancelada_en?: string | null;
           monto_devolucion?: number | null;
           devolucion_pct?: number | null;
+          devolucion_saldada_en?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -350,6 +353,14 @@ export type Database = {
       };
       completar_viaje: {
         Args: { p_viaje_id: string };
+        Returns: Json;
+      };
+      cancelar_viaje: {
+        Args: { p_viaje_id: string; p_motivo?: string };
+        Returns: Json;
+      };
+      marcar_devolucion_saldada: {
+        Args: { p_reserva_id: string };
         Returns: Json;
       };
     };
