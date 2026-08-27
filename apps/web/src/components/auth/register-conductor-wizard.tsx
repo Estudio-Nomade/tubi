@@ -88,16 +88,16 @@ export function RegisterConductorWizard() {
   }
 
   const title = STEP_TITLES[step - 1];
-  const ctaLabel =
-    step === TOTAL_STEPS
-      ? pending
-        ? "Creando cuenta…"
-        : "Crear cuenta"
-      : "Continuar";
+  const isFinalStep = step === TOTAL_STEPS;
+  const ctaLabel = isFinalStep
+    ? pending
+      ? "Creando cuenta…"
+      : "Crear cuenta"
+    : "Continuar";
 
   return (
     <form
-      action={step === TOTAL_STEPS ? formAction : undefined}
+      action={isFinalStep ? formAction : undefined}
       onSubmit={handleSubmit}
       className="flex flex-1 flex-col gap-6 px-5 pb-6 pt-3"
     >
@@ -188,7 +188,11 @@ export function RegisterConductorWizard() {
       <div className="flex-1" aria-hidden />
 
       <div className="flex flex-col gap-4">
-        <BtnPrimary type="submit" disabled={pending}>
+        <BtnPrimary
+          type={isFinalStep ? "submit" : "button"}
+          onClick={isFinalStep ? undefined : handleContinue}
+          disabled={pending}
+        >
           {ctaLabel}
         </BtnPrimary>
 
