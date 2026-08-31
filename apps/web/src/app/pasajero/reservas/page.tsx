@@ -127,7 +127,7 @@ function cancelPreview(item: ReservaListItem): {
 
 /** Passenger reservation history — Pencil P7 card style. */
 export default async function PasajeroReservasPage({ searchParams }: PageProps) {
-  const profile = await requireProfile(["pasajero", "operador"]);
+  const profile = await requireProfile(["pasajero"]);
   const params = await searchParams;
   const ok = first(params.ok);
 

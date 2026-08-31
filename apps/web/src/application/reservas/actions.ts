@@ -29,7 +29,7 @@ export async function createReservaAction(
     return { error: "Ese viaje no es válido." };
   }
 
-  await requireProfile(["pasajero", "operador"]);
+  await requireProfile(["pasajero"]);
   const supabase = await createClient();
   const service = createReservasService(
     createSupabaseReservasRepository(supabase),
@@ -65,7 +65,7 @@ export async function cancelReservaAction(
     return { error: "Esa reserva no es válida." };
   }
 
-  await requireProfile(["pasajero", "operador"]);
+  await requireProfile(["pasajero"]);
   const supabase = await createClient();
   const service = createReservasService(
     createSupabaseReservasRepository(supabase),

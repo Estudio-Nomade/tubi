@@ -26,7 +26,7 @@ function settingsToMap(items: Setting[]): Map<string, Setting> {
 
 /** Pencil P6 · Checkout seña */
 export default async function CheckoutSenaPage({ params }: PageProps) {
-  const profile = await requireProfile(["pasajero", "operador"]);
+  const profile = await requireProfile(["pasajero"]);
   const { id } = await params;
 
   const supabase = await createClient();

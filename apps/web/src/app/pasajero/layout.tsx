@@ -6,7 +6,7 @@ export default async function PasajeroLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const profile = await requireProfile(["pasajero", "operador"]);
+  const profile = await requireProfile(["pasajero"]);
   return (
     <SessionProvider key={profile.id} profile={profile}>
       {children}

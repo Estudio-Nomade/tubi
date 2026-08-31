@@ -16,7 +16,7 @@ import { createClient } from "@/lib/supabase/server";
 
 /** Index: 0 empty · 1 redirect · N list of confirmed boarding passes. */
 export default async function PasajeroPaseIndexPage() {
-  const profile = await requireProfile(["pasajero", "operador"]);
+  const profile = await requireProfile(["pasajero"]);
   const supabase = await createClient();
   const reservas = createReservasService(
     createSupabaseReservasRepository(supabase),

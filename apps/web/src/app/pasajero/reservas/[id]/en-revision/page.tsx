@@ -20,7 +20,7 @@ type PageProps = {
 
 /** Pencil P11 · Seña en revisión */
 export default async function SenaEnRevisionPage({ params }: PageProps) {
-  const profile = await requireProfile(["pasajero", "operador"]);
+  const profile = await requireProfile(["pasajero"]);
   const { id } = await params;
 
   const supabase = await createClient();

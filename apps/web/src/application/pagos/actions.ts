@@ -47,7 +47,7 @@ function extFromMime(mime: string): string {
 export async function submitSenaComprobanteAction(
   formData: FormData,
 ): Promise<SubmitSenaResult | void> {
-  const profile = await requireProfile(["pasajero", "operador"]);
+  const profile = await requireProfile(["pasajero"]);
   const reservaId = String(formData.get("reserva_id") ?? "").trim();
   const file = formData.get("comprobante");
 
