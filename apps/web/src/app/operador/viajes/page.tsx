@@ -2,11 +2,11 @@ import Link from "next/link";
 
 import { createOperadorViajesRepository } from "@/adapters/supabase/operador-viajes-repository";
 import { createOperadorViajesService } from "@/application/operador";
-import { OperadorNav } from "@/components/operador/operador-nav";
 import {
   AppHeader,
   EmptyHint,
   StatusPill,
+  TabBar,
   type StatusPillVariant,
 } from "@/components/design";
 import type { EstadoViaje } from "@/domain/viajes";
@@ -39,15 +39,12 @@ export default async function OperadorViajesPage() {
   const service = createOperadorViajesService(
     createOperadorViajesRepository(supabase),
   );
-  const [items, devCount] = await Promise.all([
-    service.listViajes(),
-    service.countDevoluciones(),
-  ]);
+  const items = await service.listViajes();
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
       <AppHeader showBack backHref="/operador" roleLabel="Operador" />
-      <main className="flex flex-1 flex-col gap-5 px-5 pb-8 pt-3">
+      <main className="flex flex-1 flex-col gap-5 px-5 pb-4 pt-3">
         <div className="flex flex-col gap-1">
           <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">
             Viajes
@@ -102,10 +99,9 @@ export default async function OperadorViajesPage() {
           </ul>
         )}
 
-        <div className="mt-auto">
-          <OperadorNav active="viajes" devolucionesCount={devCount} />
-        </div>
+        <div className="flex-1" aria-hidden />
       </main>
+      <TabBar variant="operador" active="viajes" />
     </div>
   );
 }
