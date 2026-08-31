@@ -8,6 +8,7 @@ import {
   AppHeader,
   InfoRow,
   StatusPill,
+  TabBar,
 } from "@/components/design";
 import { SenaResolveActions } from "@/components/operador/sena-resolve-actions";
 import { formatArs, formatHoraAr } from "@/lib/format";
@@ -34,7 +35,7 @@ export default async function ConfirmarSenaPage({ params }: PageProps) {
   return (
     <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
       <AppHeader showBack backHref="/operador" roleLabel="Operador" />
-      <main className="flex flex-1 flex-col gap-5 px-5 pb-8 pt-2">
+      <main className="flex flex-1 flex-col gap-5 px-5 pb-4 pt-2">
         <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">
           Confirmar seña
         </h1>
@@ -118,6 +119,7 @@ export default async function ConfirmarSenaPage({ params }: PageProps) {
           )}
         </div>
       </main>
+      <TabBar variant="operador" active="senas" />
     </div>
   );
 }

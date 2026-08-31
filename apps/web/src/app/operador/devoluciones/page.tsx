@@ -1,8 +1,7 @@
 import { createOperadorViajesRepository } from "@/adapters/supabase/operador-viajes-repository";
 import { createOperadorViajesService } from "@/application/operador";
 import { MarkRefundDoneButton } from "@/components/operador/mark-refund-done-button";
-import { OperadorNav } from "@/components/operador/operador-nav";
-import { AppHeader, EmptyHint } from "@/components/design";
+import { AppHeader, EmptyHint, TabBar } from "@/components/design";
 import { formatArs, formatFechaHoraAr } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
@@ -25,13 +24,16 @@ export default async function OperadorDevolucionesPage({
   return (
     <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
       <AppHeader showBack backHref="/operador" roleLabel="Operador" />
-      <main className="flex flex-1 flex-col gap-5 px-5 pb-8 pt-3">
+      <main className="flex flex-1 flex-col gap-5 px-5 pb-4 pt-3">
         <div className="flex flex-col gap-1">
           <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">
             Devoluciones
           </h1>
           <p className="text-sm font-medium text-muted-foreground">
             Señas a transferir fuera de la app
+            {items.length > 0
+              ? ` · ${items.length} pendiente${items.length === 1 ? "" : "s"}`
+              : ""}
           </p>
         </div>
 
@@ -88,13 +90,9 @@ export default async function OperadorDevolucionesPage({
           </ul>
         )}
 
-        <div className="mt-auto">
-          <OperadorNav
-            active="devoluciones"
-            devolucionesCount={items.length}
-          />
-        </div>
+        <div className="flex-1" aria-hidden />
       </main>
+      <TabBar variant="operador" active="devoluciones" />
     </div>
   );
 }

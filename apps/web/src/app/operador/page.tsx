@@ -1,17 +1,13 @@
 import Link from "next/link";
 
 import { createOperadorSenasRepository } from "@/adapters/supabase/operador-senas-repository";
-import { createOperadorViajesRepository } from "@/adapters/supabase/operador-viajes-repository";
-import {
-  createOperadorSenasService,
-  createOperadorViajesService,
-} from "@/application/operador";
+import { createOperadorSenasService } from "@/application/operador";
 import {
   AppHeader,
   EmptyHint,
   StatusPill,
+  TabBar,
 } from "@/components/design";
-import { OperadorNav } from "@/components/operador/operador-nav";
 import { formatArs, formatFechaHoraAr, formatHoraAr } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
@@ -28,18 +24,12 @@ export default async function OperadorPage({ searchParams }: PageProps) {
   const service = createOperadorSenasService(
     createOperadorSenasRepository(supabase),
   );
-  const viajes = createOperadorViajesService(
-    createOperadorViajesRepository(supabase),
-  );
-  const [items, devCount] = await Promise.all([
-    service.listPending(),
-    viajes.countDevoluciones(),
-  ]);
+  const items = await service.listPending();
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
       <AppHeader roleLabel="Operador" />
-      <main className="flex flex-1 flex-col gap-5 px-5 pb-8 pt-3">
+      <main className="flex flex-1 flex-col gap-5 px-5 pb-4 pt-3">
         <div className="flex flex-col gap-1">
           <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">
             Señas pendientes
@@ -109,10 +99,9 @@ export default async function OperadorPage({ searchParams }: PageProps) {
           </ul>
         )}
 
-        <div className="mt-auto">
-          <OperadorNav active="senas" devolucionesCount={devCount} />
-        </div>
+        <div className="flex-1" aria-hidden />
       </main>
+      <TabBar variant="operador" active="senas" />
     </div>
   );
 }

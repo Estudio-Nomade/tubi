@@ -42,9 +42,12 @@ export default async function CuentaPage() {
     rows.push({ label: "Email", value: email });
   }
 
-  const showTabBar =
-    profile.rol === "pasajero" || profile.rol === "conductor";
-  const tabVariant = profile.rol === "conductor" ? "conductor" : "pasajero";
+  const tabVariant =
+    profile.rol === "operador"
+      ? "operador"
+      : profile.rol === "conductor"
+        ? "conductor"
+        : "pasajero";
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
@@ -106,7 +109,7 @@ export default async function CuentaPage() {
           <BtnSecondary type="submit">Cerrar sesión</BtnSecondary>
         </form>
       </main>
-      {showTabBar ? <TabBar variant={tabVariant} active="cuenta" /> : null}
+      <TabBar variant={tabVariant} active="cuenta" />
     </div>
   );
 }
