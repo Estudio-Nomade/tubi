@@ -1,7 +1,12 @@
 export type {
   CancelViajeResult,
+  ConductorCatalogoRow,
+  CrearViajeInput,
+  CrearViajeResult,
   DevolucionPendienteRow,
   MarkRefundResult,
+  RutaCatalogoRow,
+  VehiculoCatalogoRow,
   ViajeOperadorDetalle,
   ViajeOperadorReservaRow,
   ViajeOperadorRow,

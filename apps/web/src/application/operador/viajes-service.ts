@@ -1,8 +1,12 @@
 import type {
   CancelViajeResult,
+  ConductorCatalogoRow,
+  CrearViajeInput,
+  CrearViajeResult,
   DevolucionPendienteRow,
   MarkRefundResult,
   OperadorViajesRepository,
+  RutaCatalogoRow,
   ViajeOperadorDetalle,
   ViajeOperadorRow,
 } from "@/domain/operador";
@@ -29,6 +33,15 @@ export function createOperadorViajesService(repo: OperadorViajesRepository) {
     },
     marcarDevolucionSaldada(reservaId: string): Promise<MarkRefundResult> {
       return repo.marcarDevolucionSaldada(reservaId);
+    },
+    listRutas(): Promise<RutaCatalogoRow[]> {
+      return repo.listRutas();
+    },
+    listConductoresConVehiculos(): Promise<ConductorCatalogoRow[]> {
+      return repo.listConductoresConVehiculos();
+    },
+    crearViaje(input: CrearViajeInput): Promise<CrearViajeResult> {
+      return repo.crearViaje(input);
     },
   };
 }

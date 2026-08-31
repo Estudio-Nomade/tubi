@@ -17,6 +17,8 @@ export {
 } from "./viajes-service";
 export {
   cancelarViajeAction,
+  crearViajeAction,
   marcarDevolucionSaldadaAction,
   type ActionError as OperadorViajesActionError,
+  type CrearViajeActionResult,
 } from "./viajes-actions";

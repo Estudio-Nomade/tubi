@@ -50,3 +50,43 @@ export type MarkRefundResult = {
   reservaId: string;
   saldadaEn: string;
 };
+
+export type RutaCatalogoRow = {
+  id: string;
+  nombre: string;
+  origen: string;
+  destino: string;
+};
+
+export type VehiculoCatalogoRow = {
+  id: string;
+  patente: string;
+  marca: string;
+  modelo: string;
+  color: string;
+  capacidad: number;
+};
+
+export type ConductorCatalogoRow = {
+  id: string;
+  nombre: string;
+  apellido: string;
+  vehiculos: VehiculoCatalogoRow[];
+};
+
+export type CrearViajeInput = {
+  rutaId: string;
+  conductorId: string;
+  vehiculoId: string;
+  fechaSalidaIso: string;
+  precio?: number | null;
+  etaLlegadaIso?: string | null;
+};
+
+export type CrearViajeResult = {
+  ok: true;
+  viajeId: string;
+  estado: "programado";
+  fechaSalida: string;
+  precio: number;
+};

@@ -70,6 +70,7 @@ export default async function OperadorViajeDetallePage({
   const { id } = await params;
   const q = await searchParams;
   const okCancelado = q.ok === "cancelado";
+  const okCreado = q.ok === "creado";
 
   const supabase = await createClient();
   const service = createOperadorViajesService(
@@ -106,6 +107,15 @@ export default async function OperadorViajeDetallePage({
             {trip.ocupacion}/{trip.capacidad} · {formatArs(trip.precio)}
           </p>
         </div>
+
+        {okCreado ? (
+          <p
+            className="rounded-xl bg-[#E8F5E9] px-3 py-2 text-sm font-medium text-[#1B5E20]"
+            role="status"
+          >
+            Viaje creado. Ya figura como programado en el catálogo.
+          </p>
+        ) : null}
 
         {okCancelado || trip.estado === "cancelado" ? (
           <p

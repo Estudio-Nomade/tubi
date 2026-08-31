@@ -2,9 +2,14 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import type {
   CancelViajeResult,
+  ConductorCatalogoRow,
+  CrearViajeInput,
+  CrearViajeResult,
   DevolucionPendienteRow,
   MarkRefundResult,
   OperadorViajesRepository,
+  RutaCatalogoRow,
+  VehiculoCatalogoRow,
   ViajeOperadorDetalle,
   ViajeOperadorReservaRow,
   ViajeOperadorRow,
@@ -260,6 +265,103 @@ export function createOperadorViajesRepository(
         ok: true,
         reservaId: String(obj.reserva_id ?? reservaId),
         saldadaEn: String(obj.saldada_en ?? new Date().toISOString()),
+      };
+    },
+
+    async listRutas(): Promise<RutaCatalogoRow[]> {
+      const { data, error } = await client
+        .from("ruta")
+        .select("id, nombre, origen, destino")
+        .order("nombre", { ascending: true });
+
+      if (error) {
+        throw new Error(`operador.listRutas failed: ${error.message}`);
+      }
+
+      return (data ?? []).map((row) => ({
+        id: row.id,
+        nombre: row.nombre,
+        origen: row.origen,
+        destino: row.destino,
+      }));
+    },
+
+    async listConductoresConVehiculos(): Promise<ConductorCatalogoRow[]> {
+      const { data: profiles, error: pErr } = await client
+        .from("profiles")
+        .select("id, nombre, apellido")
+        .eq("rol", "conductor")
+        .order("nombre", { ascending: true });
+
+      if (pErr) {
+        throw new Error(
+          `operador.listConductoresConVehiculos profiles failed: ${pErr.message}`,
+        );
+      }
+
+      const { data: vehiculos, error: vErr } = await client
+        .from("vehiculo")
+        .select("id, conductor_id, patente, marca, modelo, color, capacidad")
+        .order("patente", { ascending: true });
+
+      if (vErr) {
+        throw new Error(
+          `operador.listConductoresConVehiculos vehiculos failed: ${vErr.message}`,
+        );
+      }
+
+      const byConductor = new Map<string, VehiculoCatalogoRow[]>();
+      for (const v of vehiculos ?? []) {
+        const list = byConductor.get(v.conductor_id) ?? [];
+        list.push({
+          id: v.id,
+          patente: v.patente,
+          marca: v.marca,
+          modelo: v.modelo,
+          color: v.color,
+          capacidad: Number(v.capacidad),
+        });
+        byConductor.set(v.conductor_id, list);
+      }
+
+      return (profiles ?? []).map((p) => ({
+        id: p.id,
+        nombre: p.nombre,
+        apellido: p.apellido,
+        vehiculos: byConductor.get(p.id) ?? [],
+      }));
+    },
+
+    async crearViaje(input: CrearViajeInput): Promise<CrearViajeResult> {
+      const { data, error } = await client.rpc("crear_viaje", {
+        p_ruta_id: input.rutaId,
+        p_conductor_id: input.conductorId,
+        p_vehiculo_id: input.vehiculoId,
+        p_fecha_salida: input.fechaSalidaIso,
+        p_precio: input.precio ?? null,
+        p_eta_llegada: input.etaLlegadaIso ?? null,
+      });
+      if (error) throw new Error(error.message);
+      if (data == null || typeof data !== "object") {
+        throw new Error("UNKNOWN");
+      }
+      const obj = data as {
+        ok?: boolean;
+        viaje_id?: string;
+        estado?: string;
+        fecha_salida?: string;
+        precio?: number | string;
+      };
+      const viajeId = obj.viaje_id ? String(obj.viaje_id) : "";
+      if (!viajeId || obj.ok === false) {
+        throw new Error("UNKNOWN");
+      }
+      return {
+        ok: true,
+        viajeId,
+        estado: "programado",
+        fechaSalida: String(obj.fecha_salida ?? input.fechaSalidaIso),
+        precio: Number(obj.precio ?? input.precio ?? 0),
       };
     },
   };
