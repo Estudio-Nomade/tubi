@@ -1,8 +1,15 @@
+import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { getCurrentProfile, homePathForRol } from "@/application/auth";
-import { AppHeader, BtnPrimary } from "@/components/design";
+import { BtnPrimary, BtnSecondary } from "@/components/design";
+
+const TRUST_CHIPS = [
+  "Viajes programados",
+  "Seña de compromiso",
+  "Identificación con QR",
+] as const;
 
 export default async function Home() {
   const profile = await getCurrentProfile();
@@ -12,27 +19,51 @@ export default async function Home() {
 
   return (
     <div className="mx-auto flex min-h-screen max-w-[375px] flex-col bg-background">
-      <AppHeader />
-      <main className="flex flex-1 flex-col gap-6 px-5 py-6">
-        <div className="flex flex-col gap-2">
-          <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">
-            Tubi
-          </h1>
-          <p className="text-sm font-medium text-muted-foreground">
-            Viajes compartidos interurbanos · Tandil ↔ Buenos Aires
-          </p>
+      <main className="flex flex-1 flex-col px-5 pb-8 pt-10">
+        <div className="flex flex-1 flex-col items-center justify-center gap-8">
+          <div className="flex flex-col items-center gap-5">
+            <Image
+              src="/brand/logo.png"
+              alt="Tubi"
+              width={160}
+              height={133}
+              priority
+              className="h-auto w-[160px]"
+            />
+            <p className="font-heading text-2xl font-semibold tracking-tight text-foreground">
+              Tubi
+            </p>
+          </div>
+
+          <div className="flex w-full flex-col gap-3 text-center">
+            <h1 className="font-heading text-[26px] font-semibold leading-tight text-foreground">
+              Viajes compartidos Tandil ↔ Buenos Aires
+            </h1>
+            <p className="text-[15px] leading-relaxed text-muted-foreground">
+              Salí con horario, conductor y lugar de encuentro claros. Reservá
+              con seña y viajá con tu pase QR.
+            </p>
+          </div>
+
+          <ul className="flex w-full flex-wrap items-center justify-center gap-2">
+            {TRUST_CHIPS.map((label) => (
+              <li
+                key={label}
+                className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-medium text-muted-foreground"
+              >
+                {label}
+              </li>
+            ))}
+          </ul>
         </div>
 
-        <div className="mt-auto flex flex-col items-center gap-4">
+        <div className="mt-10 flex w-full flex-col gap-3">
           <BtnPrimary asChild>
             <Link href="/login">Ingresar</Link>
           </BtnPrimary>
-          <Link
-            href="/registro"
-            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-          >
-            Crear cuenta
-          </Link>
+          <BtnSecondary asChild>
+            <Link href="/registro">Crear cuenta</Link>
+          </BtnSecondary>
         </div>
       </main>
     </div>
