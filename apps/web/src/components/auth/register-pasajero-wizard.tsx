@@ -196,7 +196,7 @@ export function RegisterPasajeroWizard() {
         </BtnPrimary>
 
         <Link
-          href="/login"
+          href="/login?rol=pasajero"
           className="text-center text-sm font-medium text-primary"
         >
           Ya tengo cuenta

@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 export default function RegistroPasajeroPage() {
   return (
     <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
-      <AppHeader showBack backHref="/login" />
+      <AppHeader showBack backHref="/login?rol=pasajero" />
       <RegisterPasajeroWizard />
     </div>
   );
