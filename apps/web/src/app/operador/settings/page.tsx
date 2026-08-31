@@ -1,6 +1,6 @@
 import { getSettings } from "@/application/settings";
 import { OperadorSettingsForm } from "@/components/operador/settings-form";
-import { AppHeader } from "@/components/design";
+import { AppHeader, TabBar } from "@/components/design";
 import type { Setting } from "@/domain/settings";
 
 type PageProps = {
@@ -24,7 +24,7 @@ export default async function OperadorSettingsPage({ searchParams }: PageProps) 
   return (
     <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
       <AppHeader showBack backHref="/operador" roleLabel="Operador" />
-      <main className="flex flex-1 flex-col gap-4 px-5 pb-10 pt-3">
+      <main className="flex flex-1 flex-col gap-4 px-5 pb-4 pt-3">
         <h1 className="font-heading text-[22px] font-semibold leading-tight text-foreground">
           Configuración
         </h1>
@@ -49,6 +49,7 @@ export default async function OperadorSettingsPage({ searchParams }: PageProps) 
           <OperadorSettingsForm initial={map} />
         )}
       </main>
+      <TabBar variant="operador" active="settings" />
     </div>
   );
 }

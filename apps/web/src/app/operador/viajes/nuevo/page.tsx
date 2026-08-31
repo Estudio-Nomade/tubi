@@ -2,8 +2,7 @@ import { createOperadorViajesRepository } from "@/adapters/supabase/operador-via
 import { createOperadorViajesService } from "@/application/operador";
 import { getSetting } from "@/application/settings";
 import { CrearViajeForm } from "@/components/operador/crear-viaje-form";
-import { OperadorNav } from "@/components/operador/operador-nav";
-import { AppHeader } from "@/components/design";
+import { AppHeader, TabBar } from "@/components/design";
 import { SETTING_KEYS } from "@/domain/settings";
 import { addDaysLocal, toIsoDateLocal } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
@@ -25,10 +24,9 @@ export default async function OperadorViajeNuevoPage() {
     createOperadorViajesRepository(supabase),
   );
 
-  const [rutas, conductores, devCount, precioSetting] = await Promise.all([
+  const [rutas, conductores, precioSetting] = await Promise.all([
     service.listRutas(),
     service.listConductoresConVehiculos(),
-    service.countDevoluciones(),
     getSetting(SETTING_KEYS.TARIFA_PRECIO_BASE_TANDIL_BSAS),
   ]);
 
@@ -45,7 +43,7 @@ export default async function OperadorViajeNuevoPage() {
         backHref="/operador/viajes"
         roleLabel="Operador"
       />
-      <main className="flex flex-1 flex-col gap-5 px-5 pb-8 pt-3">
+      <main className="flex flex-1 flex-col gap-5 px-5 pb-4 pt-3">
         <div className="flex flex-col gap-1">
           <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">
             Nuevo viaje
@@ -66,10 +64,9 @@ export default async function OperadorViajeNuevoPage() {
           />
         </div>
 
-        <div className="mt-auto">
-          <OperadorNav active="viajes" devolucionesCount={devCount} />
-        </div>
+        <div className="flex-1" aria-hidden />
       </main>
+      <TabBar variant="operador" active="viajes" />
     </div>
   );
 }

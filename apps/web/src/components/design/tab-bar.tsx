@@ -2,7 +2,16 @@
 
 import type { ComponentType } from "react"
 import Link from "next/link"
-import { House, QrCode, Search, User, Bus } from "lucide-react"
+import {
+  Banknote,
+  Bus,
+  House,
+  QrCode,
+  Search,
+  Settings,
+  Undo2,
+  User,
+} from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
@@ -26,8 +35,26 @@ const CONDUCTOR_TABS: TabItem[] = [
   { key: "cuenta", label: "Cuenta", href: "/cuenta", icon: User },
 ]
 
+const OPERADOR_TABS: TabItem[] = [
+  { key: "senas", label: "Señas", href: "/operador", icon: Banknote },
+  { key: "viajes", label: "Viajes", href: "/operador/viajes", icon: Bus },
+  {
+    key: "devoluciones",
+    label: "Devol.",
+    href: "/operador/devoluciones",
+    icon: Undo2,
+  },
+  {
+    key: "settings",
+    label: "Ajustes",
+    href: "/operador/settings",
+    icon: Settings,
+  },
+  { key: "cuenta", label: "Cuenta", href: "/cuenta", icon: User },
+]
+
 type TabBarProps = {
-  variant: "pasajero" | "conductor"
+  variant: "pasajero" | "conductor" | "operador"
   active: string
   className?: string
   /** Conductor "viajes" tab target; defaults to `/conductor`. */
@@ -39,11 +66,15 @@ export function TabBar({ variant, active, className, viajesHref }: TabBarProps) 
   const tabs =
     variant === "pasajero"
       ? PASAJERO_TABS
-      : CONDUCTOR_TABS.map((tab) =>
-          tab.key === "viajes" && viajesHref
-            ? { ...tab, href: viajesHref }
-            : tab
-        )
+      : variant === "operador"
+        ? OPERADOR_TABS
+        : CONDUCTOR_TABS.map((tab) =>
+            tab.key === "viajes" && viajesHref
+              ? { ...tab, href: viajesHref }
+              : tab
+          )
+
+  const compact = variant === "operador"
 
   return (
     <nav
@@ -62,15 +93,26 @@ export function TabBar({ variant, active, className, viajesHref }: TabBarProps) 
               key={tab.key}
               href={tab.href}
               className={cn(
-                "flex w-20 flex-col items-center justify-center gap-0.5",
+                "flex flex-col items-center justify-center gap-0.5",
+                compact
+                  ? "min-w-0 flex-1 px-0.5"
+                  : "w-20",
                 isActive ? "text-primary" : "text-muted-foreground"
               )}
               aria-current={isActive ? "page" : undefined}
+              title={
+                tab.key === "devoluciones"
+                  ? "Devoluciones"
+                  : tab.key === "settings"
+                    ? "Configuración"
+                    : tab.label
+              }
             >
-              <Icon className="size-[22px]" strokeWidth={isActive ? 2.25 : 1.75} />
+              <Icon className="size-[22px] shrink-0" strokeWidth={isActive ? 2.25 : 1.75} />
               <span
                 className={cn(
-                  "text-[11px] leading-none",
+                  "max-w-full truncate leading-none",
+                  compact ? "text-[10px]" : "text-[11px]",
                   isActive ? "font-semibold" : "font-medium"
                 )}
               >
