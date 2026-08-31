@@ -1,7 +1,11 @@
 import type {
   CancelViajeResult,
+  ConductorCatalogoRow,
+  CrearViajeInput,
+  CrearViajeResult,
   DevolucionPendienteRow,
   MarkRefundResult,
+  RutaCatalogoRow,
   ViajeOperadorDetalle,
   ViajeOperadorRow,
 } from "./viajes-types";
@@ -13,4 +17,7 @@ export interface OperadorViajesRepository {
   countDevolucionesPendientes(): Promise<number>;
   cancelarViaje(viajeId: string, motivo?: string | null): Promise<CancelViajeResult>;
   marcarDevolucionSaldada(reservaId: string): Promise<MarkRefundResult>;
+  listRutas(): Promise<RutaCatalogoRow[]>;
+  listConductoresConVehiculos(): Promise<ConductorCatalogoRow[]>;
+  crearViaje(input: CrearViajeInput): Promise<CrearViajeResult>;
 }

@@ -363,6 +363,17 @@ export type Database = {
         Args: { p_reserva_id: string };
         Returns: Json;
       };
+      crear_viaje: {
+        Args: {
+          p_ruta_id: string;
+          p_conductor_id: string;
+          p_vehiculo_id: string;
+          p_fecha_salida: string;
+          p_precio?: number | null;
+          p_eta_llegada?: string | null;
+        };
+        Returns: Json;
+      };
     };
     Enums: {
       rol: Rol;

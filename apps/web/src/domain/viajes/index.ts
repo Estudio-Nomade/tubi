@@ -27,3 +27,10 @@ export {
   mapMarkRefundErrorMessage,
   markRefundErrorUserMessage,
 } from "./cancel-trip";
+export type { CreateTripErrorCode } from "./create-trip";
+export {
+  mapCreateTripErrorMessage,
+  createTripErrorUserMessage,
+  fechaHoraLocalToIso,
+  parseCrearViajeForm,
+} from "./create-trip";
