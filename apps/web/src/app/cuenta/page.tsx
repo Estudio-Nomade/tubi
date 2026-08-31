@@ -93,7 +93,7 @@ export default async function CuentaPage() {
 
         <div className="flex-1" aria-hidden />
 
-        {profile.rol === "pasajero" || profile.rol === "operador" ? (
+        {profile.rol === "pasajero" ? (
           <Link
             href="/pasajero/reservas"
             className="inline-flex h-11 w-full items-center justify-center rounded-[14px] border border-border bg-card text-sm font-semibold text-foreground"

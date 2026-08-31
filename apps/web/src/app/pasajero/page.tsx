@@ -21,7 +21,7 @@ type PageProps = {
 
 /** Pencil P2 empty / P7 with active reservation. */
 export default async function PasajeroPage({ searchParams }: PageProps) {
-  const profile = await requireProfile(["pasajero", "operador"]);
+  const profile = await requireProfile(["pasajero"]);
   const params = await searchParams;
   const justCreated =
     typeof params.reserva === "string" && params.reserva.length > 0;
