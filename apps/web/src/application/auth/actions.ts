@@ -20,6 +20,7 @@ import {
 import { createClient } from "@/lib/supabase/server";
 
 import { createAuthService, homePathForRol } from "./auth-service";
+import { mapAuthError } from "./map-auth-error";
 
 export type AuthActionResult = { error: string };
 
@@ -59,7 +60,9 @@ export async function signInAction(
   });
 
   if (error || !data.user) {
-    return { error: error?.message ?? "No se pudo iniciar sesión" };
+    return {
+      error: mapAuthError(error?.message, "No se pudo iniciar sesión"),
+    };
   }
 
   const profile = await service.getProfileById(data.user.id);
@@ -92,7 +95,7 @@ export async function signUpPasajeroAction(
   const { data, error } = await supabase.auth.signUp({ email, password });
 
   if (error) {
-    return { error: error.message };
+    return { error: mapAuthError(error.message, "No se pudo crear la cuenta") };
   }
 
   let userId = data.user?.id ?? null;
@@ -102,9 +105,10 @@ export async function signUpPasajeroAction(
     const signIn = await supabase.auth.signInWithPassword({ email, password });
     if (signIn.error || !signIn.data.user) {
       return {
-        error:
-          signIn.error?.message ??
+        error: mapAuthError(
+          signIn.error?.message,
           "Cuenta creada. Confirmá el email antes de continuar.",
+        ),
       };
     }
     userId = signIn.data.user.id;
@@ -126,7 +130,7 @@ export async function signUpPasajeroAction(
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error al crear perfil";
-    return { error: message };
+    return { error: mapAuthError(message, "Error al crear perfil") };
   }
 
   revalidatePath("/", "layout");
@@ -154,7 +158,7 @@ export async function signUpConductorAction(
   const { data, error } = await supabase.auth.signUp({ email, password });
 
   if (error) {
-    return { error: error.message };
+    return { error: mapAuthError(error.message, "No se pudo crear la cuenta") };
   }
 
   let userId = data.user?.id ?? null;
@@ -163,9 +167,10 @@ export async function signUpConductorAction(
     const signIn = await supabase.auth.signInWithPassword({ email, password });
     if (signIn.error || !signIn.data.user) {
       return {
-        error:
-          signIn.error?.message ??
+        error: mapAuthError(
+          signIn.error?.message,
           "Cuenta creada. Confirmá el email antes de continuar.",
+        ),
       };
     }
     userId = signIn.data.user.id;
@@ -186,7 +191,7 @@ export async function signUpConductorAction(
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error al crear perfil";
-    return { error: message };
+    return { error: mapAuthError(message, "Error al crear perfil") };
   }
 
   revalidatePath("/", "layout");
