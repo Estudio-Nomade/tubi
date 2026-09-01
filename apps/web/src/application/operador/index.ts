@@ -30,3 +30,14 @@ export {
   crearVehiculoAction,
   type CrearVehiculoActionResult,
 } from "./vehiculos-actions";
+export {
+  createOperadorParadasService,
+  type OperadorParadasService,
+} from "./paradas-service";
+export {
+  actualizarParadaAction,
+  crearParadaIntermediaAction,
+  eliminarParadaIntermediaAction,
+  reordenarParadasAction,
+  type ParadaActionResult,
+} from "./paradas-actions";

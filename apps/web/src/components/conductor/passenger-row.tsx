@@ -8,6 +8,7 @@ import { cn } from "@/lib/utils";
 type Props = {
   nombre: string;
   paradaLabel: string;
+  recogidaLabel?: string | null;
   estado: EstadoReserva;
   /** When set and estado is verificada, row links to C7. */
   cobrarHref?: string;
@@ -36,12 +37,14 @@ function pillFor(estado: EstadoReserva): {
 export function PassengerRow({
   nombre,
   paradaLabel,
+  recogidaLabel,
   estado,
   cobrarHref,
   recogidaHref,
   dense = false,
 }: Props) {
   const pill = pillFor(estado);
+  const pickupLabel = recogidaLabel ?? paradaLabel;
   const showCobrar = estado === "verificada" && !!cobrarHref;
   const showRecogida =
     !!recogidaHref &&
@@ -72,7 +75,7 @@ export function PassengerRow({
             dense ? "text-xs" : "text-[13px]",
           )}
         >
-          {paradaLabel}
+          {pickupLabel}
           {showCobrar ? " · Cobrar saldo" : null}
           {!showCobrar && showRecogida && estado === "confirmada"
             ? " · Recogida"

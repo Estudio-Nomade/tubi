@@ -4,6 +4,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import type { PickupMode } from "@/domain/geo";
 import {
   RESERVA_ESTADOS_OCUPAN,
   type BoardingPass,
@@ -11,6 +12,7 @@ import {
   type CancelReservaResult,
   type EstadoReserva,
   type PoliticaCancelacionSnapshot,
+  type RecogidaInput,
   type Reserva,
   type ReservaActivaSummary,
   type ReservaListItem,
@@ -58,6 +60,11 @@ function mapReserva(row: ReservaRow): Reserva {
     qrToken: row.qr_token,
     politicaCancelacion: parsePolitica(row.politica_cancelacion),
     asientoNum: row.asiento_num,
+    recogidaLabel: row.recogida_label ?? null,
+    recogidaLat: row.recogida_lat == null ? null : Number(row.recogida_lat),
+    recogidaLng: row.recogida_lng == null ? null : Number(row.recogida_lng),
+    recogidaPlaceId: row.recogida_place_id ?? null,
+    recogidaMode: (row.recogida_mode as PickupMode | null) ?? null,
     createdAt: row.created_at,
   };
 }
@@ -77,6 +84,18 @@ function mapRpcError(message: string): Error {
   }
   if (message.includes("RESERVA_POLITICA_INVALIDA")) {
     return new Error("RESERVA_POLITICA_INVALIDA");
+  }
+  if (message.includes("RECOGIDA_REQUERIDA")) {
+    return new Error("RECOGIDA_REQUERIDA");
+  }
+  if (message.includes("RECOGIDA_FUERA_ZONA")) {
+    return new Error("RECOGIDA_FUERA_ZONA");
+  }
+  if (message.includes("RECOGIDA_INVALIDA")) {
+    return new Error("RECOGIDA_INVALIDA");
+  }
+  if (message.includes("PARADA_ORIGEN_MISSING")) {
+    return new Error("PARADA_ORIGEN_MISSING");
   }
   return new Error(message);
 }
@@ -116,9 +135,16 @@ export function createSupabaseReservasRepository(
   client: Client,
 ): ReservasRepository {
   return {
-    async createForPassenger(viajeId: string): Promise<Reserva> {
+    async createForPassenger(
+      viajeId: string,
+      recogida?: RecogidaInput,
+    ): Promise<Reserva> {
       const { data, error } = await client.rpc("crear_reserva", {
         p_viaje_id: viajeId,
+        p_recogida_label: recogida?.label ?? null,
+        p_recogida_lat: recogida?.lat ?? null,
+        p_recogida_lng: recogida?.lng ?? null,
+        p_recogida_place_id: recogida?.placeId ?? null,
       });
 
       if (error) {

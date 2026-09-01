@@ -188,6 +188,7 @@ export default async function ConductorViajePage({
                       <PassengerRow
                         nombre={p.nombre}
                         paradaLabel={p.paradaLabel}
+                        recogidaLabel={p.recogidaLabel}
                         estado={p.estado}
                         dense
                         cobrarHref={
@@ -227,6 +228,7 @@ export default async function ConductorViajePage({
                       <PassengerRow
                         nombre={p.nombre}
                         paradaLabel={p.paradaLabel}
+                        recogidaLabel={p.recogidaLabel}
                         estado={p.estado}
                         dense
                       />

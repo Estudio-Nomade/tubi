@@ -5,9 +5,9 @@ import { Car, UserRound } from "lucide-react";
 import { createSupabaseViajesRepository } from "@/adapters/supabase/viajes-repository";
 import { createViajesService } from "@/application/viajes";
 import { AppHeader, InfoRow } from "@/components/design";
-import { ReserveButton } from "@/components/pasajero/reserve-button";
+import { ReservePanel } from "@/components/pasajero/reserve-panel";
+import { pickupModeForOrigen } from "@/domain/geo";
 import {
-  formatArs,
   formatHoraAr,
   formatHoraLlegadaAr,
 } from "@/lib/format";
@@ -64,6 +64,15 @@ export default async function ViajeDetailPage({
     .filter(Boolean)
     .join(" ");
   const vehiculoLabel = `${viaje.vehiculo.marca} ${viaje.vehiculo.modelo} · ${viaje.vehiculo.color} · ${viaje.vehiculo.patente}`;
+
+  const pickupMode = pickupModeForOrigen(viaje.origen);
+  const origenParada = viaje.paradas.find((p) => p.tipo === "origen");
+  const fixedLabel = origenParada
+    ? origenParada.nombre.includes(origenParada.ciudad) ||
+      origenParada.ciudad === origenParada.nombre
+      ? origenParada.nombre
+      : `${origenParada.nombre} · ${origenParada.ciudad}`
+    : null;
 
   const horaSalida = formatHoraAr(viaje.fechaSalida);
   const horaLlegada = formatHoraLlegadaAr(viaje.etaLlegada);
@@ -160,27 +169,18 @@ export default async function ViajeDetailPage({
       </main>
 
       <div className="sticky bottom-0 border-t border-border bg-background px-5 pb-6 pt-4">
-        <div className="flex items-center gap-4">
-          <div className="flex shrink-0 flex-col gap-0.5">
-            <span className="text-xs font-medium text-muted-foreground">
-              Total
-            </span>
-            <span className="font-heading text-2xl font-semibold leading-none text-foreground">
-              {formatArs(viaje.precio)}
-            </span>
-          </div>
-          <div className="min-w-0 flex-1">
-            <ReserveButton
-              viajeId={viaje.id}
-              disabled={!canReserve}
-              disabledReason={
-                viaje.estado !== "programado"
-                  ? "Este viaje ya no se puede reservar."
-                  : "Este viaje no tiene asientos disponibles."
-              }
-            />
-          </div>
-        </div>
+        <ReservePanel
+          viajeId={viaje.id}
+          pickupMode={pickupMode}
+          fixedLabel={fixedLabel}
+          precio={viaje.precio}
+          disabled={!canReserve}
+          disabledReason={
+            viaje.estado !== "programado"
+              ? "Este viaje ya no se puede reservar."
+              : "Este viaje no tiene asientos disponibles."
+          }
+        />
       </div>
     </div>
   );

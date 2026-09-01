@@ -118,6 +118,7 @@ export function createOperadorViajesRepository(
         .select(
           `
           id,
+          ruta_id,
           fecha_salida,
           estado,
           precio,
@@ -142,6 +143,7 @@ export function createOperadorViajesRepository(
       if (!data) return null;
 
       const typed = data as unknown as {
+        ruta_id?: string;
         reservas?: unknown;
       } & Record<string, unknown>;
       const base = mapViajeRow(typed);
@@ -173,7 +175,7 @@ export function createOperadorViajesRepository(
         });
       }
 
-      return { ...base, reservas };
+      return { ...base, rutaId: typed.ruta_id ?? "", reservas };
     },
 
     async listDevolucionesPendientes(): Promise<DevolucionPendienteRow[]> {

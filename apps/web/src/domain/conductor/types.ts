@@ -17,7 +17,10 @@ export type ConductorPassengerRow = {
   reservaId: string;
   nombre: string;
   estado: EstadoReserva;
+  /** Fallback: ciudad de origen de la ruta (reservas viejas sin recogida). */
   paradaLabel: string;
+  /** Punto de recogida real declarado al reservar. */
+  recogidaLabel: string | null;
 };
 
 export type ConductorTripDetail = ConductorTripSummary & {
@@ -79,6 +82,9 @@ export type PickupContext = {
   fechaSalida: string;
   paradaLabel: string;
   nextParadaLabel: string | null;
+  recogidaLabel: string | null;
+  recogidaLat: number | null;
+  recogidaLng: number | null;
   estado: "confirmada" | "verificada";
 };
 

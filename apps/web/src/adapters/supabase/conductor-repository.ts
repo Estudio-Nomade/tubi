@@ -329,6 +329,9 @@ export function createSupabaseConductorRepository(
           id,
           estado,
           created_at,
+          recogida_label,
+          recogida_lat,
+          recogida_lng,
           pasajero:profiles!reserva_pasajero_id_fkey ( nombre, apellido ),
           viaje!inner (
             id,
@@ -352,6 +355,9 @@ export function createSupabaseConductorRepository(
         id: string;
         estado: "confirmada" | "verificada";
         created_at: string;
+        recogida_label: string | null;
+        recogida_lat: number | string | null;
+        recogida_lng: number | string | null;
         pasajero:
           | { nombre: string; apellido: string | null }
           | { nombre: string; apellido: string | null }[]
@@ -403,6 +409,9 @@ export function createSupabaseConductorRepository(
         fechaSalida: viaje.fecha_salida,
         paradaLabel: ruta.origen,
         nextParadaLabel,
+        recogidaLabel: typed.recogida_label ?? null,
+        recogidaLat: typed.recogida_lat == null ? null : Number(typed.recogida_lat),
+        recogidaLng: typed.recogida_lng == null ? null : Number(typed.recogida_lng),
         estado: typed.estado,
       };
     },
@@ -639,6 +648,7 @@ async function listPassengers(
       `
       id,
       estado,
+      recogida_label,
       pasajero:profiles!reserva_pasajero_id_fkey ( nombre, apellido )
     `,
     )
@@ -655,6 +665,7 @@ async function listPassengers(
     const typed = row as unknown as {
       id: string;
       estado: EstadoReserva;
+      recogida_label: string | null;
       pasajero:
         | { nombre: string; apellido: string | null }
         | { nombre: string; apellido: string | null }[]
@@ -666,6 +677,7 @@ async function listPassengers(
       nombre: pax ? fullName(pax.nombre, pax.apellido) : "Pasajero",
       estado: typed.estado,
       paradaLabel: origenFallback,
+      recogidaLabel: typed.recogida_label ?? null,
     };
   });
 }

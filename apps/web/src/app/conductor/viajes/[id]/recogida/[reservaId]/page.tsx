@@ -5,6 +5,7 @@ import { createConductorService } from "@/application/conductor";
 import { getSetting } from "@/application/settings";
 import { PickupActions } from "@/components/conductor/pickup-actions";
 import { AppHeader } from "@/components/design";
+import { mapsLink } from "@/domain/geo";
 import { SETTING_KEYS } from "@/domain/settings";
 import { requireProfile } from "@/lib/auth/require-profile";
 import { createClient } from "@/lib/supabase/server";
@@ -56,7 +57,7 @@ export default async function ConductorRecogidaPage({ params }: PageProps) {
       <main className="flex flex-1 flex-col gap-5 px-5 pb-8 pt-3">
         <div className="flex flex-col gap-2">
           <h1 className="font-heading text-[22px] font-semibold text-foreground">
-            {ctx.paradaLabel}
+            {ctx.recogidaLabel ?? ctx.paradaLabel}
           </h1>
           <p className="text-base font-semibold text-foreground">
             {ctx.pasajeroNombre}
@@ -64,6 +65,16 @@ export default async function ConductorRecogidaPage({ params }: PageProps) {
           <p className="text-sm font-medium text-muted-foreground">
             Espera máxima {esperaLabel}. Si no llega, no-show y seguís.
           </p>
+          {ctx.recogidaLat != null && ctx.recogidaLng != null ? (
+            <a
+              href={mapsLink(ctx.recogidaLat, ctx.recogidaLng)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-semibold text-primary underline-offset-4 hover:underline"
+            >
+              Cómo llegar
+            </a>
+          ) : null}
         </div>
 
         <PickupActions

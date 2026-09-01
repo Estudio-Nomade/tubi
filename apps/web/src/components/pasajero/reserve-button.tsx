@@ -4,15 +4,18 @@ import { useState, useTransition } from "react";
 
 import { createReservaAction } from "@/application/reservas";
 import { BtnPrimary } from "@/components/design";
+import type { RecogidaInput } from "@/domain/reservas";
 
 type ReserveButtonProps = {
   viajeId: string;
+  pickup?: RecogidaInput | null;
   disabled?: boolean;
   disabledReason?: string;
 };
 
 export function ReserveButton({
   viajeId,
+  pickup = null,
   disabled = false,
   disabledReason,
 }: ReserveButtonProps) {
@@ -22,7 +25,7 @@ export function ReserveButton({
   function onClick() {
     setError(null);
     startTransition(async () => {
-      const result = await createReservaAction(viajeId);
+      const result = await createReservaAction(viajeId, pickup ?? undefined);
       if (result?.error) {
         setError(result.error);
       }
