@@ -41,6 +41,14 @@ function mapViajeRows(data: unknown[] | null): ViajeOperadorRow[] {
   return rows;
 }
 
+async function vencerProgramados(client: Client): Promise<void> {
+  try {
+    await client.rpc("vencer_programados");
+  } catch {
+    // Best-effort: la lista igual filtra por fecha abajo.
+  }
+}
+
 function one<T>(v: T | T[] | null | undefined): T | null {
   if (v == null) return null;
   return Array.isArray(v) ? (v[0] ?? null) : v;
@@ -58,6 +66,7 @@ export function createOperadorViajesRepository(
 ): OperadorViajesRepository {
   return {
     async listViajesActivos(): Promise<ViajeOperadorRow[]> {
+      await vencerProgramados(client);
       const { data, error } = await client
         .from("viaje")
         .select(TRIP_LIST_SELECT)
@@ -69,10 +78,18 @@ export function createOperadorViajesRepository(
         throw new Error(`operador.listViajesActivos failed: ${error.message}`);
       }
 
-      return sortViajesActivos(mapViajeRows(data));
+      const nowMs = Date.now();
+      return sortViajesActivos(
+        mapViajeRows(data).filter(
+          (row) =>
+            row.estado !== "programado" ||
+            new Date(row.fechaSalida).getTime() >= nowMs,
+        ),
+      );
     },
 
     async listViajesHistorial(): Promise<ViajeOperadorRow[]> {
+      await vencerProgramados(client);
       const { data, error } = await client
         .from("viaje")
         .select(TRIP_LIST_SELECT)
