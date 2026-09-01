@@ -5,6 +5,7 @@ import {
   createVehiculoErrorUserMessage,
   mapCreateVehiculoErrorMessage,
   parseCrearVehiculoForm,
+  parseCrearVehiculoPropioForm,
 } from "./create-vehiculo";
 
 const COND = "ae9f204f-ab02-41cc-949e-d4949a78ce0d";
@@ -97,6 +98,47 @@ describe("parseCrearVehiculoForm", () => {
       assert.ok(res.fieldErrors?.patente);
       assert.ok(res.fieldErrors?.marca);
       assert.ok(res.fieldErrors?.capacidad);
+    }
+  });
+});
+
+describe("parseCrearVehiculoPropioForm", () => {
+  it("happy path without conductorId", () => {
+    const res = parseCrearVehiculoPropioForm({
+      patente: "AB 123 CD",
+      marca: "Toyota",
+      modelo: "Corolla",
+      color: "Blanco",
+      capacidad: "4",
+    });
+    assert.equal(res.ok, true);
+    if (res.ok) assert.equal(res.capacidad, 4);
+  });
+
+  it("rejects capacidad 0", () => {
+    const res = parseCrearVehiculoPropioForm({
+      patente: "AB123CD",
+      marca: "Toyota",
+      modelo: "Corolla",
+      color: "Blanco",
+      capacidad: "0",
+    });
+    assert.equal(res.ok, false);
+    if (!res.ok) assert.ok(res.fieldErrors?.capacidad);
+  });
+
+  it("rejects empty fields", () => {
+    const res = parseCrearVehiculoPropioForm({
+      patente: "",
+      marca: "",
+      modelo: "",
+      color: "",
+      capacidad: "",
+    });
+    assert.equal(res.ok, false);
+    if (!res.ok) {
+      assert.ok(res.fieldErrors?.patente);
+      assert.ok(res.fieldErrors?.marca);
     }
   });
 });

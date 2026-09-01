@@ -47,6 +47,7 @@ export default async function ConductorPage() {
     createSupabaseConductorRepository(supabase),
   );
   const trips = await service.listTrips(profile.id);
+  const vehiculos = await service.listMisVehiculos(profile.id);
   const primary = trips[0] ?? null;
   const detail = primary
     ? await service.getTrip(primary.id, profile.id, {
@@ -78,6 +79,20 @@ export default async function ConductorPage() {
             Conductor
           </span>
         </div>
+
+        {vehiculos.length === 0 ? (
+          <Link
+            href="/conductor/vehiculo"
+            className="flex flex-col gap-1 rounded-2xl border border-primary/25 bg-primary/5 px-4 py-3 transition-colors hover:bg-primary/10"
+          >
+            <p className="text-sm font-semibold text-foreground">
+              Completá los datos de tu vehículo
+            </p>
+            <p className="text-xs font-medium text-muted-foreground">
+              Para que el operador pueda asignarte viajes, cargá tu auto.
+            </p>
+          </Link>
+        ) : null}
 
         {!primary || !detail ? (
           <div className="flex flex-1 flex-col gap-6">

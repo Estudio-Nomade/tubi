@@ -69,6 +69,83 @@ export type ParseCrearVehiculoErr = {
   fieldErrors?: Partial<Record<keyof CrearVehiculoFormFields, string>>;
 };
 
+export type CrearVehiculoPropioFormFields = {
+  patente: string;
+  marca: string;
+  modelo: string;
+  color: string;
+  capacidad: string;
+};
+
+export type ParseCrearVehiculoPropioOk = {
+  ok: true;
+  patente: string;
+  marca: string;
+  modelo: string;
+  color: string;
+  capacidad: number;
+};
+
+export type ParseCrearVehiculoPropioErr = {
+  ok: false;
+  error: string;
+  fieldErrors?: Partial<Record<keyof CrearVehiculoPropioFormFields, string>>;
+};
+
+export function parseCrearVehiculoPropioForm(
+  fields: CrearVehiculoPropioFormFields,
+): ParseCrearVehiculoPropioOk | ParseCrearVehiculoPropioErr {
+  const fieldErrors: ParseCrearVehiculoPropioErr["fieldErrors"] = {};
+
+  const patente = fields.patente.trim();
+  const marca = fields.marca.trim();
+  const modelo = fields.modelo.trim();
+  const color = fields.color.trim();
+  const capacidadRaw = fields.capacidad.trim();
+
+  if (!patente) {
+    fieldErrors.patente = "Indicá la patente.";
+  }
+  if (!marca) {
+    fieldErrors.marca = "Indicá la marca.";
+  }
+  if (!modelo) {
+    fieldErrors.modelo = "Indicá el modelo.";
+  }
+  if (!color) {
+    fieldErrors.color = "Indicá el color.";
+  }
+
+  let capacidad = 0;
+  if (capacidadRaw === "") {
+    fieldErrors.capacidad = "Indicá la capacidad.";
+  } else {
+    const n = Number(capacidadRaw.replace(",", "."));
+    if (!Number.isFinite(n) || !Number.isInteger(n) || n < 1) {
+      fieldErrors.capacidad = "La capacidad debe ser un número mayor a 0.";
+    } else {
+      capacidad = n;
+    }
+  }
+
+  if (Object.keys(fieldErrors).length > 0) {
+    return {
+      ok: false,
+      error: "Revisá los datos del vehículo.",
+      fieldErrors,
+    };
+  }
+
+  return {
+    ok: true,
+    patente,
+    marca,
+    modelo,
+    color,
+    capacidad,
+  };
+}
+
 const UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 

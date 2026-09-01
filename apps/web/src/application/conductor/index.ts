@@ -10,3 +10,7 @@ export {
   completeTripAction,
   type ActionError,
 } from "./actions";
+export {
+  crearVehiculoPropioAction,
+  type CrearVehiculoPropioActionResult,
+} from "./vehiculos-actions";
