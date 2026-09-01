@@ -10,6 +10,7 @@ import { pickupModeForOrigen } from "@/domain/geo";
 import {
   formatHoraAr,
   formatHoraLlegadaAr,
+  formatPersonaNombre,
 } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 import { cn } from "@/lib/utils";
@@ -60,9 +61,10 @@ export default async function ViajeDetailPage({
   if (!viaje) notFound();
 
   const canReserve = viaje.estado === "programado" && viaje.asientosLibres > 0;
-  const conductorNombre = [viaje.conductor.nombre, viaje.conductor.apellido]
-    .filter(Boolean)
-    .join(" ");
+  const conductorNombre = formatPersonaNombre(
+    viaje.conductor.nombre,
+    viaje.conductor.apellido,
+  );
   const vehiculoLabel = `${viaje.vehiculo.marca} ${viaje.vehiculo.modelo} · ${viaje.vehiculo.color} · ${viaje.vehiculo.patente}`;
 
   const pickupMode = pickupModeForOrigen(viaje.origen);

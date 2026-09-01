@@ -4,6 +4,7 @@
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { formatPersonaNombre } from "@/lib/format";
 import type { Database } from "@/lib/supabase/types";
 
 type Client = SupabaseClient<Database>;
@@ -89,7 +90,7 @@ function mapRow(raw: unknown): PendingSenaItem | null {
     apellido: string;
   } | null;
   const pasajeroNombre = pasajero
-    ? [pasajero.nombre, pasajero.apellido].filter(Boolean).join(" ")
+    ? formatPersonaNombre(pasajero.nombre, pasajero.apellido)
     : "Pasajero";
 
   return {

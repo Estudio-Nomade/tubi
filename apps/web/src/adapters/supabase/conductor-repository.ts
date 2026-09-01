@@ -27,6 +27,7 @@ import {
   type MetodoPago,
 } from "@/domain/pagos";
 import type { EstadoReserva } from "@/domain/reservas";
+import { formatPersonaNombre } from "@/lib/format";
 import type { Database, EstadoViaje, Json } from "@/lib/supabase/types";
 
 type Client = SupabaseClient<Database>;
@@ -47,10 +48,6 @@ const LISTABLE: EstadoReserva[] = [
 function one<T>(value: T | T[] | null | undefined): T | null {
   if (value == null) return null;
   return Array.isArray(value) ? (value[0] ?? null) : value;
-}
-
-function fullName(nombre: string, apellido: string | null | undefined): string {
-  return [nombre, apellido].filter(Boolean).join(" ").trim();
 }
 
 function mapRpcError(message: string): Error {
@@ -274,7 +271,7 @@ export function createSupabaseConductorRepository(
       return {
         reservaId: typed.id,
         viajeId: viaje.id,
-        pasajeroNombre: fullName(pax.nombre, pax.apellido),
+        pasajeroNombre: formatPersonaNombre(pax.nombre, pax.apellido),
         origen: ruta.origen,
         destino: ruta.destino,
         fechaSalida: viaje.fecha_salida,
@@ -403,7 +400,7 @@ export function createSupabaseConductorRepository(
       return {
         reservaId: typed.id,
         viajeId: viaje.id,
-        pasajeroNombre: fullName(pax.nombre, pax.apellido),
+        pasajeroNombre: formatPersonaNombre(pax.nombre, pax.apellido),
         origen: ruta.origen,
         destino: ruta.destino,
         fechaSalida: viaje.fecha_salida,
@@ -674,7 +671,7 @@ async function listPassengers(
     const pax = one(typed.pasajero);
     return {
       reservaId: typed.id,
-      nombre: pax ? fullName(pax.nombre, pax.apellido) : "Pasajero",
+      nombre: pax ? formatPersonaNombre(pax.nombre, pax.apellido) : "Pasajero",
       estado: typed.estado,
       paradaLabel: origenFallback,
       recogidaLabel: typed.recogida_label ?? null,

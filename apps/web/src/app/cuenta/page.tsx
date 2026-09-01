@@ -10,6 +10,7 @@ import {
 } from "@/components/design";
 import type { Rol } from "@/domain/auth";
 import { requireProfile } from "@/lib/auth/require-profile";
+import { formatPersonaNombre } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
 const ROL_LABEL: Record<Rol, string> = {
@@ -26,9 +27,7 @@ export default async function CuentaPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const displayName = [profile.nombre, profile.apellido]
-    .filter(Boolean)
-    .join(" ");
+  const displayName = formatPersonaNombre(profile.nombre, profile.apellido);
   const initial = (profile.nombre.trim().charAt(0) || "?").toUpperCase();
   const email = user?.email ?? null;
   const backHref = homePathForRol(profile.rol);

@@ -20,6 +20,7 @@ import {
   registerConductorSchema,
   registerPasajeroSchema,
 } from "@/domain/auth";
+import { normalizarNombrePila } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
 import { createAuthService, homePathForRol } from "./auth-service";
@@ -165,6 +166,7 @@ export async function signUpConductorAction(
   }
 
   const { nombre, apellido, telefono, email, password } = parsed.data;
+  const nombreNormalizado = normalizarNombrePila(nombre, apellido);
   const { supabase, service } = await getAuthService();
 
   const { data, error } = await supabase.auth.signUp({ email, password });
@@ -196,7 +198,7 @@ export async function signUpConductorAction(
     await service.createProfile({
       id: userId,
       rol: "conductor",
-      nombre,
+      nombre: nombreNormalizado,
       apellido,
       telefono,
       dni: null,

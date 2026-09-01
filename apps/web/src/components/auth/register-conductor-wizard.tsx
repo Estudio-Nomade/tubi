@@ -116,6 +116,7 @@ export function RegisterConductorWizard() {
           <Field
             label="Nombre"
             autoComplete="given-name"
+            placeholder="Solo tu nombre, sin apellido"
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             error={errors.nombre}
@@ -128,6 +129,7 @@ export function RegisterConductorWizard() {
           <Field
             label="Apellido"
             autoComplete="family-name"
+            placeholder="Ej: Yaquinta"
             value={apellido}
             onChange={(e) => setApellido(e.target.value)}
             error={errors.apellido}

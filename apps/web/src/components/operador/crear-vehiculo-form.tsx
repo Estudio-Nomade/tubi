@@ -8,6 +8,7 @@ import {
 } from "@/application/operador/vehiculos-actions";
 import { BtnPrimary, Field } from "@/components/design";
 import type { ConductorCatalogoRow } from "@/domain/operador";
+import { formatPersonaNombre } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -84,7 +85,7 @@ export function CrearVehiculoForm({ conductores, initialConductorId }: Props) {
         ) : (
           conductores.map((c) => (
             <option key={c.id} value={c.id}>
-              {[c.nombre, c.apellido].filter(Boolean).join(" ") || "Conductor"}
+              {formatPersonaNombre(c.nombre, c.apellido) || "Conductor"}
             </option>
           ))
         )}

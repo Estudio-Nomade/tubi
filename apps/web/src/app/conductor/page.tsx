@@ -13,7 +13,7 @@ import {
   TabBar,
   type StatusPillVariant,
 } from "@/components/design";
-import { formatFechaHoraAr, formatHoraAr } from "@/lib/format";
+import { formatFechaHoraAr, formatHoraAr, formatPersonaNombre } from "@/lib/format";
 import { conductorLandingPath } from "@/application/conductor/landing-path";
 import { requireProfile } from "@/lib/auth/require-profile";
 import { createClient } from "@/lib/supabase/server";
@@ -47,9 +47,7 @@ export default async function ConductorPage({
   const ok = typeof params.ok === "string" ? params.ok : null;
 
   const profile = await requireProfile(["conductor", "operador"]);
-  const displayName = [profile.nombre, profile.apellido]
-    .filter(Boolean)
-    .join(" ");
+  const displayName = formatPersonaNombre(profile.nombre, profile.apellido);
 
   const supabase = await createClient();
   const service = createConductorService(
