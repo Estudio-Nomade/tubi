@@ -8,6 +8,10 @@ export type {
 export type { ViajesRepository } from "./ports";
 export { searchViajesSchema, type SearchViajesInput } from "./schemas";
 export {
+  groupViajesByFechaLocal,
+  type ViajeGrupo,
+} from "./group-by-day";
+export {
   VIAJE_TRANSITIONS,
   canTransitionViaje,
   canCompleteViaje,

@@ -31,8 +31,9 @@ function buildBackHref(
   const origen = first(searchParams.origen).trim();
   const destino = first(searchParams.destino).trim();
   const fecha = first(searchParams.fecha).trim();
-  if (origen && destino && fecha) {
-    const q = new URLSearchParams({ origen, destino, fecha });
+  if (origen && destino) {
+    const q = new URLSearchParams({ origen, destino });
+    if (fecha) q.set("fecha", fecha);
     const hora = first(searchParams.hora_desde).trim();
     if (hora) q.set("hora_desde", hora);
     return {

@@ -5,8 +5,8 @@ export type { EstadoViaje, TipoParada };
 export type SearchViajesQuery = {
   origen: string;
   destino: string;
-  /** YYYY-MM-DD */
-  fecha: string;
+  /** YYYY-MM-DD opcional: si viene, filtra ese día; si no, próximos viajes */
+  fecha?: string;
   /** HH:mm optional lower bound on departure time */
   horaDesde?: string;
 };
