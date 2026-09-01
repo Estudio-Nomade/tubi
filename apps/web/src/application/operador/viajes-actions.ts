@@ -69,6 +69,7 @@ export async function cancelarViajeAction(
 
   revalidatePath("/operador");
   revalidatePath("/operador/viajes");
+  revalidatePath("/operador/viajes/historial");
   revalidatePath(`/operador/viajes/${viajeId}`);
   revalidatePath("/operador/devoluciones");
   revalidatePath("/pasajero");
