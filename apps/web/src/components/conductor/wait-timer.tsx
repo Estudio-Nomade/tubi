@@ -47,7 +47,10 @@ export function WaitTimer({ maxMinutes, storageKey, onExpired, className }: Prop
   const [remaining, setRemaining] = useState<number | null>(null);
   const expiredFired = useRef(false);
   const onExpiredRef = useRef(onExpired);
-  onExpiredRef.current = onExpired;
+
+  useEffect(() => {
+    onExpiredRef.current = onExpired;
+  }, [onExpired]);
 
   useEffect(() => {
     expiredFired.current = false;
