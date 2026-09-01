@@ -14,9 +14,11 @@ import {
   type StatusPillVariant,
 } from "@/components/design";
 import { formatFechaHoraAr, formatHoraAr } from "@/lib/format";
+import { conductorLandingPath } from "@/application/conductor/landing-path";
 import { requireProfile } from "@/lib/auth/require-profile";
 import { createClient } from "@/lib/supabase/server";
 import type { EstadoViaje } from "@/lib/supabase/types";
+import { redirect } from "next/navigation";
 
 function tripEstadoPill(estado: EstadoViaje): {
   label: string;
@@ -36,7 +38,14 @@ function tripEstadoPill(estado: EstadoViaje): {
 }
 
 /** Pencil C3 home with trip · C2 empty. */
-export default async function ConductorPage() {
+export default async function ConductorPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const params = await searchParams;
+  const ok = typeof params.ok === "string" ? params.ok : null;
+
   const profile = await requireProfile(["conductor", "operador"]);
   const displayName = [profile.nombre, profile.apellido]
     .filter(Boolean)
@@ -48,6 +57,12 @@ export default async function ConductorPage() {
   );
   const trips = await service.listTrips(profile.id);
   const vehiculos = await service.listMisVehiculos(profile.id);
+
+  // Operador puede mirar home conductor sin vehículo propio.
+  if (profile.rol === "conductor" && vehiculos.length === 0) {
+    redirect(conductorLandingPath(false));
+  }
+
   const primary = trips[0] ?? null;
   const detail = primary
     ? await service.getTrip(primary.id, profile.id, {
@@ -80,18 +95,13 @@ export default async function ConductorPage() {
           </span>
         </div>
 
-        {vehiculos.length === 0 ? (
-          <Link
-            href="/conductor/vehiculo"
-            className="flex flex-col gap-1 rounded-2xl border border-primary/25 bg-primary/5 px-4 py-3 transition-colors hover:bg-primary/10"
+        {ok === "vehiculo" ? (
+          <p
+            className="rounded-xl bg-[#E4EDE5] px-3 py-2 text-sm font-medium text-[#5F7A61]"
+            role="status"
           >
-            <p className="text-sm font-semibold text-foreground">
-              Completá los datos de tu vehículo
-            </p>
-            <p className="text-xs font-medium text-muted-foreground">
-              Para que el operador pueda asignarte viajes, cargá tu auto.
-            </p>
-          </Link>
+            Vehículo registrado. Cuando el operador te asigne un viaje, aparece acá.
+          </p>
         ) : null}
 
         {!primary || !detail ? (
