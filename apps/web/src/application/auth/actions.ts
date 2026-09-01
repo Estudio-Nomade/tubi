@@ -11,12 +11,16 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { createSupabaseConductorRepository } from "@/adapters/supabase/conductor-repository";
 import { createSupabaseProfilesRepository } from "@/adapters/supabase/profiles-repository";
+import { createConductorService } from "@/application/conductor";
+import { conductorLandingPath } from "@/application/conductor/landing-path";
 import {
   loginSchema,
   registerConductorSchema,
   registerPasajeroSchema,
 } from "@/domain/auth";
+import { normalizarNombrePila } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
 import { createAuthService, homePathForRol } from "./auth-service";
@@ -71,6 +75,15 @@ export async function signInAction(
   }
 
   revalidatePath("/", "layout");
+
+  if (profile.rol === "conductor") {
+    const conductorService = createConductorService(
+      createSupabaseConductorRepository(supabase),
+    );
+    const vehiculos = await conductorService.listMisVehiculos(profile.id);
+    redirect(conductorLandingPath(vehiculos.length > 0));
+  }
+
   redirect(homePathForRol(profile.rol));
 }
 
@@ -153,6 +166,7 @@ export async function signUpConductorAction(
   }
 
   const { nombre, apellido, telefono, email, password } = parsed.data;
+  const nombreNormalizado = normalizarNombrePila(nombre, apellido);
   const { supabase, service } = await getAuthService();
 
   const { data, error } = await supabase.auth.signUp({ email, password });
@@ -184,7 +198,7 @@ export async function signUpConductorAction(
     await service.createProfile({
       id: userId,
       rol: "conductor",
-      nombre,
+      nombre: nombreNormalizado,
       apellido,
       telefono,
       dni: null,
@@ -195,7 +209,8 @@ export async function signUpConductorAction(
   }
 
   revalidatePath("/", "layout");
-  redirect("/conductor");
+  // Self-serve conductor has no vehicle yet — force FR-09 onboarding.
+  redirect(conductorLandingPath(false));
 }
 
 export async function signOutAction(): Promise<void> {

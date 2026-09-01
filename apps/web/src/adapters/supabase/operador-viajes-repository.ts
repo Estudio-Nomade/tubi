@@ -17,6 +17,7 @@ import {
 } from "@/domain/operador";
 import type { EstadoReserva } from "@/domain/reservas";
 import type { EstadoViaje } from "@/domain/viajes";
+import { formatPersonaNombre } from "@/lib/format";
 import type { Database } from "@/lib/supabase/types";
 
 type Client = SupabaseClient<Database>;
@@ -58,7 +59,7 @@ function conductorLabel(
   c: { nombre: string; apellido: string } | null,
 ): string {
   if (!c) return "Conductor";
-  return [c.nombre, c.apellido].filter(Boolean).join(" ") || "Conductor";
+  return formatPersonaNombre(c.nombre, c.apellido) || "Conductor";
 }
 
 export function createOperadorViajesRepository(

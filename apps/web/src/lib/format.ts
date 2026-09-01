@@ -1,5 +1,47 @@
 /** Display helpers (UI only — no business constants). */
 
+/**
+ * Canonical "nombre + apellido" for display.
+ * If `apellido` is already the trailing suffix of `nombre` (case-insensitive,
+ * trimmed) — e.g. nombre="Martina Yaquinta", apellido="Yaquinta" — avoid the
+ * duplicated apellido and return `nombre` as-is.
+ */
+export function formatPersonaNombre(
+  nombre: string,
+  apellido: string | null | undefined,
+): string {
+  const n = nombre?.trim() ?? "";
+  const a = apellido?.trim() ?? "";
+  if (!n) return a;
+  if (!a) return n;
+  const nLower = n.toLowerCase();
+  const aLower = a.toLowerCase();
+  if (nLower === aLower || nLower.endsWith(` ${aLower}`)) return n;
+  return `${n} ${a}`;
+}
+
+/**
+ * Strips a trailing apellido from a first-name field so we don't persist
+ * duplicated data (e.g. wizard collects "Martina Yaquinta" + "Yaquinta").
+ * Returns the cleaned first name. Leaves the input untouched when the strip
+ * would empty it (nombre === apellido) or when apellido isn't a suffix.
+ */
+export function normalizarNombrePila(
+  nombre: string,
+  apellido: string,
+): string {
+  const n = nombre.trim();
+  const a = apellido.trim();
+  if (!n || !a) return n;
+  const nLower = n.toLowerCase();
+  const aLower = a.toLowerCase();
+  if (nLower === aLower) return n;
+  if (nLower.endsWith(` ${aLower}`)) {
+    return n.slice(0, n.length - a.length).trim();
+  }
+  return n;
+}
+
 export function formatArs(amount: number): string {
   return new Intl.NumberFormat("es-AR", {
     style: "currency",

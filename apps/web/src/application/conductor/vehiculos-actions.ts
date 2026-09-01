@@ -88,7 +88,8 @@ export async function crearVehiculoPropioAction(
   revalidatePath("/operador");
   revalidatePath("/operador/viajes");
   revalidatePath("/operador/viajes/nuevo");
-  redirect("/conductor/vehiculo?ok=creado");
+  // After first vehicle, land on home (onboarding complete).
+  redirect("/conductor?ok=vehiculo");
 }
 
 export async function actualizarVehiculoPropioAction(

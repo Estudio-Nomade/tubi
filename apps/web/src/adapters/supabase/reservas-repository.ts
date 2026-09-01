@@ -19,6 +19,7 @@ import {
   type ReservasRepository,
 } from "@/domain/reservas";
 import type { Database, Json } from "@/lib/supabase/types";
+import { formatPersonaNombre } from "@/lib/format";
 
 type Client = SupabaseClient<Database>;
 type ReservaRow = Database["public"]["Tables"]["reserva"]["Row"];
@@ -26,10 +27,6 @@ type ReservaRow = Database["public"]["Tables"]["reserva"]["Row"];
 function one<T>(value: T | T[] | null | undefined): T | null {
   if (value == null) return null;
   return Array.isArray(value) ? (value[0] ?? null) : value;
-}
-
-function fullName(nombre: string, apellido: string | null | undefined): string {
-  return [nombre, apellido].filter(Boolean).join(" ").trim();
 }
 
 function parsePolitica(raw: Json): PoliticaCancelacionSnapshot {
@@ -465,8 +462,8 @@ function mapBoardingPass(data: unknown): BoardingPass | null {
     origen: ruta.origen,
     destino: ruta.destino,
     fechaSalida: viaje.fecha_salida,
-    passengerName: fullName(pasajero.nombre, pasajero.apellido),
-    conductorName: fullName(conductor.nombre, conductor.apellido),
+    passengerName: formatPersonaNombre(pasajero.nombre, pasajero.apellido),
+    conductorName: formatPersonaNombre(conductor.nombre, conductor.apellido),
     vehicleLabel: `${vehiculo.patente} · ${vehiculo.marca} ${vehiculo.modelo} · ${vehiculo.color}`,
   };
 }

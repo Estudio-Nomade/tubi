@@ -12,6 +12,7 @@ import type {
   ConductorCatalogoRow,
   RutaCatalogoRow,
 } from "@/domain/operador";
+import { formatPersonaNombre } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 type Props = {
@@ -172,7 +173,7 @@ export function CrearViajeForm({
         ) : (
           conductores.map((c) => (
             <option key={c.id} value={c.id}>
-              {[c.nombre, c.apellido].filter(Boolean).join(" ") || "Conductor"}
+              {formatPersonaNombre(c.nombre, c.apellido) || "Conductor"}
             </option>
           ))
         )}
