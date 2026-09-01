@@ -1,24 +1,45 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
-import type {
-  CancelViajeResult,
-  ConductorCatalogoRow,
-  CrearViajeInput,
-  CrearViajeResult,
-  DevolucionPendienteRow,
-  MarkRefundResult,
-  OperadorViajesRepository,
-  RutaCatalogoRow,
-  VehiculoCatalogoRow,
-  ViajeOperadorDetalle,
-  ViajeOperadorReservaRow,
-  ViajeOperadorRow,
+import {
+  sortViajesActivos,
+  type CancelViajeResult,
+  type ConductorCatalogoRow,
+  type CrearViajeInput,
+  type CrearViajeResult,
+  type DevolucionPendienteRow,
+  type MarkRefundResult,
+  type OperadorViajesRepository,
+  type RutaCatalogoRow,
+  type VehiculoCatalogoRow,
+  type ViajeOperadorDetalle,
+  type ViajeOperadorReservaRow,
+  type ViajeOperadorRow,
 } from "@/domain/operador";
 import type { EstadoReserva } from "@/domain/reservas";
 import type { EstadoViaje } from "@/domain/viajes";
 import type { Database } from "@/lib/supabase/types";
 
 type Client = SupabaseClient<Database>;
+
+const TRIP_LIST_SELECT = `
+  id,
+  fecha_salida,
+  estado,
+  precio,
+  conductor:profiles!viaje_conductor_id_fkey ( nombre, apellido ),
+  vehiculo!inner ( patente, capacidad ),
+  ruta!inner ( origen, destino ),
+  reservas:reserva ( id, estado )
+`;
+
+function mapViajeRows(data: unknown[] | null): ViajeOperadorRow[] {
+  const rows: ViajeOperadorRow[] = [];
+  for (const raw of data ?? []) {
+    const mapped = mapViajeRow(raw as unknown);
+    if (mapped) rows.push(mapped);
+  }
+  return rows;
+}
 
 function one<T>(v: T | T[] | null | undefined): T | null {
   if (v == null) return null;
@@ -36,34 +57,40 @@ export function createOperadorViajesRepository(
   client: Client,
 ): OperadorViajesRepository {
   return {
-    async listViajesProximos(): Promise<ViajeOperadorRow[]> {
+    async listViajesActivos(): Promise<ViajeOperadorRow[]> {
       const { data, error } = await client
         .from("viaje")
-        .select(
-          `
-          id,
-          fecha_salida,
-          estado,
-          precio,
-          conductor:profiles!viaje_conductor_id_fkey ( nombre, apellido ),
-          vehiculo!inner ( patente, capacidad ),
-          ruta!inner ( origen, destino ),
-          reservas:reserva ( id, estado )
-        `,
-        )
+        .select(TRIP_LIST_SELECT)
+        .in("estado", ["en_curso", "recogida", "programado"])
         .order("fecha_salida", { ascending: true })
+        .limit(80);
+
+      if (error) {
+        throw new Error(`operador.listViajesActivos failed: ${error.message}`);
+      }
+
+      return sortViajesActivos(mapViajeRows(data));
+    },
+
+    async listViajesHistorial(): Promise<ViajeOperadorRow[]> {
+      const { data, error } = await client
+        .from("viaje")
+        .select(TRIP_LIST_SELECT)
+        .in("estado", ["cancelado", "completado"])
+        .order("fecha_salida", { ascending: false })
         .limit(40);
 
       if (error) {
-        throw new Error(`operador.listViajesProximos failed: ${error.message}`);
+        throw new Error(
+          `operador.listViajesHistorial failed: ${error.message}`,
+        );
       }
 
-      const rows: ViajeOperadorRow[] = [];
-      for (const raw of data ?? []) {
-        const mapped = mapViajeRow(raw as unknown);
-        if (mapped) rows.push(mapped);
-      }
-      return rows;
+      return mapViajeRows(data);
+    },
+
+    async listViajesProximos(): Promise<ViajeOperadorRow[]> {
+      return this.listViajesActivos();
     },
 
     async getViajeDetalle(
