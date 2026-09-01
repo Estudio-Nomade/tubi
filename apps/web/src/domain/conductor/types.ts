@@ -124,6 +124,10 @@ export type CrearVehiculoPropioInput = {
   capacidad: number;
 };
 
+export type ActualizarVehiculoPropioInput = CrearVehiculoPropioInput & {
+  vehiculoId: string;
+};
+
 export type CrearVehiculoPropioResult = {
   ok: true;
   vehiculoId: string;

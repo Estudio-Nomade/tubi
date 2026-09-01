@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { createSupabaseConductorRepository } from "@/adapters/supabase/conductor-repository";
 import { createConductorService } from "@/application/conductor";
 import { AppHeader, EmptyHint, TabBar } from "@/components/design";
@@ -44,6 +46,14 @@ export default async function ConductorVehiculoPage({
             Vehículo registrado. Ya puede asignarte viajes.
           </p>
         ) : null}
+        {ok === "actualizado" ? (
+          <p
+            className="rounded-xl bg-[#E4EDE5] px-3 py-2 text-sm font-medium text-[#5F7A61]"
+            role="status"
+          >
+            Vehículo actualizado.
+          </p>
+        ) : null}
 
         {vehiculos.length === 0 ? (
           <div className="rounded-2xl border border-border bg-card px-4 py-2 shadow-[0_4px_16px_rgba(28,25,23,0.06)]">
@@ -56,9 +66,17 @@ export default async function ConductorVehiculoPage({
                 key={v.id}
                 className="flex flex-col gap-1 rounded-2xl border border-border bg-card p-4 shadow-[0_4px_16px_rgba(28,25,23,0.06)]"
               >
-                <p className="font-heading text-[17px] font-semibold text-foreground">
-                  {v.patente}
-                </p>
+                <div className="flex items-start justify-between gap-3">
+                  <p className="font-heading text-[17px] font-semibold text-foreground">
+                    {v.patente}
+                  </p>
+                  <Link
+                    href={`/conductor/vehiculo/${v.id}/editar`}
+                    className="shrink-0 text-sm font-semibold text-primary underline underline-offset-2"
+                  >
+                    Editar
+                  </Link>
+                </div>
                 <p className="text-sm font-medium text-muted-foreground">
                   {v.marca} {v.modelo} · {v.color}
                 </p>

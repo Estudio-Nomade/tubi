@@ -2,6 +2,7 @@ export type CreateVehiculoErrorCode =
   | "NO_AUTENTICADO"
   | "NO_AUTORIZADO"
   | "CONDUCTOR_INVALIDO"
+  | "VEHICULO_INVALIDO"
   | "PATENTE_DUPLICADA"
   | "PATENTE_INVALIDA"
   | "CAPACIDAD_INVALIDA"
@@ -14,6 +15,7 @@ export function mapCreateVehiculoErrorMessage(
   if (msg.includes("NO_AUTENTICADO")) return "NO_AUTENTICADO";
   if (msg.includes("NO_AUTORIZADO")) return "NO_AUTORIZADO";
   if (msg.includes("CONDUCTOR_INVALIDO")) return "CONDUCTOR_INVALIDO";
+  if (msg.includes("VEHICULO_INVALIDO")) return "VEHICULO_INVALIDO";
   if (msg.includes("PATENTE_DUPLICADA")) return "PATENTE_DUPLICADA";
   if (msg.includes("PATENTE_INVALIDA")) return "PATENTE_INVALIDA";
   if (msg.includes("CAPACIDAD_INVALIDA")) return "CAPACIDAD_INVALIDA";
@@ -31,6 +33,8 @@ export function createVehiculoErrorUserMessage(
       return "No tenés permiso para registrar vehículos.";
     case "CONDUCTOR_INVALIDO":
       return "Elegí un conductor válido.";
+    case "VEHICULO_INVALIDO":
+      return "No encontramos ese vehículo o no te pertenece.";
     case "PATENTE_DUPLICADA":
       return "Ya hay un vehículo con esa patente.";
     case "PATENTE_INVALIDA":

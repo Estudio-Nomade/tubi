@@ -395,6 +395,17 @@ export type Database = {
         };
         Returns: Json;
       };
+      actualizar_vehiculo_propio: {
+        Args: {
+          p_vehiculo_id: string;
+          p_patente: string;
+          p_marca: string;
+          p_modelo: string;
+          p_color: string;
+          p_capacidad: number;
+        };
+        Returns: Json;
+      };
     };
     Enums: {
       rol: Rol;

@@ -90,3 +90,55 @@ export async function crearVehiculoPropioAction(
   revalidatePath("/operador/viajes/nuevo");
   redirect("/conductor/vehiculo?ok=creado");
 }
+
+export async function actualizarVehiculoPropioAction(
+  _prev: CrearVehiculoPropioActionResult | void,
+  formData: FormData,
+): Promise<CrearVehiculoPropioActionResult | void> {
+  await requireProfile(["conductor"]);
+
+  const vehiculoId = formString(formData, "vehiculoId");
+
+  const parsed = parseCrearVehiculoPropioForm({
+    patente: formString(formData, "patente"),
+    marca: formString(formData, "marca"),
+    modelo: formString(formData, "modelo"),
+    color: formString(formData, "color"),
+    capacidad: formString(formData, "capacidad"),
+  });
+
+  if (!parsed.ok) {
+    return {
+      error: parsed.error,
+      fieldErrors: parsed.fieldErrors,
+    };
+  }
+
+  const supabase = await createClient();
+  const service = createConductorService(
+    createSupabaseConductorRepository(supabase),
+  );
+
+  try {
+    await service.actualizarVehiculoPropio({
+      vehiculoId,
+      patente: parsed.patente,
+      marca: parsed.marca,
+      modelo: parsed.modelo,
+      color: parsed.color,
+      capacidad: parsed.capacidad,
+    });
+  } catch (err) {
+    if (isNextRedirect(err)) throw err;
+    const msg = err instanceof Error ? err.message : "";
+    const code = mapCreateVehiculoErrorMessage(msg);
+    return { error: createVehiculoErrorUserMessage(code) };
+  }
+
+  revalidatePath("/conductor");
+  revalidatePath("/conductor/vehiculo");
+  revalidatePath("/operador");
+  revalidatePath("/operador/viajes");
+  revalidatePath("/operador/viajes/nuevo");
+  redirect("/conductor/vehiculo?ok=actualizado");
+}
