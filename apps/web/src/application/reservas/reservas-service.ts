@@ -3,6 +3,7 @@ import {
   type BoardingPass,
   type BoardingPassSummary,
   type CancelReservaResult,
+  type RecogidaInput,
   type Reserva,
   type ReservaActivaSummary,
   type ReservaListItem,
@@ -11,8 +12,8 @@ import {
 
 export function createReservasService(repo: ReservasRepository) {
   return {
-    crear(viajeId: string): Promise<Reserva> {
-      return repo.createForPassenger(viajeId);
+    crear(viajeId: string, recogida?: RecogidaInput): Promise<Reserva> {
+      return repo.createForPassenger(viajeId, recogida);
     },
     getByIdForPassenger(
       id: string,

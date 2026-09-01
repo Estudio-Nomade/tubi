@@ -243,6 +243,11 @@ export type Database = {
           monto_devolucion: number | null;
           devolucion_pct: number | null;
           devolucion_saldada_en: string | null;
+          recogida_label: string | null;
+          recogida_lat: number | null;
+          recogida_lng: number | null;
+          recogida_place_id: string | null;
+          recogida_mode: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -259,6 +264,11 @@ export type Database = {
           monto_devolucion?: number | null;
           devolucion_pct?: number | null;
           devolucion_saldada_en?: string | null;
+          recogida_label?: string | null;
+          recogida_lat?: number | null;
+          recogida_lng?: number | null;
+          recogida_place_id?: string | null;
+          recogida_mode?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -275,6 +285,11 @@ export type Database = {
           monto_devolucion?: number | null;
           devolucion_pct?: number | null;
           devolucion_saldada_en?: string | null;
+          recogida_label?: string | null;
+          recogida_lat?: number | null;
+          recogida_lng?: number | null;
+          recogida_place_id?: string | null;
+          recogida_mode?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -320,8 +335,43 @@ export type Database = {
     Views: Record<string, never>;
     Functions: {
       crear_reserva: {
-        Args: { p_viaje_id: string };
+        Args: {
+          p_viaje_id: string;
+          p_recogida_label?: string | null;
+          p_recogida_lat?: number | null;
+          p_recogida_lng?: number | null;
+          p_recogida_place_id?: string | null;
+        };
         Returns: Database["public"]["Tables"]["reserva"]["Row"];
+      };
+      actualizar_parada: {
+        Args: {
+          p_parada_id: string;
+          p_nombre: string;
+          p_ciudad: string;
+          p_lat: number;
+          p_lng: number;
+        };
+        Returns: Json;
+      };
+      crear_parada_intermedia: {
+        Args: {
+          p_ruta_id: string;
+          p_nombre: string;
+          p_ciudad: string;
+          p_lat: number;
+          p_lng: number;
+          p_orden?: number | null;
+        };
+        Returns: Json;
+      };
+      eliminar_parada_intermedia: {
+        Args: { p_parada_id: string };
+        Returns: Json;
+      };
+      reordenar_paradas_ruta: {
+        Args: { p_ruta_id: string; p_ids: string[] };
+        Returns: Json;
       };
       asientos_libres_viaje: {
         Args: { p_viaje_id: string };

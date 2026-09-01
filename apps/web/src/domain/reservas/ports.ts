@@ -2,14 +2,18 @@ import type {
   BoardingPass,
   BoardingPassSummary,
   CancelReservaResult,
+  RecogidaInput,
   Reserva,
   ReservaActivaSummary,
   ReservaListItem,
 } from "./types";
 
 export interface ReservasRepository {
-  /** Atomic create via RPC (capacity + snapshots + qr_token). */
-  createForPassenger(viajeId: string): Promise<Reserva>;
+  /** Atomic create via RPC (capacity + snapshots + qr_token + recogida). */
+  createForPassenger(
+    viajeId: string,
+    recogida?: RecogidaInput,
+  ): Promise<Reserva>;
   findByIdForPassenger(
     id: string,
     pasajeroId: string,

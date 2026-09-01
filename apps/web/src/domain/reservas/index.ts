@@ -28,6 +28,7 @@ export type {
   BoardingPassSummary,
   CancelReservaResult,
   EstadoReserva,
+  RecogidaInput,
   Reserva,
   ReservaActivaSummary,
   ReservaListItem,

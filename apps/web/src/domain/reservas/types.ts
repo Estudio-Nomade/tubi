@@ -1,3 +1,5 @@
+import type { PickupMode } from "@/domain/geo";
+
 import type { PoliticaCancelacionSnapshot } from "./snapshots";
 
 export type EstadoReserva =
@@ -8,6 +10,14 @@ export type EstadoReserva =
   | "cancelada"
   | "no_show";
 
+/** Punto de recogida que el pasajero declara al reservar (solo Tandil libre). */
+export type RecogidaInput = {
+  label: string;
+  lat: number;
+  lng: number;
+  placeId?: string | null;
+};
+
 export type Reserva = {
   id: string;
   viajeId: string;
@@ -17,6 +27,11 @@ export type Reserva = {
   qrToken: string;
   politicaCancelacion: PoliticaCancelacionSnapshot;
   asientoNum: number | null;
+  recogidaLabel: string | null;
+  recogidaLat: number | null;
+  recogidaLng: number | null;
+  recogidaPlaceId: string | null;
+  recogidaMode: PickupMode | null;
   createdAt: string;
 };
 
