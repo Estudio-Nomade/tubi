@@ -105,9 +105,7 @@ async function fetchAsientosLibres(
 export function createSupabaseViajesRepository(client: Client): ViajesRepository {
   return {
     async search(query: SearchViajesQuery): Promise<ViajeListItem[]> {
-      const { startIso, endIso } = dayBoundsIso(query.fecha, query.horaDesde);
-
-      const { data, error } = await client
+      let q = client
         .from("viaje")
         .select(
           `
@@ -121,10 +119,25 @@ export function createSupabaseViajesRepository(client: Client): ViajesRepository
         )
         .eq("estado", "programado")
         .eq("ruta.origen", query.origen)
-        .eq("ruta.destino", query.destino)
-        .gte("fecha_salida", startIso)
-        .lte("fecha_salida", endIso)
-        .order("fecha_salida", { ascending: true });
+        .eq("ruta.destino", query.destino);
+
+      if (query.fecha) {
+        const { startIso, endIso } = dayBoundsIso(query.fecha, query.horaDesde);
+        // Nunca ofrecer salidas ya pasadas, incluso con un día "hoy".
+        const nowIso = new Date().toISOString();
+        const start =
+          new Date(startIso).getTime() > Date.now() ? startIso : nowIso;
+        q = q.gte("fecha_salida", start).lte("fecha_salida", endIso);
+      } else {
+        q = q.gte("fecha_salida", new Date().toISOString());
+      }
+
+      q = q.order("fecha_salida", { ascending: true });
+      if (!query.fecha) {
+        q = q.limit(50);
+      }
+
+      const { data, error } = await q;
 
       if (error) {
         throw new Error(`viajes.search failed: ${error.message}`);
