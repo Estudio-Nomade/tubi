@@ -12,3 +12,8 @@ export type {
   ViajeOperadorRow,
 } from "./viajes-types";
 export type { OperadorViajesRepository } from "./viajes-ports";
+export type {
+  CrearVehiculoInput,
+  CrearVehiculoResult,
+} from "./vehiculos-types";
+export type { OperadorVehiculosRepository } from "./vehiculos-ports";

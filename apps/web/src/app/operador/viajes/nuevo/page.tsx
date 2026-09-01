@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { createOperadorViajesRepository } from "@/adapters/supabase/operador-viajes-repository";
 import { createOperadorViajesService } from "@/application/operador";
 import { getSetting } from "@/application/settings";
@@ -18,7 +20,19 @@ function defaultPrecioString(valor: unknown): string {
   return "";
 }
 
-export default async function OperadorViajeNuevoPage() {
+type PageProps = {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function OperadorViajeNuevoPage({
+  searchParams,
+}: PageProps) {
+  const params = await searchParams;
+  const conductorId =
+    typeof params.conductorId === "string" ? params.conductorId : undefined;
+  const vehiculoId =
+    typeof params.vehiculoId === "string" ? params.vehiculoId : undefined;
+
   const supabase = await createClient();
   const service = createOperadorViajesService(
     createOperadorViajesRepository(supabase),
@@ -53,6 +67,18 @@ export default async function OperadorViajeNuevoPage() {
           </p>
         </div>
 
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs font-medium text-muted-foreground">
+            ¿El conductor no tiene auto?
+          </p>
+          <Link
+            href="/operador/viajes/vehiculos/nuevo"
+            className="text-sm font-semibold text-primary underline underline-offset-2"
+          >
+            Registrar vehículo
+          </Link>
+        </div>
+
         <div className="rounded-2xl border border-border bg-card p-4 shadow-[0_4px_16px_rgba(28,25,23,0.06)]">
           <CrearViajeForm
             rutas={rutas}
@@ -61,6 +87,8 @@ export default async function OperadorViajeNuevoPage() {
             defaultFecha={defaultFecha}
             minFecha={hoy}
             defaultHora={defaultHora}
+            initialConductorId={conductorId}
+            initialVehiculoId={vehiculoId}
           />
         </div>
 

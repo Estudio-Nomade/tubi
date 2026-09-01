@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useMemo, useState } from "react";
 
 import {
@@ -20,6 +21,8 @@ type Props = {
   defaultFecha: string;
   minFecha: string;
   defaultHora: string;
+  initialConductorId?: string;
+  initialVehiculoId?: string;
 };
 
 const selectClass =
@@ -101,6 +104,8 @@ export function CrearViajeForm({
   defaultFecha,
   minFecha,
   defaultHora,
+  initialConductorId,
+  initialVehiculoId,
 }: Props) {
   const [state, formAction, pending] = useActionState(
     crearViajeAction,
@@ -108,7 +113,7 @@ export function CrearViajeForm({
   );
 
   const [conductorId, setConductorId] = useState(
-    conductores[0]?.id ?? "",
+    initialConductorId ?? conductores[0]?.id ?? "",
   );
 
   const vehiculos = useMemo(() => {
@@ -116,7 +121,12 @@ export function CrearViajeForm({
     return c?.vehiculos ?? [];
   }, [conductores, conductorId]);
 
-  const selectedVehiculoId = vehiculos[0]?.id ?? "";
+  const selectedVehiculoId = useMemo(() => {
+    if (initialVehiculoId && vehiculos.some((v) => v.id === initialVehiculoId)) {
+      return initialVehiculoId;
+    }
+    return vehiculos[0]?.id ?? "";
+  }, [initialVehiculoId, vehiculos]);
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
@@ -187,6 +197,18 @@ export function CrearViajeForm({
           ))
         )}
       </SelectField>
+
+      {vehiculos.length === 0 && conductorId ? (
+        <div className="rounded-xl bg-muted px-3 py-2 text-sm font-medium text-muted-foreground">
+          Este conductor no tiene vehículo.{" "}
+          <Link
+            href={`/operador/viajes/vehiculos/nuevo?conductorId=${conductorId}`}
+            className="font-semibold text-primary underline underline-offset-2"
+          >
+            Registrar vehículo
+          </Link>
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-2 gap-3">
         <InputField

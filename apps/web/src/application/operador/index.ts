@@ -22,3 +22,11 @@ export {
   type ActionError as OperadorViajesActionError,
   type CrearViajeActionResult,
 } from "./viajes-actions";
+export {
+  createOperadorVehiculosService,
+  type OperadorVehiculosService,
+} from "./vehiculos-service";
+export {
+  crearVehiculoAction,
+  type CrearVehiculoActionResult,
+} from "./vehiculos-actions";
