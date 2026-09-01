@@ -23,6 +23,14 @@ const NETWORK_PATTERNS = [
 const NETWORK_MESSAGE =
   "No se pudo conectar con el servidor de autenticación. En local: `supabase start` y `apps/web/.env.local` con URL/anon de `supabase status -o env` (preferí ANON_KEY JWT eyJ…). Reiniciá el dev server tras cambiar el env.";
 
+const CREDENTIALS_PATTERNS = [
+  /invalid login credentials/i,
+  /invalid_credentials/i,
+] as const;
+
+const CREDENTIALS_MESSAGE =
+  "Email o contraseña incorrectos. En local usá las cuentas demo (password `demo-demo-1`), p. ej. pasajero.demo@tubi.local.";
+
 export function isAuthNetworkError(message: string): boolean {
   const m = message.trim();
   if (!m) return false;
@@ -34,5 +42,6 @@ export function mapAuthError(message: string | null | undefined, fallback: strin
   const raw = (message ?? "").trim();
   if (!raw) return fallback;
   if (isAuthNetworkError(raw)) return NETWORK_MESSAGE;
+  if (CREDENTIALS_PATTERNS.some((re) => re.test(raw))) return CREDENTIALS_MESSAGE;
   return raw;
 }
