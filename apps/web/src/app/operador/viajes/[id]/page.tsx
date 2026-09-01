@@ -172,6 +172,14 @@ export default async function OperadorViajeDetallePage({
         {canCancel ? <CancelTripButton viajeId={trip.id} /> : null}
 
         <Link
+          href={`/operador/rutas/${trip.rutaId}/paradas`}
+          className="flex items-center justify-between gap-2 rounded-xl border border-border bg-card px-3.5 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-card/80"
+        >
+          <span>Paradas de la ruta</span>
+          <span className="font-semibold text-primary">Editar</span>
+        </Link>
+
+        <Link
           href="/operador/devoluciones"
           className="text-center text-sm font-medium text-primary underline-offset-4 hover:underline"
         >

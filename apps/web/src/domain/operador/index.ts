@@ -18,3 +18,18 @@ export type {
   CrearVehiculoResult,
 } from "./vehiculos-types";
 export type { OperadorVehiculosRepository } from "./vehiculos-ports";
+export type {
+  ActualizarParadaInput,
+  CrearParadaIntermediaInput,
+  ParadaMutationResult,
+  ParadaRow,
+  RutaParadasInfo,
+} from "./paradas-types";
+export type { OperadorParadasRepository } from "./paradas-ports";
+export type { ParadaErrorCode } from "./paradas";
+export {
+  mapParadasErrorMessage,
+  moveParada,
+  parseParadaForm,
+  paradasErrorUserMessage,
+} from "./paradas";

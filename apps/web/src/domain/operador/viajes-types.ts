@@ -23,6 +23,7 @@ export type ViajeOperadorReservaRow = {
 };
 
 export type ViajeOperadorDetalle = ViajeOperadorRow & {
+  rutaId: string;
   reservas: ViajeOperadorReservaRow[];
 };
 
