@@ -4,6 +4,9 @@ import type {
   CompleteTripResult,
   ConductorTripDetail,
   ConductorTripSummary,
+  ConductorVehiculoRow,
+  CrearVehiculoPropioInput,
+  CrearVehiculoPropioResult,
   MarkNoShowResult,
   PickupContext,
   RegisterSaldoResult,
@@ -18,6 +21,10 @@ export interface ConductorRepository {
     conductorId: string,
     options?: { isOperador?: boolean },
   ): Promise<ConductorTripDetail | null>;
+  listMisVehiculos(conductorId: string): Promise<ConductorVehiculoRow[]>;
+  crearVehiculoPropio(
+    input: CrearVehiculoPropioInput,
+  ): Promise<CrearVehiculoPropioResult>;
   startPickup(viajeId: string): Promise<void>;
   verifyQr(viajeId: string, qrToken: string): Promise<VerifyQrResult>;
   getSaldoContext(

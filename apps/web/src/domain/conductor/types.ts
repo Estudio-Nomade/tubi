@@ -106,3 +106,28 @@ export type CompleteTripResult = {
   origen: string;
   destino: string;
 };
+
+export type ConductorVehiculoRow = {
+  id: string;
+  patente: string;
+  marca: string;
+  modelo: string;
+  color: string;
+  capacidad: number;
+};
+
+export type CrearVehiculoPropioInput = {
+  patente: string;
+  marca: string;
+  modelo: string;
+  color: string;
+  capacidad: number;
+};
+
+export type CrearVehiculoPropioResult = {
+  ok: true;
+  vehiculoId: string;
+  conductorId: string;
+  patente: string;
+  capacidad: number;
+};

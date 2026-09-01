@@ -3,6 +3,9 @@ import type {
   ConductorRepository,
   ConductorTripDetail,
   ConductorTripSummary,
+  ConductorVehiculoRow,
+  CrearVehiculoPropioInput,
+  CrearVehiculoPropioResult,
   MarkNoShowResult,
   PickupContext,
   RegisterSaldoResult,
@@ -56,6 +59,14 @@ export function createConductorService(repo: ConductorRepository) {
     },
     completeTrip(viajeId: string): Promise<CompleteTripResult> {
       return repo.completeTrip(viajeId);
+    },
+    listMisVehiculos(conductorId: string): Promise<ConductorVehiculoRow[]> {
+      return repo.listMisVehiculos(conductorId);
+    },
+    crearVehiculoPropio(
+      input: CrearVehiculoPropioInput,
+    ): Promise<CrearVehiculoPropioResult> {
+      return repo.crearVehiculoPropio(input);
     },
   };
 }
