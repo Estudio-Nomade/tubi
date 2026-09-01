@@ -1,13 +1,12 @@
-import { AppHeader, EmptyHint, TabBar, TripCard } from "@/components/design";
-import { createViajesService } from "@/application/viajes";
+import Link from "next/link";
+
 import { createSupabaseViajesRepository } from "@/adapters/supabase/viajes-repository";
-import { searchViajesSchema } from "@/domain/viajes";
-import {
-  formatArs,
-  formatFechaTituloAr,
-  formatHoraAr,
-} from "@/lib/format";
+import { createViajesService } from "@/application/viajes";
+import { AppHeader, EmptyHint, TabBar, TripCard } from "@/components/design";
+import { groupViajesByFechaLocal, searchViajesSchema } from "@/domain/viajes";
+import { formatArs, formatHoraAr } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
+import { cn } from "@/lib/utils";
 
 type PageProps = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
@@ -18,70 +17,117 @@ function first(value: string | string[] | undefined): string {
   return value ?? "";
 }
 
-/** Pencil P4 · Resultados — DateTitle Fraunces 22 + route subtitle + TripList gap 12 */
+function chipClass(active: boolean): string {
+  return cn(
+    "shrink-0 rounded-full px-3.5 py-2 text-sm font-semibold transition-colors",
+    active
+      ? "bg-primary text-primary-foreground"
+      : "bg-muted text-muted-foreground",
+  );
+}
+
+/** Pencil P4 · Resultados — días con oferta agrupados por fecha local. */
 export default async function ResultadosPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const parsed = searchViajesSchema.safeParse({
     origen: first(params.origen),
     destino: first(params.destino),
-    fecha: first(params.fecha),
+    fecha: first(params.fecha) || undefined,
     hora_desde: first(params.hora_desde) || undefined,
   });
 
   if (!parsed.success) {
     return (
       <Shell title="Resultados" subtitle="Completá la búsqueda">
-        <EmptyHint message="Completá origen, destino y fecha para buscar." />
+        <EmptyHint message="Completá origen y destino para buscar." />
       </Shell>
     );
   }
 
-  const horaDesde =
-    parsed.data.hora_desde && parsed.data.hora_desde.length > 0
-      ? parsed.data.hora_desde
+  const { origen, destino } = parsed.data;
+  const fecha =
+    parsed.data.fecha && parsed.data.fecha.length > 0
+      ? parsed.data.fecha
       : undefined;
 
   const supabase = await createClient();
   const service = createViajesService(createSupabaseViajesRepository(supabase));
-  const viajes = await service.search({
-    origen: parsed.data.origen,
-    destino: parsed.data.destino,
-    fecha: parsed.data.fecha,
-    horaDesde,
-  });
+  const viajes = await service.search({ origen, destino });
 
-  const title = formatFechaTituloAr(parsed.data.fecha);
-  const subtitle = `${parsed.data.origen} → ${parsed.data.destino}`;
+  const subtitle = `${origen} → ${destino}`;
 
-  const returnQuery = new URLSearchParams({
-    origen: parsed.data.origen,
-    destino: parsed.data.destino,
-    fecha: parsed.data.fecha,
-  });
-  if (horaDesde) returnQuery.set("hora_desde", horaDesde);
+  if (viajes.length === 0) {
+    return (
+      <Shell title="Próximos viajes" subtitle={subtitle}>
+        <div className="rounded-2xl border border-border bg-card px-4 py-2 shadow-[0_4px_16px_rgba(28,25,23,0.06)]">
+          <EmptyHint message="No hay viajes programados en esta ruta. Probá al revés o más tarde." />
+        </div>
+      </Shell>
+    );
+  }
+
+  const grupos = groupViajesByFechaLocal(viajes);
+  const seleccionado = fecha
+    ? grupos.find((g) => g.fechaKey === fecha)
+    : undefined;
+  const shownGrupos = seleccionado ? [seleccionado] : grupos;
+  const title = seleccionado ? seleccionado.label : "Próximos viajes";
+
+  const baseParams = new URLSearchParams({ origen, destino });
+  const returnQuery = new URLSearchParams({ origen, destino });
+  if (fecha) returnQuery.set("fecha", fecha);
 
   return (
     <Shell title={title} subtitle={subtitle}>
-      {viajes.length === 0 ? (
-        <div className="rounded-2xl border border-border bg-card px-4 py-2 shadow-[0_4px_16px_rgba(28,25,23,0.06)]">
-          <EmptyHint message="No hay viajes para esa fecha." />
-        </div>
-      ) : (
-        <ul className="flex flex-col gap-3">
-          {viajes.map((viaje) => (
-            <li key={viaje.id}>
-              <TripCard
-                origen={viaje.origen}
-                destino={viaje.destino}
-                horaLabel={formatHoraAr(viaje.fechaSalida)}
-                asientosLabel={`${viaje.asientosLibres} asientos`}
-                precioLabel={formatArs(viaje.precio)}
-                href={`/pasajero/viajes/${viaje.id}?${returnQuery.toString()}`}
-              />
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className="flex gap-2 overflow-x-auto pb-1">
+        {fecha ? (
+          <Link
+            href={`/pasajero/resultados?${baseParams.toString()}`}
+            className={chipClass(false)}
+          >
+            Todos
+          </Link>
+        ) : null}
+        {grupos.map((g) => (
+          <Link
+            key={g.fechaKey}
+            href={`/pasajero/resultados?${baseParams.toString()}&fecha=${g.fechaKey}`}
+            className={chipClass(fecha === g.fechaKey)}
+          >
+            {g.label}
+          </Link>
+        ))}
+      </div>
+
+      {fecha && !seleccionado ? (
+        <p className="text-sm font-medium text-muted-foreground">
+          No hay viajes para ese día. Te mostramos los próximos.
+        </p>
+      ) : null}
+
+      <ul className="flex flex-col gap-4">
+        {shownGrupos.map((grupo) => (
+          <li key={grupo.fechaKey} className="flex flex-col gap-3">
+            <h2 className="font-heading text-base font-semibold text-foreground">
+              {grupo.label}
+            </h2>
+            <ul className="flex flex-col gap-3">
+              {grupo.items.map((viaje) => (
+                <li key={viaje.id}>
+                  <TripCard
+                    origen={viaje.origen}
+                    destino={viaje.destino}
+                    horaLabel={formatHoraAr(viaje.fechaSalida)}
+                    asientosLabel={`${viaje.asientosLibres} asientos`}
+                    precioLabel={formatArs(viaje.precio)}
+                    href={`/pasajero/viajes/${viaje.id}?${returnQuery.toString()}`}
+                  />
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
     </Shell>
   );
 }

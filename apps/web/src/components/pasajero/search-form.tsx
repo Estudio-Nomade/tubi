@@ -1,14 +1,10 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowUpDown } from "lucide-react";
 
 import { BtnPrimary, Field } from "@/components/design";
-import { addDaysLocal, toIsoDateLocal } from "@/lib/format";
-import { cn } from "@/lib/utils";
-
-type Chip = { label: string; value: string };
 
 type SearchFormProps = {
   defaultOrigen?: string;
@@ -20,19 +16,8 @@ export function SearchForm({
   defaultDestino = "Buenos Aires",
 }: SearchFormProps) {
   const router = useRouter();
-  const chips = useMemo<Chip[]>(() => {
-    const today = new Date();
-    return [
-      { label: "Hoy", value: toIsoDateLocal(today) },
-      { label: "Mañana", value: toIsoDateLocal(addDaysLocal(today, 1)) },
-      { label: "+2 días", value: toIsoDateLocal(addDaysLocal(today, 2)) },
-    ];
-  }, []);
-
   const [origen, setOrigen] = useState(defaultOrigen);
   const [destino, setDestino] = useState(defaultDestino);
-  const [fecha, setFecha] = useState(chips[1]?.value ?? chips[0]!.value);
-  const [horaDesde, setHoraDesde] = useState("");
 
   function swap() {
     setOrigen(destino);
@@ -44,9 +29,7 @@ export function SearchForm({
     const params = new URLSearchParams({
       origen: origen.trim(),
       destino: destino.trim(),
-      fecha,
     });
-    if (horaDesde) params.set("hora_desde", horaDesde);
     router.push(`/pasajero/resultados?${params.toString()}`);
   }
 
@@ -81,39 +64,10 @@ export function SearchForm({
         />
       </div>
 
-      <div className="flex flex-col gap-2">
-        <p className="text-xs font-medium text-muted-foreground">Fecha</p>
-        <div className="flex flex-wrap gap-2">
-          {chips.map((chip) => {
-            const active = chip.value === fecha;
-            return (
-              <button
-                key={chip.value}
-                type="button"
-                onClick={() => setFecha(chip.value)}
-                className={cn(
-                  "rounded-full px-3.5 py-2 text-sm font-semibold transition-colors",
-                  active
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-muted text-muted-foreground",
-                )}
-              >
-                {chip.label}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-
-      <Field
-        label="Horario desde (opcional)"
-        name="hora_desde"
-        type="time"
-        value={horaDesde}
-        onChange={(e) => setHoraDesde(e.target.value)}
-      />
-
-      <BtnPrimary type="submit">Buscar</BtnPrimary>
+      <BtnPrimary type="submit">Ver viajes</BtnPrimary>
+      <p className="text-center text-xs font-medium text-muted-foreground">
+        Vas a ver los días con viajes cargados por Tubi.
+      </p>
     </form>
   );
 }
