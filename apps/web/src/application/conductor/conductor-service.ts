@@ -1,4 +1,5 @@
 import type {
+  ActualizarVehiculoPropioInput,
   CompleteTripResult,
   ConductorRepository,
   ConductorTripDetail,
@@ -67,6 +68,11 @@ export function createConductorService(repo: ConductorRepository) {
       input: CrearVehiculoPropioInput,
     ): Promise<CrearVehiculoPropioResult> {
       return repo.crearVehiculoPropio(input);
+    },
+    actualizarVehiculoPropio(
+      input: ActualizarVehiculoPropioInput,
+    ): Promise<CrearVehiculoPropioResult> {
+      return repo.actualizarVehiculoPropio(input);
     },
   };
 }

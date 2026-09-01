@@ -1,6 +1,7 @@
 import type { MetodoPago } from "@/domain/pagos";
 
 import type {
+  ActualizarVehiculoPropioInput,
   CompleteTripResult,
   ConductorTripDetail,
   ConductorTripSummary,
@@ -24,6 +25,9 @@ export interface ConductorRepository {
   listMisVehiculos(conductorId: string): Promise<ConductorVehiculoRow[]>;
   crearVehiculoPropio(
     input: CrearVehiculoPropioInput,
+  ): Promise<CrearVehiculoPropioResult>;
+  actualizarVehiculoPropio(
+    input: ActualizarVehiculoPropioInput,
   ): Promise<CrearVehiculoPropioResult>;
   startPickup(viajeId: string): Promise<void>;
   verifyQr(viajeId: string, qrToken: string): Promise<VerifyQrResult>;

@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import { createSupabaseConductorRepository } from "@/adapters/supabase/conductor-repository";
+import { createConductorService } from "@/application/conductor";
 import { homePathForRol, signOutAction } from "@/application/auth";
 import {
   AppHeader,
@@ -30,6 +32,13 @@ export default async function CuentaPage() {
   const initial = (profile.nombre.trim().charAt(0) || "?").toUpperCase();
   const email = user?.email ?? null;
   const backHref = homePathForRol(profile.rol);
+
+  const vehiculos =
+    profile.rol === "conductor"
+      ? await createConductorService(
+          createSupabaseConductorRepository(supabase),
+        ).listMisVehiculos(profile.id)
+      : [];
 
   const rows: { label: string; value: string }[] = [];
   if (profile.rol === "pasajero" && profile.dni) {
@@ -91,6 +100,46 @@ export default async function CuentaPage() {
                 </div>
               </div>
             ))}
+          </div>
+        ) : null}
+
+        {profile.rol === "conductor" ? (
+          <div className="overflow-hidden rounded-2xl border border-border bg-card p-1 shadow-sm">
+            <div className="flex items-center justify-between gap-3 px-4 py-3.5">
+              <span className="text-sm font-medium text-muted-foreground">
+                Vehículo
+              </span>
+              <Link
+                href="/conductor/vehiculo"
+                className="shrink-0 text-sm font-semibold text-primary underline underline-offset-2"
+              >
+                {vehiculos.length === 0 ? "Cargar vehículo" : "Mi vehículo"}
+              </Link>
+            </div>
+            {vehiculos.map((v) => (
+              <div key={v.id}>
+                <div className="mx-4 h-px bg-border" aria-hidden />
+                <div className="flex items-center justify-between gap-3 px-4 py-3.5">
+                  <span className="truncate text-sm font-semibold text-foreground">
+                    {v.patente} · {v.marca} {v.modelo} · {v.capacidad} asientos
+                  </span>
+                  <Link
+                    href={`/conductor/vehiculo/${v.id}/editar`}
+                    className="shrink-0 text-sm font-semibold text-primary underline underline-offset-2"
+                  >
+                    Editar
+                  </Link>
+                </div>
+              </div>
+            ))}
+            {vehiculos.length === 0 ? (
+              <>
+                <div className="mx-4 h-px bg-border" aria-hidden />
+                <div className="px-4 py-3.5 text-sm font-medium text-muted-foreground">
+                  Sin vehículo cargado
+                </div>
+              </>
+            ) : null}
           </div>
         ) : null}
 

@@ -12,5 +12,6 @@ export {
 } from "./actions";
 export {
   crearVehiculoPropioAction,
+  actualizarVehiculoPropioAction,
   type CrearVehiculoPropioActionResult,
 } from "./vehiculos-actions";
