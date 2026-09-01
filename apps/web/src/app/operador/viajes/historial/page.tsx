@@ -4,7 +4,6 @@ import { createOperadorViajesRepository } from "@/adapters/supabase/operador-via
 import { createOperadorViajesService } from "@/application/operador";
 import {
   AppHeader,
-  BtnPrimary,
   EmptyHint,
   StatusPill,
   TabBar,
@@ -19,12 +18,6 @@ function pillFor(estado: EstadoViaje): {
   variant: StatusPillVariant;
 } {
   switch (estado) {
-    case "programado":
-      return { label: "Programado", variant: "neutral" };
-    case "recogida":
-      return { label: "Recogida", variant: "pending" };
-    case "en_curso":
-      return { label: "En curso", variant: "ok" };
     case "completado":
       return { label: "Completado", variant: "ok" };
     case "cancelado":
@@ -34,58 +27,40 @@ function pillFor(estado: EstadoViaje): {
   }
 }
 
-/** Operator active trips (en curso → recogida → programado) + link to history. */
-export default async function OperadorViajesPage() {
+/** Operator trip history: cancelado + completado, most recent first. */
+export default async function OperadorViajesHistorialPage() {
   const supabase = await createClient();
   const service = createOperadorViajesService(
     createOperadorViajesRepository(supabase),
   );
-  const items = await service.listViajesActivos();
+  const items = await service.listViajesHistorial();
 
   return (
     <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
-      <AppHeader showBack backHref="/operador" roleLabel="Operador" />
+      <AppHeader showBack backHref="/operador/viajes" roleLabel="Operador" />
       <main className="flex flex-1 flex-col gap-5 px-5 pb-4 pt-3">
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 flex-col gap-1">
             <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">
-              Viajes
+              Historial
             </h1>
             <p className="text-sm font-medium text-muted-foreground">
               {items.length === 0
-                ? "Sin viajes activos"
-                : `${items.length} activo${items.length === 1 ? "" : "s"}`}
+                ? "Sin viajes en el historial"
+                : `${items.length} viaje${items.length === 1 ? "" : "s"}`}
             </p>
           </div>
           <Link
-            href="/operador/viajes/nuevo"
-            className="shrink-0 rounded-full bg-primary px-3.5 py-2 text-sm font-semibold text-primary-foreground"
+            href="/operador/viajes"
+            className="shrink-0 text-sm font-medium text-primary underline-offset-4 hover:underline"
           >
-            Crear viaje
-          </Link>
-        </div>
-
-        <div className="flex justify-end">
-          <Link
-            href="/operador/viajes/historial"
-            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-          >
-            Historial
+            Activos
           </Link>
         </div>
 
         {items.length === 0 ? (
           <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card px-4 py-4 shadow-[0_4px_16px_rgba(28,25,23,0.06)]">
-            <EmptyHint message="No hay viajes activos. Creá uno o mirá el historial." />
-            <BtnPrimary asChild>
-              <Link href="/operador/viajes/nuevo">Crear viaje</Link>
-            </BtnPrimary>
-            <Link
-              href="/operador/viajes/historial"
-              className="text-center text-sm font-medium text-primary underline-offset-4 hover:underline"
-            >
-              Ver historial
-            </Link>
+            <EmptyHint message="Todavía no hay viajes cancelados ni completados." />
           </div>
         ) : (
           <ul className="flex flex-col gap-3">

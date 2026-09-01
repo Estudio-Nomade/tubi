@@ -11,6 +11,9 @@ import type {
 } from "./viajes-types";
 
 export interface OperadorViajesRepository {
+  listViajesActivos(): Promise<ViajeOperadorRow[]>;
+  listViajesHistorial(): Promise<ViajeOperadorRow[]>;
+  /** @deprecated usar listViajesActivos */
   listViajesProximos(): Promise<ViajeOperadorRow[]>;
   getViajeDetalle(viajeId: string): Promise<ViajeOperadorDetalle | null>;
   listDevolucionesPendientes(): Promise<DevolucionPendienteRow[]>;

@@ -13,6 +13,12 @@ import type {
 
 export function createOperadorViajesService(repo: OperadorViajesRepository) {
   return {
+    listViajesActivos(): Promise<ViajeOperadorRow[]> {
+      return repo.listViajesActivos();
+    },
+    listViajesHistorial(): Promise<ViajeOperadorRow[]> {
+      return repo.listViajesHistorial();
+    },
     listViajes(): Promise<ViajeOperadorRow[]> {
       return repo.listViajesProximos();
     },

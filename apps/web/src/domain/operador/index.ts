@@ -12,6 +12,7 @@ export type {
   ViajeOperadorRow,
 } from "./viajes-types";
 export type { OperadorViajesRepository } from "./viajes-ports";
+export { sortViajesActivos } from "./viajes-sort";
 export type {
   CrearVehiculoInput,
   CrearVehiculoResult,

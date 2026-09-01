@@ -359,6 +359,10 @@ export type Database = {
         Args: { p_viaje_id: string; p_motivo?: string };
         Returns: Json;
       };
+      vencer_programados: {
+        Args: Record<PropertyKey, never>;
+        Returns: number;
+      };
       marcar_devolucion_saldada: {
         Args: { p_reserva_id: string };
         Returns: Json;
