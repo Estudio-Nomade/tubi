@@ -5,6 +5,8 @@ export {
 export {
   cancelReservaAction,
   createReservaAction,
+  resolvePickupAddressAction,
   type CancelReservaActionResult,
   type CreateReservaResult,
+  type ResolvePickupResult,
 } from "./actions";

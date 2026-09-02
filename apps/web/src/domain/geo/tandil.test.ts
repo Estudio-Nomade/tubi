@@ -3,6 +3,7 @@ import { describe, it } from "node:test";
 
 import {
   isWithinBbox,
+  isValidManualAddress,
   mapsLink,
   pickupModeForOrigen,
   TANDIL_BBOX,
@@ -44,5 +45,29 @@ describe("mapsLink", () => {
     assert.match(link, /google\.com\/maps/);
     assert.match(link, /-37\.3217/);
     assert.match(link, /-59\.1332/);
+  });
+});
+
+describe("isValidManualAddress", () => {
+  it("acepta calle y altura", () => {
+    assert.equal(isValidManualAddress("San Martín 454"), true);
+    assert.equal(isValidManualAddress("Av. Colón 1100"), true);
+  });
+
+  it("rechaza sin altura (solo letras)", () => {
+    assert.equal(isValidManualAddress("San Martín"), false);
+  });
+
+  it("rechaza texto muy corto", () => {
+    assert.equal(isValidManualAddress("S 4"), false);
+  });
+
+  it("rechaza solo números", () => {
+    assert.equal(isValidManualAddress("12345"), false);
+  });
+
+  it("rechaza espacios y vacío", () => {
+    assert.equal(isValidManualAddress("   "), false);
+    assert.equal(isValidManualAddress(""), false);
   });
 });

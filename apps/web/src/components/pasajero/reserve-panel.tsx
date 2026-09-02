@@ -35,7 +35,7 @@ export function ReservePanel({
   const reason = disabled
     ? disabledReason
     : needPickup
-      ? "Elegí dónde te buscamos en Tandil."
+      ? "Elegí o escribí dónde te buscamos en Tandil."
       : undefined;
 
   return (

@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Loader2, MapPin, Search } from "lucide-react";
 
+import { resolvePickupAddressAction } from "@/application/reservas";
+import { isValidManualAddress } from "@/domain/geo";
 import type { RecogidaInput } from "@/domain/reservas";
 import { cn } from "@/lib/utils";
 
@@ -26,6 +28,8 @@ export function PickupPlacePicker({ value, onChange }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [noResults, setNoResults] = useState(false);
+  const [resolving, setResolving] = useState(false);
+  const [aproximada, setAproximada] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -96,6 +100,7 @@ export function PickupPlacePicker({ value, onChange }: Props) {
     setResults([]);
     setLoading(false);
     setNoResults(false);
+    setAproximada(false);
   }
 
   function clear() {
@@ -105,7 +110,38 @@ export function PickupPlacePicker({ value, onChange }: Props) {
     setResults([]);
     setOpen(false);
     setNoResults(false);
+    setAproximada(false);
   }
+
+  async function confirmManual() {
+    if (timerRef.current) clearTimeout(timerRef.current);
+    setResolving(true);
+    setError(null);
+    try {
+      const result = await resolvePickupAddressAction(query);
+      if (result.ok) {
+        onChange({
+          label: result.recogida.label,
+          lat: result.recogida.lat,
+          lng: result.recogida.lng,
+          placeId: result.recogida.placeId,
+        });
+        setQuery(result.recogida.label);
+        setAproximada(result.aproximada);
+        setResults([]);
+        setOpen(false);
+        setNoResults(false);
+      } else {
+        setError(result.error);
+      }
+    } catch {
+      setError("No pudimos ubicar esa dirección. Verificá calle y altura.");
+    } finally {
+      setResolving(false);
+    }
+  }
+
+  const canConfirmManual = !value && !resolving && isValidManualAddress(query);
 
   return (
     <div className="flex w-full flex-col gap-2">
@@ -118,6 +154,7 @@ export function PickupPlacePicker({ value, onChange }: Props) {
           value={query}
           onChange={(e) => {
             setQuery(e.target.value);
+            setAproximada(false);
             search(e.target.value);
           }}
           placeholder="Buscá tu dirección en Tandil"
@@ -174,6 +211,20 @@ export function PickupPlacePicker({ value, onChange }: Props) {
         </p>
       ) : null}
 
+      {canConfirmManual ? (
+        <button
+          type="button"
+          onClick={confirmManual}
+          disabled={resolving}
+          className="flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-70"
+        >
+          {resolving ? (
+            <Loader2 className="size-4 animate-spin" aria-hidden />
+          ) : null}
+          {resolving ? "Ubicando…" : "Usar esta dirección"}
+        </button>
+      ) : null}
+
       {error ? (
         <p className="text-xs font-medium text-destructive" role="alert">
           {error}
@@ -184,6 +235,12 @@ export function PickupPlacePicker({ value, onChange }: Props) {
         <p className="flex items-start gap-2 rounded-xl bg-muted/60 px-3 py-2 text-sm font-medium text-foreground">
           <MapPin className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden />
           {value.label}
+        </p>
+      ) : null}
+
+      {value && aproximada ? (
+        <p className="text-xs font-medium text-muted-foreground" role="status">
+          Dirección escrita · ubicación aproximada en Tandil.
         </p>
       ) : null}
     </div>
