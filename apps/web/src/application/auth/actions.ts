@@ -21,6 +21,7 @@ import {
   registerOperadorSchema,
   registerPasajeroSchema,
 } from "@/domain/auth";
+import type { Profile } from "@/domain/auth";
 import { normalizarNombrePila } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
@@ -70,9 +71,26 @@ export async function signInAction(
     };
   }
 
-  const profile = await service.getProfileById(data.user.id);
+  let profile: Profile | null;
+  try {
+    profile = await service.getProfileById(data.user.id);
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "";
+    return { error: mapAuthError(message, "No se pudo cargar tu perfil") };
+  }
+
   if (!profile) {
-    return { error: "Perfil no encontrado" };
+    // Sesión ya quedó seteada pero no hay fila en profiles: no la dejamos
+    // a medias (evita loop /login ↔ /pasajero). SignOut best-effort.
+    try {
+      await supabase.auth.signOut();
+    } catch {
+      // Ignorar: el error de perfil es lo que hay que mostrar.
+    }
+    return {
+      error:
+        "No encontramos un perfil para esta cuenta. Registrate o contactá soporte.",
+    };
   }
 
   revalidatePath("/", "layout");
@@ -81,7 +99,13 @@ export async function signInAction(
     const conductorService = createConductorService(
       createSupabaseConductorRepository(supabase),
     );
-    const vehiculos = await conductorService.listMisVehiculos(profile.id);
+    let vehiculos: Awaited<ReturnType<typeof conductorService.listMisVehiculos>>;
+    try {
+      vehiculos = await conductorService.listMisVehiculos(profile.id);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "";
+      return { error: mapAuthError(message, "No se pudo cargar tu información") };
+    }
     redirect(conductorLandingPath(vehiculos.length > 0));
   }
 
