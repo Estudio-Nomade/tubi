@@ -18,6 +18,7 @@ import { conductorLandingPath } from "@/application/conductor/landing-path";
 import {
   loginSchema,
   registerConductorSchema,
+  registerOperadorSchema,
   registerPasajeroSchema,
 } from "@/domain/auth";
 import { normalizarNombrePila } from "@/lib/format";
@@ -211,6 +212,77 @@ export async function signUpConductorAction(
   revalidatePath("/", "layout");
   // Self-serve conductor has no vehicle yet — force FR-09 onboarding.
   redirect(conductorLandingPath(false));
+}
+
+function mapOperadorSignupError(message: string): string {
+  if (message.includes("REGISTRO_OPERADOR_DESHABILITADO")) {
+    return "El registro de operador está deshabilitado.";
+  }
+  if (message.includes("PERFIL_YA_EXISTE")) {
+    return "Ya existe una cuenta para este usuario.";
+  }
+  if (message.includes("DATOS_INVALIDOS")) {
+    return "Revisá los datos ingresados.";
+  }
+  return "No se pudo crear la cuenta de operador.";
+}
+
+export async function signUpOperadorAction(
+  formData: FormData,
+): Promise<AuthActionResult | void> {
+  const parsed = registerOperadorSchema.safeParse({
+    nombre: formString(formData, "nombre"),
+    apellido: formString(formData, "apellido"),
+    telefono: formString(formData, "telefono"),
+    email: formString(formData, "email"),
+    password: formString(formData, "password"),
+  });
+
+  if (!parsed.success) {
+    return { error: firstZodError(parsed.error) };
+  }
+
+  const { nombre, apellido, telefono, email, password } = parsed.data;
+  const nombreNormalizado = normalizarNombrePila(nombre, apellido);
+  const { supabase } = await getAuthService();
+
+  const { data, error } = await supabase.auth.signUp({ email, password });
+
+  if (error) {
+    return { error: mapAuthError(error.message, "No se pudo crear la cuenta") };
+  }
+
+  let userId = data.user?.id ?? null;
+
+  if (!data.session) {
+    const signIn = await supabase.auth.signInWithPassword({ email, password });
+    if (signIn.error || !signIn.data.user) {
+      return {
+        error: mapAuthError(
+          signIn.error?.message,
+          "Cuenta creada. Confirmá el email antes de continuar.",
+        ),
+      };
+    }
+    userId = signIn.data.user.id;
+  }
+
+  if (!userId) {
+    return { error: "No se pudo crear la cuenta" };
+  }
+
+  const { error: rpcError } = await supabase.rpc("crear_perfil_operador", {
+    p_nombre: nombreNormalizado,
+    p_apellido: apellido,
+    p_telefono: telefono,
+  });
+
+  if (rpcError) {
+    return { error: mapOperadorSignupError(rpcError.message) };
+  }
+
+  revalidatePath("/", "layout");
+  redirect(homePathForRol("operador"));
 }
 
 export async function signOutAction(): Promise<void> {

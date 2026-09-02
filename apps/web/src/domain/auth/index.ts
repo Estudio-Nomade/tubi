@@ -4,7 +4,9 @@ export {
   loginSchema,
   registerPasajeroSchema,
   registerConductorSchema,
+  registerOperadorSchema,
   type LoginInput,
   type RegisterPasajeroInput,
   type RegisterConductorInput,
+  type RegisterOperadorInput,
 } from "./schemas";

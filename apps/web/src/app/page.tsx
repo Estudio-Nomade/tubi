@@ -64,6 +64,12 @@ export default async function Home() {
           <BtnSecondary asChild>
             <Link href="/registro">Crear cuenta</Link>
           </BtnSecondary>
+          <Link
+            href="/login?rol=operador"
+            className="text-center text-xs font-medium text-muted-foreground"
+          >
+            Soy operador
+          </Link>
         </div>
       </main>
     </div>

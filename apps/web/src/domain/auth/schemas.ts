@@ -40,6 +40,15 @@ export const registerConductorSchema = z.object({
   password: passwordSchema,
 });
 
+export const registerOperadorSchema = z.object({
+  nombre: z.string().min(1, "Nombre requerido").max(100),
+  apellido: z.string().min(1, "Apellido requerido").max(100),
+  telefono: telefonoSchema,
+  email: emailSchema,
+  password: passwordSchema,
+});
+
 export type LoginInput = z.infer<typeof loginSchema>;
 export type RegisterPasajeroInput = z.infer<typeof registerPasajeroSchema>;
 export type RegisterConductorInput = z.infer<typeof registerConductorSchema>;
+export type RegisterOperadorInput = z.infer<typeof registerOperadorSchema>;

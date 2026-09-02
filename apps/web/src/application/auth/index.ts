@@ -6,6 +6,7 @@ export {
   signInAction,
   signUpPasajeroAction,
   signUpConductorAction,
+  signUpOperadorAction,
   signOutAction,
   getCurrentProfile,
   type AuthActionResult,
