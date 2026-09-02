@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { Loader2, MapPin, Search } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { Loader2, LocateFixed, MapPin, Search } from "lucide-react";
 
+import { isWithinBbox } from "@/domain/geo";
 import type { RecogidaInput } from "@/domain/reservas";
 import { cn } from "@/lib/utils";
 
@@ -25,6 +26,8 @@ export function PickupPlacePicker({ value, onChange }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [geoLoading, setGeoLoading] = useState(false);
+  const [geoMessage, setGeoMessage] = useState<string | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -32,6 +35,79 @@ export function PickupPlacePicker({ value, onChange }: Props) {
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, []);
+
+  const requestCurrentLocation = useCallback(() => {
+    if (!("geolocation" in navigator)) {
+      setGeoMessage("Tu navegador no comparte ubicación. Buscá la dirección.");
+      return;
+    }
+
+    setGeoLoading(true);
+    setGeoMessage(null);
+    setError(null);
+
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        const { latitude: lat, longitude: lng } = position.coords;
+        try {
+          const res = await fetch(`/api/geocode?lat=${lat}&lng=${lng}`);
+          if (!res.ok) {
+            setGeoMessage(
+              "No se pudo obtener la dirección. Probá de nuevo o buscá a mano.",
+            );
+            return;
+          }
+          const json = (await res.json()) as { results?: Suggestion[] };
+          const suggestion = json.results?.[0];
+          if (!suggestion) {
+            setGeoMessage(
+              "No se pudo obtener la dirección. Probá de nuevo o buscá a mano.",
+            );
+            return;
+          }
+          if (!isWithinBbox(lat, lng)) {
+            setGeoMessage(
+              "Tu ubicación está fuera de Tandil. Elegí una dirección en la ciudad.",
+            );
+            return;
+          }
+          onChange({
+            label: suggestion.label,
+            lat,
+            lng,
+            placeId: suggestion.placeId,
+          });
+          setQuery(suggestion.label);
+          setResults([]);
+          setOpen(false);
+        } catch {
+          setGeoMessage(
+            "No se pudo obtener la dirección. Probá de nuevo o buscá a mano.",
+          );
+        } finally {
+          setGeoLoading(false);
+        }
+      },
+      (err) => {
+        setGeoLoading(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          setGeoMessage("No pudimos usar tu ubicación. Escribí la dirección.");
+        } else {
+          setGeoMessage(
+            "No se pudo obtener la dirección. Probá de nuevo o buscá a mano.",
+          );
+        }
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
+    );
+  }, [onChange]);
+
+  // Pre-cargar dirección solo la primera vez, sin pisar una elección manual.
+  useEffect(() => {
+    if (value !== null || query.trim() !== "") return;
+    const id = setTimeout(() => requestCurrentLocation(), 0);
+    return () => clearTimeout(id);
+  }, [value, query, requestCurrentLocation]);
 
   function search(raw: string) {
     const q = raw.trim();
@@ -89,7 +165,7 @@ export function PickupPlacePicker({ value, onChange }: Props) {
   }
 
   return (
-    <div className="relative flex w-full flex-col gap-2">
+    <div className="flex w-full flex-col gap-2">
       <div className="relative">
         <Search
           className="pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
@@ -118,7 +194,49 @@ export function PickupPlacePicker({ value, onChange }: Props) {
             ×
           </button>
         ) : null}
+
+        {open && results.length > 0 ? (
+          <ul className="absolute top-[calc(100%+0.25rem)] z-20 flex w-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[0_8px_24px_rgba(28,25,23,0.12)]">
+            {results.map((s) => (
+              <li key={`${s.placeId ?? "x"}-${s.lat}-${s.lng}`}>
+                <button
+                  type="button"
+                  onClick={() => select(s)}
+                  className="flex w-full items-start gap-2.5 px-3.5 py-3 text-left transition-colors hover:bg-muted"
+                >
+                  <MapPin
+                    className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+                    aria-hidden
+                  />
+                  <span className="text-sm font-medium leading-snug text-foreground">
+                    {s.label}
+                  </span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
+
+      <button
+        type="button"
+        onClick={requestCurrentLocation}
+        disabled={geoLoading}
+        className="flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-70"
+      >
+        {geoLoading ? (
+          <Loader2 className="size-4 animate-spin" aria-hidden />
+        ) : (
+          <LocateFixed className="size-4" aria-hidden />
+        )}
+        {geoLoading ? "Obteniendo ubicación…" : "Usar mi ubicación"}
+      </button>
+
+      {geoMessage ? (
+        <p className="text-xs font-medium text-muted-foreground" role="status">
+          {geoMessage}
+        </p>
+      ) : null}
 
       {loading ? (
         <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
@@ -131,28 +249,6 @@ export function PickupPlacePicker({ value, onChange }: Props) {
         <p className="text-xs font-medium text-destructive" role="alert">
           {error}
         </p>
-      ) : null}
-
-      {open && results.length > 0 ? (
-        <ul className="absolute top-[calc(100%+0.25rem)] z-20 flex w-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[0_8px_24px_rgba(28,25,23,0.12)]">
-          {results.map((s) => (
-            <li key={`${s.placeId ?? "x"}-${s.lat}-${s.lng}`}>
-              <button
-                type="button"
-                onClick={() => select(s)}
-                className="flex w-full items-start gap-2.5 px-3.5 py-3 text-left transition-colors hover:bg-muted"
-              >
-                <MapPin
-                  className="mt-0.5 size-4 shrink-0 text-muted-foreground"
-                  aria-hidden
-                />
-                <span className="text-sm font-medium leading-snug text-foreground">
-                  {s.label}
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
       ) : null}
 
       {value ? (

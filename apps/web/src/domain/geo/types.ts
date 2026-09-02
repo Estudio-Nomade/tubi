@@ -26,3 +26,8 @@ export type GeocodeInput = {
   query: string;
   bias?: GeocodeBias;
 };
+
+export type GeocodeReverseInput = {
+  lat: number;
+  lng: number;
+};
