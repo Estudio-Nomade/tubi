@@ -34,7 +34,12 @@ export function SearchForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-5">
+    <form
+      action="/pasajero/resultados"
+      method="get"
+      onSubmit={onSubmit}
+      className="flex flex-col gap-5"
+    >
       <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
         <Field
           label="Origen"
