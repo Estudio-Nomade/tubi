@@ -7,11 +7,13 @@
 import type {
   GeocodeBias,
   GeocodeInput,
+  GeocodeReverseInput,
   GeocodeSuggestion,
   Geocoder,
 } from "@/domain/geo";
 
 const PHOTON_URL = "https://photon.komoot.io/api/";
+const PHOTON_REVERSE_URL = "https://photon.komoot.io/reverse";
 
 type PhotonProperties = {
   name?: string;
@@ -134,6 +136,39 @@ export function createPhotonGeocoder(): Geocoder {
         if (s) out.push(s);
       }
       return out;
+    },
+
+    async reverse(input: GeocodeReverseInput): Promise<GeocodeSuggestion | null> {
+      const { lat, lng } = input;
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+      const params = new URLSearchParams({
+        lat: String(lat),
+        lon: String(lng),
+        lang: "es",
+      });
+
+      let res: Response;
+      try {
+        res = await fetch(`${PHOTON_REVERSE_URL}?${params.toString()}`, {
+          headers: { accept: "application/json" },
+        });
+      } catch {
+        return null;
+      }
+
+      if (!res.ok) return null;
+
+      let json: unknown;
+      try {
+        json = await res.json();
+      } catch {
+        return null;
+      }
+
+      const features = (json as { features?: PhotonFeature[] })?.features ?? [];
+      const first = features[0];
+      return first ? toSuggestion(first) : null;
     },
   };
 }

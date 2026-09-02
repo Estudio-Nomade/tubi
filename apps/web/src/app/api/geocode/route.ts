@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 
 /**
  * Proxy de geocodificación (AD-9): el browser nunca llama a Photon directo.
- * GET /api/geocode?q=<texto>&bias=tandil
+ * Forward: GET /api/geocode?q=<texto>&bias=tandil
+ * Reverse: GET /api/geocode?lat=<lat>&lng=<lng>
  */
 export async function GET(request: Request) {
   const supabase = await createClient();
@@ -22,11 +23,21 @@ export async function GET(request: Request) {
   const biasParam = (url.searchParams.get("bias") ?? "").trim().toLowerCase();
   const limitRaw = Number(url.searchParams.get("limit") ?? "6");
 
+  const latRaw = Number(url.searchParams.get("lat"));
+  const lngRaw = Number(url.searchParams.get("lng"));
+  const isReverse = Number.isFinite(latRaw) && Number.isFinite(lngRaw);
+
+  const geocoder = createPhotonGeocoder();
+
+  if (isReverse) {
+    const suggestion = await geocoder.reverse({ lat: latRaw, lng: lngRaw });
+    return NextResponse.json({ results: suggestion ? [suggestion] : [] });
+  }
+
   if (!q) {
     return NextResponse.json({ results: [] });
   }
 
-  const geocoder = createPhotonGeocoder();
   const bias =
     biasParam === "tandil"
       ? { lat: TANDIL_CENTER.lat, lon: TANDIL_CENTER.lng, bbox: TANDIL_BBOX }
