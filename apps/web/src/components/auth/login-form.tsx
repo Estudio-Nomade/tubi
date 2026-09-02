@@ -9,7 +9,7 @@ import {
 } from "@/application/auth";
 import { BtnPrimary, Field } from "@/components/design";
 
-export type LoginRolContext = "conductor" | "pasajero";
+export type LoginRolContext = "conductor" | "pasajero" | "operador";
 
 async function loginAction(
   _prev: AuthActionResult | null,
@@ -20,7 +20,9 @@ async function loginAction(
 }
 
 function parseRol(value: string | undefined): LoginRolContext | null {
-  if (value === "conductor" || value === "pasajero") return value;
+  if (value === "conductor" || value === "pasajero" || value === "operador") {
+    return value;
+  }
   return null;
 }
 
@@ -33,12 +35,19 @@ export function LoginForm({ rol: rolParam }: LoginFormProps) {
   const [state, formAction, pending] = useActionState(loginAction, null);
   const rol = parseRol(rolParam);
   const isConductor = rol === "conductor";
-  const createHref = isConductor ? "/registro/conductor" : "/registro";
+  const isOperador = rol === "operador";
+  const createHref = isConductor
+    ? "/registro/conductor"
+    : isOperador
+      ? "/registro/operador"
+      : "/registro";
   const subtitle = isConductor
     ? "Cuenta de conductor"
-    : rol === "pasajero"
-      ? "Cuenta de pasajero"
-      : "Email y contraseña";
+    : isOperador
+      ? "Cuenta de operador"
+      : rol === "pasajero"
+        ? "Cuenta de pasajero"
+        : "Email y contraseña";
 
   return (
     <form
@@ -92,7 +101,7 @@ export function LoginForm({ rol: rolParam }: LoginFormProps) {
           Crear cuenta
         </Link>
 
-        {isConductor ? (
+        {isConductor || isOperador ? (
           <Link
             href="/login?rol=pasajero"
             className="text-center text-xs font-medium text-muted-foreground"

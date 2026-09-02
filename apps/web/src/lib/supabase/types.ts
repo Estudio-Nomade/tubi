@@ -460,6 +460,14 @@ export type Database = {
         };
         Returns: Json;
       };
+      crear_perfil_operador: {
+        Args: {
+          p_nombre: string;
+          p_apellido: string;
+          p_telefono: string;
+        };
+        Returns: Json;
+      };
     };
     Enums: {
       rol: Rol;
