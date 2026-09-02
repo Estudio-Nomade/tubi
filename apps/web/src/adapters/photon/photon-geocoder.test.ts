@@ -17,6 +17,18 @@ function mockFetch(features: unknown[]) {
     )) as typeof fetch;
 }
 
+function captureFetchUrl() {
+  const urls: string[] = [];
+  globalThis.fetch = (async (input: string | URL | Request) => {
+    urls.push(String(input));
+    return new Response(
+      JSON.stringify({ features: [] }),
+      { status: 200, headers: { "content-type": "application/json" } },
+    );
+  }) as typeof fetch;
+  return urls;
+}
+
 describe("photon geocoder reverse", () => {
   it("mapea la feature de reverse a una suggestion con label legible", async () => {
     mockFetch([
@@ -73,5 +85,29 @@ describe("photon geocoder reverse", () => {
       lng: -59.1332,
     });
     assert.equal(suggestion, null);
+  });
+});
+
+describe("photon geocoder params", () => {
+  it("search no envía lang=es (Photon rechaza 'es' con 400)", async () => {
+    const urls = captureFetchUrl();
+    await createPhotonGeocoder().search({
+      query: "colón",
+      bias: { lat: -37.3217, lon: -59.1332 },
+    });
+    assert.equal(urls.length, 1);
+    assert.match(urls[0], /\/api\/\?/);
+    assert.match(urls[0], /q=col%C3%B3n/);
+    assert.doesNotMatch(urls[0], /lang=/);
+  });
+
+  it("reverse no envía lang=es", async () => {
+    const urls = captureFetchUrl();
+    await createPhotonGeocoder().reverse({ lat: -37.3217, lng: -59.1332 });
+    assert.equal(urls.length, 1);
+    assert.match(urls[0], /\/reverse\?/);
+    assert.match(urls[0], /lat=-37\.3217/);
+    assert.match(urls[0], /lon=-59\.1332/);
+    assert.doesNotMatch(urls[0], /lang=/);
   });
 });

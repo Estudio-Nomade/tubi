@@ -92,7 +92,8 @@ export function createPhotonGeocoder(): Geocoder {
       const q = input.query.trim();
       if (!q) return [];
 
-      const params = new URLSearchParams({ q, limit: "6", lang: "es" });
+      // Photon no soporta "es"; usa los nombres nativos de OSM por default.
+      const params = new URLSearchParams({ q, limit: "6" });
 
       const bias: GeocodeBias | undefined = input.bias;
       if (bias) {
@@ -145,7 +146,6 @@ export function createPhotonGeocoder(): Geocoder {
       const params = new URLSearchParams({
         lat: String(lat),
         lon: String(lng),
-        lang: "es",
       });
 
       let res: Response;
