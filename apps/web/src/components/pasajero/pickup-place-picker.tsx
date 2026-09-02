@@ -1,9 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Loader2, LocateFixed, MapPin, Search } from "lucide-react";
+import { Loader2, MapPin, Search } from "lucide-react";
 
-import { isWithinBbox } from "@/domain/geo";
 import type { RecogidaInput } from "@/domain/reservas";
 import { cn } from "@/lib/utils";
 
@@ -26,8 +25,6 @@ export function PickupPlacePicker({ value, onChange }: Props) {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [geoLoading, setGeoLoading] = useState(false);
-  const [geoMessage, setGeoMessage] = useState<string | null>(null);
   const [noResults, setNoResults] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -37,77 +34,9 @@ export function PickupPlacePicker({ value, onChange }: Props) {
     };
   }, []);
 
-  const requestCurrentLocation = useCallback(() => {
-    if (!("geolocation" in navigator)) {
-      setGeoMessage("Tu navegador no comparte ubicación. Buscá la dirección.");
-      return;
-    }
-
-    setGeoLoading(true);
-    setGeoMessage(null);
-    setError(null);
-
-    navigator.geolocation.getCurrentPosition(
-      async (position) => {
-        const { latitude: lat, longitude: lng } = position.coords;
-        try {
-          const res = await fetch(`/api/geocode?lat=${lat}&lng=${lng}`);
-          if (!res.ok) {
-            setGeoMessage(
-              "No se pudo obtener la dirección. Probá de nuevo o buscá a mano.",
-            );
-            return;
-          }
-          const json = (await res.json()) as { results?: Suggestion[] };
-          const suggestion = json.results?.[0];
-          if (!suggestion) {
-            setGeoMessage(
-              "No se pudo obtener la dirección. Probá de nuevo o buscá a mano.",
-            );
-            return;
-          }
-          if (!isWithinBbox(lat, lng)) {
-            setGeoMessage(
-              "Tu ubicación está fuera de Tandil. Elegí una dirección en la ciudad.",
-            );
-            return;
-          }
-          onChange({
-            label: suggestion.label,
-            lat,
-            lng,
-            placeId: suggestion.placeId,
-          });
-          setQuery(suggestion.label);
-          setResults([]);
-          setOpen(false);
-          setNoResults(false);
-        } catch {
-          setGeoMessage(
-            "No se pudo obtener la dirección. Probá de nuevo o buscá a mano.",
-          );
-        } finally {
-          setGeoLoading(false);
-        }
-      },
-      (err) => {
-        setGeoLoading(false);
-        if (err.code === err.PERMISSION_DENIED) {
-          setGeoMessage("No pudimos usar tu ubicación. Escribí la dirección.");
-        } else {
-          setGeoMessage(
-            "No se pudo obtener la dirección. Probá de nuevo o buscá a mano.",
-          );
-        }
-      },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 },
-    );
-  }, [onChange]);
-
-  function search(raw: string) {
+  const search = useCallback((raw: string) => {
     const q = raw.trim();
     if (timerRef.current) clearTimeout(timerRef.current);
-    setGeoMessage(null);
 
     if (q.length < 3) {
       setResults([]);
@@ -147,7 +76,7 @@ export function PickupPlacePicker({ value, onChange }: Props) {
         setLoading(false);
       }
     }, 350);
-  }
+  }, []);
 
   function select(s: Suggestion) {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -156,7 +85,6 @@ export function PickupPlacePicker({ value, onChange }: Props) {
     setOpen(false);
     setResults([]);
     setLoading(false);
-    setGeoMessage(null);
     setNoResults(false);
   }
 
@@ -166,7 +94,6 @@ export function PickupPlacePicker({ value, onChange }: Props) {
     setQuery("");
     setResults([]);
     setOpen(false);
-    setGeoMessage(null);
     setNoResults(false);
   }
 
@@ -223,26 +150,6 @@ export function PickupPlacePicker({ value, onChange }: Props) {
           </ul>
         ) : null}
       </div>
-
-      <button
-        type="button"
-        onClick={requestCurrentLocation}
-        disabled={geoLoading}
-        className="flex h-11 items-center justify-center gap-2 rounded-xl border border-border bg-card text-sm font-medium text-foreground transition-colors hover:bg-muted disabled:opacity-70"
-      >
-        {geoLoading ? (
-          <Loader2 className="size-4 animate-spin" aria-hidden />
-        ) : (
-          <LocateFixed className="size-4" aria-hidden />
-        )}
-        {geoLoading ? "Obteniendo ubicación…" : "Usar mi ubicación"}
-      </button>
-
-      {geoMessage ? (
-        <p className="text-xs font-medium text-muted-foreground" role="status">
-          {geoMessage}
-        </p>
-      ) : null}
 
       {loading ? (
         <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
