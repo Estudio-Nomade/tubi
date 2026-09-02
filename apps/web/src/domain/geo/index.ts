@@ -2,6 +2,7 @@ export type {
   GeocodeBias,
   GeocodeInput,
   GeocodeReverseInput,
+  GeocodeSearchResult,
   GeocodeSuggestion,
   PickupMode,
 } from "./types";

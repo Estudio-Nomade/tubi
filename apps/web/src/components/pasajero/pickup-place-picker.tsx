@@ -62,7 +62,17 @@ export function PickupPlacePicker({ value, onChange }: Props) {
           setNoResults(false);
           return;
         }
-        const json = (await res.json()) as { results?: Suggestion[] };
+        const json = (await res.json()) as {
+          results?: Suggestion[];
+          error?: string | null;
+        };
+        if (json.error) {
+          setError("No se pudo buscar. Revisá tu conexión y probá de nuevo.");
+          setResults([]);
+          setOpen(false);
+          setNoResults(false);
+          return;
+        }
         const next = json.results ?? [];
         setResults(next);
         setNoResults(next.length === 0);
@@ -127,29 +137,29 @@ export function PickupPlacePicker({ value, onChange }: Props) {
             ×
           </button>
         ) : null}
-
-        {open && results.length > 0 ? (
-          <ul className="absolute top-[calc(100%+0.25rem)] z-20 flex w-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[0_8px_24px_rgba(28,25,23,0.12)]">
-            {results.map((s) => (
-              <li key={`${s.placeId ?? "x"}-${s.lat}-${s.lng}`}>
-                <button
-                  type="button"
-                  onClick={() => select(s)}
-                  className="flex w-full items-start gap-2.5 px-3.5 py-3 text-left transition-colors hover:bg-muted"
-                >
-                  <MapPin
-                    className="mt-0.5 size-4 shrink-0 text-muted-foreground"
-                    aria-hidden
-                  />
-                  <span className="text-sm font-medium leading-snug text-foreground">
-                    {s.label}
-                  </span>
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : null}
       </div>
+
+      {open && results.length > 0 ? (
+        <ul className="flex w-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-[0_8px_24px_rgba(28,25,23,0.12)]">
+          {results.map((s) => (
+            <li key={`${s.placeId ?? "x"}-${s.lat}-${s.lng}`}>
+              <button
+                type="button"
+                onClick={() => select(s)}
+                className="flex w-full items-start gap-2.5 px-3.5 py-3 text-left transition-colors hover:bg-muted"
+              >
+                <MapPin
+                  className="mt-0.5 size-4 shrink-0 text-muted-foreground"
+                  aria-hidden
+                />
+                <span className="text-sm font-medium leading-snug text-foreground">
+                  {s.label}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
       {loading ? (
         <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
