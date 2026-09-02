@@ -3,7 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { createPhotonGeocoder } from "@/adapters/photon/photon-geocoder";
 import { createSupabaseReservasRepository } from "@/adapters/supabase/reservas-repository";
+import {
+  isWithinBbox,
+  isValidManualAddress,
+  TANDIL_BBOX,
+  TANDIL_CENTER,
+} from "@/domain/geo";
 import type { RecogidaInput } from "@/domain/reservas";
 import { requireProfile } from "@/lib/auth/require-profile";
 import { createClient } from "@/lib/supabase/server";
@@ -12,6 +19,63 @@ import { createReservasService } from "./reservas-service";
 
 export type CreateReservaResult = { error: string };
 export type CancelReservaActionResult = { error: string };
+
+export type ResolvePickupResult =
+  | { ok: true; recogida: RecogidaInput; aproximada: boolean }
+  | { ok: false; error: string };
+
+/**
+ * Resuelve una dirección manual (calle + altura) a coords para recogida Tandil.
+ * Preferido: 1er hit de Photon dentro del bbox del partido. Si no hay hit (o
+ * Photon cae), último recurso documentado: coords = centro de Tandil + label
+ * "texto, Tandil" (placeId null), para no bloquear la reserva por geocoding.
+ */
+export async function resolvePickupAddressAction(
+  label: string,
+): Promise<ResolvePickupResult> {
+  const text = (label ?? "").trim();
+  if (!isValidManualAddress(text)) {
+    return {
+      ok: false,
+      error: "Escribí calle y altura (ej: San Martín 454).",
+    };
+  }
+
+  await requireProfile(["pasajero"]);
+
+  const geocoder = createPhotonGeocoder();
+  const result = await geocoder.search({
+    query: text,
+    bias: { lat: TANDIL_CENTER.lat, lon: TANDIL_CENTER.lng, bbox: TANDIL_BBOX },
+  });
+
+  if (result.error === null) {
+    const hit = result.results.find((r) => isWithinBbox(r.lat, r.lng));
+    if (hit) {
+      return {
+        ok: true,
+        recogida: {
+          label: hit.label,
+          lat: hit.lat,
+          lng: hit.lng,
+          placeId: hit.placeId,
+        },
+        aproximada: false,
+      };
+    }
+  }
+
+  return {
+    ok: true,
+    recogida: {
+      label: `${text}, Tandil`,
+      lat: TANDIL_CENTER.lat,
+      lng: TANDIL_CENTER.lng,
+      placeId: null,
+    },
+    aproximada: true,
+  };
+}
 
 function isNextRedirect(err: unknown): boolean {
   return (

@@ -34,6 +34,19 @@ export function isWithinBbox(
 }
 
 /**
+ * Validación mínima de una dirección manual (calle + altura).
+ * Se usa como gate del fallback de recogida Tandil: texto libre solo si
+ * tiene pinta de calle con número, para que el conductor lea algo legible.
+ */
+export function isValidManualAddress(label: string): boolean {
+  const text = (label ?? "").trim();
+  if (text.length < 5) return false;
+  if (!/\d/.test(text)) return false;
+  if (!/[a-záéíóúñü]/i.test(text)) return false;
+  return true;
+}
+
+/**
  * Regla de recogida cerrada por origen de ruta:
  *  - Tandil       -> libre (door-to-door dentro del partido)
  *  - Buenos Aires -> punto fijo (parada tipo 'origen' de la ruta)
