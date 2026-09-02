@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 
 import {
   signInAction,
@@ -33,6 +33,8 @@ type LoginFormProps = {
 /** Pencil P10 — title, sub, fields, spacer, CTA, create link. */
 export function LoginForm({ rol: rolParam }: LoginFormProps) {
   const [state, formAction, pending] = useActionState(loginAction, null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const rol = parseRol(rolParam);
   const isConductor = rol === "conductor";
   const isOperador = rol === "operador";
@@ -68,6 +70,8 @@ export function LoginForm({ rol: rolParam }: LoginFormProps) {
           type="email"
           autoComplete="email"
           inputMode="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
           disabled={pending}
         />
@@ -76,6 +80,8 @@ export function LoginForm({ rol: rolParam }: LoginFormProps) {
           name="password"
           type="password"
           autoComplete="current-password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
           required
           disabled={pending}
         />
