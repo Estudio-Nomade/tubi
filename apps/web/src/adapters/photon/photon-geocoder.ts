@@ -15,13 +15,18 @@ import type {
 const PHOTON_URL = "https://photon.komoot.io/api/";
 const PHOTON_REVERSE_URL = "https://photon.komoot.io/reverse";
 
+// Photon (API pública) solo soporta default|de|en|fr. `lang=es` devuelve 400.
+const PHOTON_LANG = "default";
+// Algunos edges OSM exigen User-Agent; no mandar requests sin él.
+const USER_AGENT = "Tubi/1.0 (viajes compartidos; local-dev)";
+
 type PhotonProperties = {
   name?: string;
   street?: string;
   housenumber?: string;
   city?: string;
-  district?: string;
-  county?: string;
+  town?: string;
+  village?: string;
   state?: string;
   country?: string;
   osm_id?: number;
@@ -33,32 +38,25 @@ type PhotonFeature = {
   properties?: PhotonProperties;
 };
 
+/**
+ * Label legible calle-primero (patrón Lifty `formatPhotonAddress`):
+ * "San Martín 454, Tandil, Buenos Aires". El `name` solo entra si no hay
+ * calle+altura (POI), para no anteponer un POI genérico al dato de dirección.
+ */
 function buildLabel(props: PhotonProperties): string {
-  const parts: string[] = [];
+  const street = (props.street ?? "").trim();
+  const housenumber = (props.housenumber ?? "").trim();
+  const name = (props.name ?? "").trim();
 
-  const streetLine = [props.housenumber, props.street]
-    .filter(Boolean)
-    .join(" ");
+  const streetLine = street && housenumber ? `${street} ${housenumber}` : street;
+  const primary = streetLine || name;
 
-  if (props.name && props.name !== props.street) {
-    parts.push(props.name);
-  }
-  if (streetLine && !parts.includes(streetLine)) {
-    parts.push(streetLine);
-  }
+  const locality = props.city ?? props.town ?? props.village ?? "";
+  const parts = [primary, locality, props.state, props.country]
+    .map((p) => (p ?? "").trim())
+    .filter(Boolean);
 
-  const locality = props.city ?? props.district ?? props.county ?? props.state;
-  if (locality) {
-    const already = parts.some((p) =>
-      p.toLowerCase().includes(locality.toLowerCase()),
-    );
-    if (!already) parts.push(locality);
-  }
-
-  if (parts.length === 0 && props.name) parts.push(props.name);
-  if (parts.length === 0) parts.push("Ubicación");
-
-  return parts.join(", ");
+  return parts.length > 0 ? parts.join(", ") : "Ubicación";
 }
 
 function buildOsmUrl(props: PhotonProperties): string | null {
@@ -86,13 +84,63 @@ function toSuggestion(feature: PhotonFeature): GeocodeSuggestion | null {
   };
 }
 
+type FetchResult =
+  | { ok: true; json: unknown }
+  | { ok: false; status: number; body: string };
+
+async function fetchJson(url: string): Promise<FetchResult> {
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      headers: { accept: "application/json", "user-agent": USER_AGENT },
+    });
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[photon] fetch error:", err);
+    }
+    return { ok: false, status: 0, body: "" };
+  }
+
+  if (!res.ok) {
+    let body = "";
+    try {
+      body = await res.text();
+    } catch {
+      // no hacer nada: el status ya alcanza para el log de dev
+    }
+    if (process.env.NODE_ENV !== "production") {
+      console.error(`[photon] ${url} -> HTTP ${res.status}: ${body}`);
+    }
+    return { ok: false, status: res.status, body };
+  }
+
+  try {
+    return { ok: true, json: await res.json() };
+  } catch (err) {
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[photon] json parse error:", err);
+    }
+    return { ok: false, status: res.status, body: "" };
+  }
+}
+
+function toSuggestions(json: unknown): GeocodeSuggestion[] {
+  const features = (json as { features?: PhotonFeature[] })?.features ?? [];
+  const out: GeocodeSuggestion[] = [];
+  for (const feature of features) {
+    const s = toSuggestion(feature);
+    if (s) out.push(s);
+  }
+  return out;
+}
+
 export function createPhotonGeocoder(): Geocoder {
   return {
     async search(input: GeocodeInput): Promise<GeocodeSuggestion[]> {
       const q = input.query.trim();
       if (!q) return [];
 
-      const params = new URLSearchParams({ q, limit: "6", lang: "es" });
+      const params = new URLSearchParams({ q, limit: "6", lang: PHOTON_LANG });
 
       const bias: GeocodeBias | undefined = input.bias;
       if (bias) {
@@ -111,31 +159,9 @@ export function createPhotonGeocoder(): Geocoder {
         }
       }
 
-      let res: Response;
-      try {
-        res = await fetch(`${PHOTON_URL}?${params.toString()}`, {
-          headers: { accept: "application/json" },
-        });
-      } catch {
-        return [];
-      }
-
-      if (!res.ok) return [];
-
-      let json: unknown;
-      try {
-        json = await res.json();
-      } catch {
-        return [];
-      }
-
-      const features = (json as { features?: PhotonFeature[] })?.features ?? [];
-      const out: GeocodeSuggestion[] = [];
-      for (const feature of features) {
-        const s = toSuggestion(feature);
-        if (s) out.push(s);
-      }
-      return out;
+      const result = await fetchJson(`${PHOTON_URL}?${params.toString()}`);
+      if (!result.ok) return [];
+      return toSuggestions(result.json);
     },
 
     async reverse(input: GeocodeReverseInput): Promise<GeocodeSuggestion | null> {
@@ -145,30 +171,12 @@ export function createPhotonGeocoder(): Geocoder {
       const params = new URLSearchParams({
         lat: String(lat),
         lon: String(lng),
-        lang: "es",
+        lang: PHOTON_LANG,
       });
 
-      let res: Response;
-      try {
-        res = await fetch(`${PHOTON_REVERSE_URL}?${params.toString()}`, {
-          headers: { accept: "application/json" },
-        });
-      } catch {
-        return null;
-      }
-
-      if (!res.ok) return null;
-
-      let json: unknown;
-      try {
-        json = await res.json();
-      } catch {
-        return null;
-      }
-
-      const features = (json as { features?: PhotonFeature[] })?.features ?? [];
-      const first = features[0];
-      return first ? toSuggestion(first) : null;
+      const result = await fetchJson(`${PHOTON_REVERSE_URL}?${params.toString()}`);
+      if (!result.ok) return null;
+      return toSuggestions(result.json)[0] ?? null;
     },
   };
 }
