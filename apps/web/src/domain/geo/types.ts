@@ -27,6 +27,12 @@ export type GeocodeInput = {
   bias?: GeocodeBias;
 };
 
+export type GeocodeSearchResult = {
+  results: GeocodeSuggestion[];
+  /** Distingue "no hay resultados" (null) de "el geocoder falló" (error). */
+  error: "GEOCODER_UPSTREAM" | null;
+};
+
 export type GeocodeReverseInput = {
   lat: number;
   lng: number;

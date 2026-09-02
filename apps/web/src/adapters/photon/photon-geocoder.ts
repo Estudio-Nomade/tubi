@@ -8,6 +8,7 @@ import type {
   GeocodeBias,
   GeocodeInput,
   GeocodeReverseInput,
+  GeocodeSearchResult,
   GeocodeSuggestion,
   Geocoder,
 } from "@/domain/geo";
@@ -19,6 +20,8 @@ const PHOTON_REVERSE_URL = "https://photon.komoot.io/reverse";
 const PHOTON_LANG = "default";
 // Algunos edges OSM exigen User-Agent; no mandar requests sin él.
 const USER_AGENT = "Tubi/1.0 (viajes compartidos; local-dev)";
+// No colgar el picker si Photon no responde.
+const FETCH_TIMEOUT_MS = 8000;
 
 type PhotonProperties = {
   name?: string;
@@ -93,6 +96,7 @@ async function fetchJson(url: string): Promise<FetchResult> {
   try {
     res = await fetch(url, {
       headers: { accept: "application/json", "user-agent": USER_AGENT },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
   } catch (err) {
     if (process.env.NODE_ENV !== "production") {
@@ -134,34 +138,72 @@ function toSuggestions(json: unknown): GeocodeSuggestion[] {
   return out;
 }
 
+function buildSearchUrl(q: string, bias?: GeocodeBias): string {
+  const params = new URLSearchParams({ q, limit: "6", lang: PHOTON_LANG });
+
+  if (bias) {
+    params.set("lat", String(bias.lat));
+    params.set("lon", String(bias.lon));
+    if (bias.bbox) {
+      params.set(
+        "bbox",
+        [
+          bias.bbox.minLng,
+          bias.bbox.minLat,
+          bias.bbox.maxLng,
+          bias.bbox.maxLat,
+        ].join(","),
+      );
+    }
+  }
+
+  return `${PHOTON_URL}?${params.toString()}`;
+}
+
 export function createPhotonGeocoder(): Geocoder {
   return {
-    async search(input: GeocodeInput): Promise<GeocodeSuggestion[]> {
+    async search(input: GeocodeInput): Promise<GeocodeSearchResult> {
       const q = input.query.trim();
-      if (!q) return [];
+      if (!q) return { results: [], error: null };
 
-      const params = new URLSearchParams({ q, limit: "6", lang: PHOTON_LANG });
+      // Intento A: bias completo (lat/lon + bbox). Intento B: sin bbox (solo
+      // lat/lon). Intento C: q + " Tandil" sin bbox, cuando A/B no devuelven
+      // nada y la query no menciona la ciudad. Así el predictivo no se queda
+      // en empty por un bbox o una query demasiado local.
+      const attempts: { q: string; bias?: GeocodeBias }[] = [];
+      const bias = input.bias;
 
-      const bias: GeocodeBias | undefined = input.bias;
       if (bias) {
-        params.set("lat", String(bias.lat));
-        params.set("lon", String(bias.lon));
+        attempts.push({ q, bias });
         if (bias.bbox) {
-          params.set(
-            "bbox",
-            [
-              bias.bbox.minLng,
-              bias.bbox.minLat,
-              bias.bbox.maxLng,
-              bias.bbox.maxLat,
-            ].join(","),
-          );
+          attempts.push({ q, bias: { lat: bias.lat, lon: bias.lon } });
+          if (!q.toLowerCase().includes("tandil")) {
+            attempts.push({
+              q: `${q} Tandil`,
+              bias: { lat: bias.lat, lon: bias.lon },
+            });
+          }
+        }
+      } else {
+        attempts.push({ q });
+      }
+
+      let sawError = false;
+
+      for (const attempt of attempts) {
+        const result = await fetchJson(buildSearchUrl(attempt.q, attempt.bias));
+        if (!result.ok) {
+          sawError = true;
+          continue;
+        }
+        const suggestions = toSuggestions(result.json);
+        if (suggestions.length > 0) {
+          return { results: suggestions, error: null };
         }
       }
 
-      const result = await fetchJson(`${PHOTON_URL}?${params.toString()}`);
-      if (!result.ok) return [];
-      return toSuggestions(result.json);
+      if (sawError) return { results: [], error: "GEOCODER_UPSTREAM" };
+      return { results: [], error: null };
     },
 
     async reverse(input: GeocodeReverseInput): Promise<GeocodeSuggestion | null> {

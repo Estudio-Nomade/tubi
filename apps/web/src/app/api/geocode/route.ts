@@ -23,13 +23,21 @@ export async function GET(request: Request) {
   const biasParam = (url.searchParams.get("bias") ?? "").trim().toLowerCase();
   const limitRaw = Number(url.searchParams.get("limit") ?? "6");
 
-  const latRaw = Number(url.searchParams.get("lat"));
-  const lngRaw = Number(url.searchParams.get("lng"));
-  const isReverse = Number.isFinite(latRaw) && Number.isFinite(lngRaw);
+  // `lat`/`lng` ausentes → get() devuelve null → Number(null) === 0 (finito).
+  // Detectar reverse por presencia del parámetro, no por Number(), o todo
+  // search caería en el branch reverse (reverse en 0,0 → features vacías).
+  const latParam = url.searchParams.get("lat");
+  const lngParam = url.searchParams.get("lng");
+  const isReverse = latParam !== null && lngParam !== null;
 
   const geocoder = createPhotonGeocoder();
 
   if (isReverse) {
+    const latRaw = Number(latParam);
+    const lngRaw = Number(lngParam);
+    if (!Number.isFinite(latRaw) || !Number.isFinite(lngRaw)) {
+      return NextResponse.json({ results: [] });
+    }
     const suggestion = await geocoder.reverse({ lat: latRaw, lng: lngRaw });
     return NextResponse.json({ results: suggestion ? [suggestion] : [] });
   }
@@ -48,7 +56,11 @@ export async function GET(request: Request) {
     bias,
   });
 
-  const limit = Number.isFinite(limitRaw) && limitRaw > 0 ? limitRaw : results.length;
+  if (results.error) {
+    return NextResponse.json({ results: [], error: results.error });
+  }
 
-  return NextResponse.json({ results: results.slice(0, limit) });
+  const limit = Number.isFinite(limitRaw) && limitRaw > 0 ? limitRaw : results.results.length;
+
+  return NextResponse.json({ results: results.results.slice(0, limit) });
 }
