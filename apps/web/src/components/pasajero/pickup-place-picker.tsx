@@ -28,6 +28,7 @@ export function PickupPlacePicker({ value, onChange }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoMessage, setGeoMessage] = useState<string | null>(null);
+  const [noResults, setNoResults] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
@@ -80,6 +81,7 @@ export function PickupPlacePicker({ value, onChange }: Props) {
           setQuery(suggestion.label);
           setResults([]);
           setOpen(false);
+          setNoResults(false);
         } catch {
           setGeoMessage(
             "No se pudo obtener la dirección. Probá de nuevo o buscá a mano.",
@@ -102,27 +104,23 @@ export function PickupPlacePicker({ value, onChange }: Props) {
     );
   }, [onChange]);
 
-  // Pre-cargar dirección solo la primera vez, sin pisar una elección manual.
-  useEffect(() => {
-    if (value !== null || query.trim() !== "") return;
-    const id = setTimeout(() => requestCurrentLocation(), 0);
-    return () => clearTimeout(id);
-  }, [value, query, requestCurrentLocation]);
-
   function search(raw: string) {
     const q = raw.trim();
     if (timerRef.current) clearTimeout(timerRef.current);
+    setGeoMessage(null);
 
     if (q.length < 3) {
       setResults([]);
       setOpen(false);
       setError(null);
       setLoading(false);
+      setNoResults(false);
       return;
     }
 
     setLoading(true);
     setError(null);
+    setNoResults(false);
     timerRef.current = setTimeout(async () => {
       try {
         const res = await fetch(
@@ -132,15 +130,19 @@ export function PickupPlacePicker({ value, onChange }: Props) {
           setError("No se pudo buscar. Probá de nuevo.");
           setResults([]);
           setOpen(false);
+          setNoResults(false);
           return;
         }
         const json = (await res.json()) as { results?: Suggestion[] };
-        setResults(json.results ?? []);
-        setOpen(true);
+        const next = json.results ?? [];
+        setResults(next);
+        setNoResults(next.length === 0);
+        setOpen(next.length > 0);
       } catch {
         setError("No se pudo buscar. Probá de nuevo.");
         setResults([]);
         setOpen(false);
+        setNoResults(false);
       } finally {
         setLoading(false);
       }
@@ -154,6 +156,8 @@ export function PickupPlacePicker({ value, onChange }: Props) {
     setOpen(false);
     setResults([]);
     setLoading(false);
+    setGeoMessage(null);
+    setNoResults(false);
   }
 
   function clear() {
@@ -162,6 +166,8 @@ export function PickupPlacePicker({ value, onChange }: Props) {
     setQuery("");
     setResults([]);
     setOpen(false);
+    setGeoMessage(null);
+    setNoResults(false);
   }
 
   return (
@@ -242,6 +248,12 @@ export function PickupPlacePicker({ value, onChange }: Props) {
         <p className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
           <Loader2 className="size-3.5 animate-spin" aria-hidden />
           Buscando…
+        </p>
+      ) : null}
+
+      {noResults && !loading ? (
+        <p className="text-xs font-medium text-muted-foreground" role="status">
+          No encontramos esa dirección. Probá con calle y altura en Tandil.
         </p>
       ) : null}
 
