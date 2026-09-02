@@ -29,7 +29,7 @@ const CREDENTIALS_PATTERNS = [
 ] as const;
 
 const CREDENTIALS_MESSAGE =
-  "Email o contraseña incorrectos. En local usá las cuentas demo (password `demo-demo-1`), p. ej. pasajero.demo@tubi.local.";
+  "Email o contraseña incorrectos.";
 
 export function isAuthNetworkError(message: string): boolean {
   const m = message.trim();

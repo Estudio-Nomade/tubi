@@ -2,10 +2,10 @@
 -- Passenger sena payment: transfer settings, pago RLS, storage for comprobantes.
 
 insert into public.settings (clave, valor, tipo, descripcion) values
-  ('pagos.transferencia_banco',   '"Banco Nación"',              'text', 'Banco cuenta seña'),
-  ('pagos.transferencia_alias',   '"tubi.viajes.ar"',            'text', 'Alias CBU/CVU seña'),
-  ('pagos.transferencia_cbu',     '"0110012345678901234567"',    'text', 'CBU/CVU seña (demo)'),
-  ('pagos.transferencia_titular', '"Tubi SAS"',                  'text', 'Titular cuenta seña')
+  ('pagos.transferencia_banco',   '""', 'text', 'Banco cuenta seña'),
+  ('pagos.transferencia_alias',   '""', 'text', 'Alias CBU/CVU seña'),
+  ('pagos.transferencia_cbu',     '""', 'text', 'CBU/CVU seña'),
+  ('pagos.transferencia_titular', '""', 'text', 'Titular cuenta seña')
 on conflict (clave) do update
 set valor = excluded.valor, updated_at = now();
 
