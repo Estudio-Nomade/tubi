@@ -18,7 +18,7 @@ export default async function Home() {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-screen w-full max-w-md flex-col bg-background">
       <main className="flex flex-1 flex-col px-5 pb-8 pt-10">
         <div className="flex flex-1 flex-col items-center justify-center gap-8">
           <div className="flex flex-col items-center gap-5">

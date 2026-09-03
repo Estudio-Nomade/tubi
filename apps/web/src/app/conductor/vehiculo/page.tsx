@@ -32,7 +32,7 @@ export default async function ConductorVehiculoPage({
   const isOnboarding = onboarding || vehiculos.length === 0;
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <AppHeader
         showBack={!isOnboarding}
         backHref={isOnboarding ? undefined : "/conductor"}

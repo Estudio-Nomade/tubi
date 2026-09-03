@@ -23,7 +23,7 @@ export default async function OperadorRutaParadasPage({ params }: PageProps) {
   const paradas = await service.listParadas(rutaId);
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <AppHeader showBack backHref="/operador/viajes" roleLabel="Operador" />
       <main className="flex flex-1 flex-col gap-5 px-5 pb-8 pt-3">
         <div className="flex flex-col gap-1">

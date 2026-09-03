@@ -27,7 +27,7 @@ export default async function OperadorPage({ searchParams }: PageProps) {
   const items = await service.listPending();
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <AppHeader roleLabel="Operador" />
       <main className="flex flex-1 flex-col gap-5 px-5 pb-4 pt-3">
         <div className="flex flex-col gap-1">

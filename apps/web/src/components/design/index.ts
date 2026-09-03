@@ -1,4 +1,5 @@
 export { AppHeader } from "./app-header"
+export { AppShell } from "./app-shell"
 export { Field } from "./field"
 export { ProgressDots } from "./progress-dots"
 export { BtnPrimary } from "./btn-primary"

@@ -48,7 +48,7 @@ export default async function PasajeroPaseDetallePage({ params }: PageProps) {
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       {/* Pencil CompactHeader: pad [16,20,8,20] gap 12 */}
       <header className="flex items-center gap-3 bg-background px-5 pb-2 pt-4">
         <Link

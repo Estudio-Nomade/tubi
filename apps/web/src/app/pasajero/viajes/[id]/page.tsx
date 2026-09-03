@@ -83,7 +83,7 @@ export default async function ViajeDetailPage({
     : horaSalida;
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <AppHeader showBack backHref={back.href} />
       {/* Explicit Volver keeps filters when coming from results */}
       <div className="px-5 pt-1">

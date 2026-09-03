@@ -36,7 +36,7 @@ export default async function OperadorViajesHistorialPage() {
   const items = await service.listViajesHistorial();
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <AppHeader showBack backHref="/operador/viajes" roleLabel="Operador" />
       <main className="flex flex-1 flex-col gap-5 px-5 pb-4 pt-3">
         <div className="flex items-start justify-between gap-3">

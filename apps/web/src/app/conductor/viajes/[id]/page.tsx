@@ -73,7 +73,7 @@ export default async function ConductorViajePage({
   const estadoPill = tripEstadoPill(trip.estado);
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <AppHeader showBack backHref="/conductor" roleLabel="Conductor" />
       <main className="flex flex-1 flex-col gap-5 px-5 pb-8 pt-2">
         <div className="flex flex-col gap-2">

@@ -51,7 +51,7 @@ export default async function OperadorViajeNuevoPage({
   const defaultPrecio = defaultPrecioString(precioSetting?.valor);
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <AppHeader
         showBack
         backHref="/operador/viajes"

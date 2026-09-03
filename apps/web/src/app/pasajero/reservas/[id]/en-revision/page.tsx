@@ -38,7 +38,7 @@ export default async function SenaEnRevisionPage({ params }: PageProps) {
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <AppHeader showBack backHref="/pasajero" />
       <main className="flex flex-1 flex-col items-center gap-5 px-5 pb-8 pt-4">
         <StatusPill label="En revisión" variant="pending" />

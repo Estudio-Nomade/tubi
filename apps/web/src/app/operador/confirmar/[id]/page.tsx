@@ -33,7 +33,7 @@ export default async function ConfirmarSenaPage({ params }: PageProps) {
   const tripLine = `${formatHoraAr(detail.fechaSalida)} · ${detail.origen} → ${detail.destino}`;
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <AppHeader showBack backHref="/operador" roleLabel="Operador" />
       <main className="flex flex-1 flex-col gap-5 px-5 pb-4 pt-2">
         <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 /** Pencil C1 · Registro conductor */
 export default function RegistroConductorPage() {
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <AppHeader showBack backHref="/login?rol=conductor" />
       <RegisterConductorWizard />
     </div>

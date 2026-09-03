@@ -48,7 +48,7 @@ export default async function ConductorRecogidaPage({ params }: PageProps) {
     esperaMaxMin === 1 ? "1 min" : `${esperaMaxMin} min`;
 
   return (
-    <div className="mx-auto flex min-h-dvh max-w-[375px] flex-col bg-background">
+    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <AppHeader
         showBack
         backHref={`/conductor/viajes/${viajeId}`}
