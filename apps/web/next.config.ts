@@ -15,4 +15,10 @@ export default withSerwist({
   allowedDevOrigins: ["192.168.0.*"],
   // Serwist injects webpack config; empty turbopack keeps Next 16 default happy in dev.
   turbopack: {},
+  // Match submitSenaComprobanteAction MAX_BYTES (5 MB). Default Server Action body is 1 MB.
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "5mb",
+    },
+  },
 });
