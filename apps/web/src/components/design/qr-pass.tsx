@@ -50,20 +50,41 @@ export function QRPass({
       </div>
 
       <div className="flex size-[200px] shrink-0 items-center justify-center rounded-xl bg-[#EFE8DC] p-2.5">
-        <QRCodeSVG
-          value={qrToken}
-          size={180}
-          level="M"
-          bgColor="#EFE8DC"
-          fgColor="#1C1917"
-          marginSize={0}
-          title="Código QR de abordaje"
-          className="size-full max-h-[180px] max-w-[180px]"
-        />
+        {qrToken ? (
+          <QRCodeSVG
+            value={qrToken}
+            size={180}
+            level="M"
+            bgColor="#EFE8DC"
+            fgColor="#1C1917"
+            marginSize={0}
+            title="Código QR de abordaje"
+            className="size-full max-h-[180px] max-w-[180px]"
+          />
+        ) : (
+          <p className="px-3 text-center text-sm font-medium text-muted-foreground">
+            Código no disponible
+          </p>
+        )}
       </div>
 
+      {qrToken ? (
+        <div className="flex w-full flex-col items-center gap-1.5">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            Código para el conductor
+          </p>
+          <p
+            className="w-full break-all rounded-xl bg-muted px-3 py-2.5 text-center font-mono text-sm font-semibold leading-snug text-foreground select-all"
+            title="Tocá para seleccionar y copiar"
+          >
+            {qrToken}
+          </p>
+        </div>
+      ) : null}
+
       <p className="max-w-[280px] text-center text-xs font-medium leading-relaxed text-muted-foreground">
-        Mostralo al conductor. No compartas esta pantalla.
+        Mostralo al conductor. Si no puede escanear, dictale o copiá el código.
+        No compartas esta pantalla.
       </p>
     </article>
   )

@@ -43,3 +43,5 @@ next-env.d.ts
 
 # Serwist (service worker generado en build)
 /public/sw.js
+
+certificates

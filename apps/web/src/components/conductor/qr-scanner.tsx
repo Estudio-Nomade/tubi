@@ -11,6 +11,27 @@ type QrScannerProps = {
   viajeId: string;
 };
 
+function cameraErrorMessage(err: unknown): string {
+  const msg =
+    err && typeof err === "object" && "message" in err
+      ? String((err as { message: unknown }).message)
+      : String(err ?? "");
+
+  if (typeof window !== "undefined" && !window.isSecureContext) {
+    return "La cámara requiere HTTPS o localhost. Desde el celu en la red local pegá el código del pasajero abajo.";
+  }
+  if (/NotAllowed|Permission|denied|NotReadable/i.test(msg)) {
+    return "Permiso de cámara denegado o en uso. Habilitalo en el navegador o pegá el código abajo.";
+  }
+  if (/NotFound|DevicesNotFound|no camera/i.test(msg)) {
+    return "No encontramos una cámara. Pegá el código del pasajero abajo.";
+  }
+  if (/secure|https|Only secure/i.test(msg)) {
+    return "La cámara solo funciona en HTTPS o localhost. Pegá el código abajo.";
+  }
+  return "No pudimos abrir la cámara. Pegá el código del pasajero abajo.";
+}
+
 export function QrScanner({ viajeId }: QrScannerProps) {
   const [manual, setManual] = useState("");
   const [camError, setCamError] = useState<string | null>(null);
@@ -39,33 +60,89 @@ export function QrScanner({ viajeId }: QrScannerProps) {
 
   useEffect(() => {
     let cancelled = false;
-    const scanner = new Html5Qrcode(regionId);
-    scannerRef.current = scanner;
+    let scanner: Html5Qrcode | null = null;
 
-    scanner
-      .start(
-        { facingMode: "environment" },
-        { fps: 8, qrbox: { width: 220, height: 220 } },
-        (decoded) => {
-          if (!cancelled) submitToken(decoded);
-        },
-        () => undefined,
-      )
-      .catch(() => {
+    async function startCamera() {
+      if (typeof window === "undefined") return;
+
+      if (!window.isSecureContext) {
         if (!cancelled) {
           setCamError(
-            "No pudimos abrir la cámara. Pegá el código del pasajero abajo.",
+            "La cámara requiere HTTPS o localhost. Desde el celu en la red local pegá el código del pasajero abajo.",
           );
         }
-      });
+        return;
+      }
+
+      if (!navigator.mediaDevices?.getUserMedia) {
+        if (!cancelled) {
+          setCamError(
+            "Este navegador no permite cámara. Pegá el código del pasajero abajo.",
+          );
+        }
+        return;
+      }
+
+      try {
+        scanner = new Html5Qrcode(regionId);
+        scannerRef.current = scanner;
+        await scanner.start(
+          { facingMode: "environment" },
+          { fps: 8, qrbox: { width: 220, height: 220 } },
+          (decoded) => {
+            if (!cancelled) submitToken(decoded);
+          },
+          () => undefined,
+        );
+        if (!cancelled) setCamError(null);
+      } catch (err) {
+        if (cancelled) return;
+        // Fallback: any available camera (desktop / single cam).
+        try {
+          const cameras = await Html5Qrcode.getCameras();
+          if (cancelled) return;
+          if (!cameras.length) {
+            setCamError(cameraErrorMessage(err));
+            return;
+          }
+          if (!scanner) {
+            scanner = new Html5Qrcode(regionId);
+            scannerRef.current = scanner;
+          }
+          await scanner.start(
+            cameras[0].id,
+            { fps: 8, qrbox: { width: 220, height: 220 } },
+            (decoded) => {
+              if (!cancelled) submitToken(decoded);
+            },
+            () => undefined,
+          );
+          if (!cancelled) setCamError(null);
+        } catch (err2) {
+          if (!cancelled) setCamError(cameraErrorMessage(err2 ?? err));
+        }
+      }
+    }
+
+    void startCamera();
 
     return () => {
       cancelled = true;
       const s = scannerRef.current;
       scannerRef.current = null;
-      if (s?.isScanning) {
-        void s.stop().catch(() => undefined);
-      }
+      if (!s) return;
+      void (async () => {
+        try {
+          if (s.isScanning) await s.stop();
+        } catch {
+          /* ignore */
+        }
+        try {
+          s.clear();
+        } catch {
+          /* ignore */
+        }
+      })();
     };
   }, [submitToken]);
 
@@ -117,7 +194,10 @@ export function QrScanner({ viajeId }: QrScannerProps) {
               }`}
             >
               {!pending ? (
-                <Scan className="size-12 text-primary-foreground/40" strokeWidth={1.5} />
+                <Scan
+                  className="size-12 text-primary-foreground/40"
+                  strokeWidth={1.5}
+                />
               ) : null}
             </div>
           </div>
@@ -163,10 +243,7 @@ export function QrScanner({ viajeId }: QrScannerProps) {
           />
         </label>
         {formError ? (
-          <div
-            className="rounded-xl bg-[#FCEBEA] px-3.5 py-3"
-            role="alert"
-          >
+          <div className="rounded-xl bg-[#FCEBEA] px-3.5 py-3" role="alert">
             <p className="text-sm font-semibold text-[#B42318]">Error</p>
             <p className="text-[13px] font-normal text-[#B42318]">{formError}</p>
           </div>
