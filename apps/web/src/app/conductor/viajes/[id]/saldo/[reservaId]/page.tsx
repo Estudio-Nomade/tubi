@@ -48,10 +48,15 @@ export default async function ConductorSaldoPage({ params }: PageProps) {
             {formatArs(ctx.saldo)}
           </p>
           <p className="text-[13px] font-medium text-muted-foreground">
-            Saldo al subir · viaje − seña
+            {ctx.descuentoMonto > 0
+              ? "Saldo al subir · viaje − seña − cupón"
+              : "Saldo al subir · viaje − seña"}
           </p>
           <p className="text-xs font-medium text-muted-foreground/80">
             Viaje {formatArs(ctx.precioViaje)} · seña {formatArs(ctx.montoSena)}
+            {ctx.descuentoMonto > 0
+              ? ` · cupón −${formatArs(ctx.descuentoMonto)}`
+              : null}
           </p>
         </div>
 

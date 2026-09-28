@@ -26,6 +26,13 @@ export type TipoPago = "sena" | "saldo";
 export type MetodoPago = "efectivo" | "transferencia";
 export type EstadoPago = "pendiente" | "confirmado" | "rechazado";
 
+export type EstadoCuponUsuario =
+  | "disponible"
+  | "reservado"
+  | "usado"
+  | "vencido"
+  | "anulado";
+
 export type Json =
   | string
   | number
@@ -248,6 +255,8 @@ export type Database = {
           recogida_lng: number | null;
           recogida_place_id: string | null;
           recogida_mode: string | null;
+          cupon_usuario_id: string | null;
+          descuento_monto: number;
           created_at: string;
           updated_at: string;
         };
@@ -269,6 +278,8 @@ export type Database = {
           recogida_lng?: number | null;
           recogida_place_id?: string | null;
           recogida_mode?: string | null;
+          cupon_usuario_id?: string | null;
+          descuento_monto?: number;
           created_at?: string;
           updated_at?: string;
         };
@@ -290,6 +301,101 @@ export type Database = {
           recogida_lng?: number | null;
           recogida_place_id?: string | null;
           recogida_mode?: string | null;
+          cupon_usuario_id?: string | null;
+          descuento_monto?: number;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      cupon_campania: {
+        Row: {
+          id: string;
+          codigo: string;
+          monto_descuento: number;
+          cupos_totales: number | null;
+          cupos_usados: number;
+          vigencia_desde: string;
+          vigencia_hasta: string;
+          valido_dias_post_canje: number;
+          max_por_usuario: number;
+          ruta_id: string | null;
+          activa: boolean;
+          creada_por: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          codigo: string;
+          monto_descuento: number;
+          cupos_totales?: number | null;
+          cupos_usados?: number;
+          vigencia_desde: string;
+          vigencia_hasta: string;
+          valido_dias_post_canje?: number;
+          max_por_usuario?: number;
+          ruta_id?: string | null;
+          activa?: boolean;
+          creada_por?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          codigo?: string;
+          monto_descuento?: number;
+          cupos_totales?: number | null;
+          cupos_usados?: number;
+          vigencia_desde?: string;
+          vigencia_hasta?: string;
+          valido_dias_post_canje?: number;
+          max_por_usuario?: number;
+          ruta_id?: string | null;
+          activa?: boolean;
+          creada_por?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      cupon_usuario: {
+        Row: {
+          id: string;
+          campania_id: string;
+          pasajero_id: string;
+          estado: EstadoCuponUsuario;
+          monto_descuento: number;
+          reserva_id: string | null;
+          canjeado_en: string;
+          vence_en: string;
+          usado_en: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          campania_id: string;
+          pasajero_id: string;
+          estado?: EstadoCuponUsuario;
+          monto_descuento: number;
+          reserva_id?: string | null;
+          canjeado_en?: string;
+          vence_en: string;
+          usado_en?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          campania_id?: string;
+          pasajero_id?: string;
+          estado?: EstadoCuponUsuario;
+          monto_descuento?: number;
+          reserva_id?: string | null;
+          canjeado_en?: string;
+          vence_en?: string;
+          usado_en?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -341,8 +447,30 @@ export type Database = {
           p_recogida_lat?: number | null;
           p_recogida_lng?: number | null;
           p_recogida_place_id?: string | null;
+          p_cupon_usuario_id?: string | null;
         };
         Returns: Database["public"]["Tables"]["reserva"]["Row"];
+      };
+      canjear_cupon: {
+        Args: { p_codigo: string };
+        Returns: Json;
+      };
+      crear_cupon_campania: {
+        Args: {
+          p_codigo: string;
+          p_monto_descuento: number;
+          p_cupos_totales?: number | null;
+          p_vigencia_desde?: string;
+          p_vigencia_hasta?: string;
+          p_valido_dias_post_canje?: number;
+          p_max_por_usuario?: number;
+          p_ruta_id?: string | null;
+        };
+        Returns: Json;
+      };
+      set_cupon_campania_activa: {
+        Args: { p_campania_id: string; p_activa: boolean };
+        Returns: Json;
       };
       actualizar_parada: {
         Args: {

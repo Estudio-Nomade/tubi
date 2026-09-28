@@ -20,6 +20,8 @@ export const SETTING_KEYS = {
   VERIFICACION_DNI_MODO: "verificacion.dni_modo",
   FEATURE_RATINGS_HABILITADO: "feature.ratings_habilitado",
   AUTH_ALLOW_OPERADOR_SIGNUP: "auth.allow_operador_signup",
+  /** Kill-switch canje/aplicación de cupones (seed 0031; no editable en UI v1). */
+  CUPONES_ENABLED: "cupones.enabled",
 } as const;
 
 export type SettingKey = (typeof SETTING_KEYS)[keyof typeof SETTING_KEYS];

@@ -91,8 +91,9 @@ stateDiagram-v2
 
 ### RN-02 — Saldo al subir
 
-- `saldo = viaje.precio − reserva.monto_sena` (la comisión la retiene la plataforma, no se descuenta al pasajero).
-- Se paga al subir, en **efectivo** o **transferencia**. El conductor lo registra (`pago` tipo `saldo`).
+- `saldo = max(0, viaje.precio − reserva.monto_sena − reserva.descuento_monto)` (la comisión la retiene la plataforma, no se descuenta al pasajero).
+- El descuento de cupón **no toca la seña** (`monto_sena` y flujo de comprobante intactos). Detalle: `docs/superpowers/specs/2026-09-28-cupones-descuento-design.md`.
+- Se paga al subir, en **efectivo** o **transferencia**. El conductor lo registra (`pago` tipo `saldo`). Si el saldo es 0, se aborda sin fila de pago de saldo.
 
 ### RN-03 — Devolución de seña por cancelación del pasajero
 

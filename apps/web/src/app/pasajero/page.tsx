@@ -180,6 +180,13 @@ export default async function PasajeroPage({ searchParams }: PageProps) {
           Mis reservas
         </Link>
 
+        <Link
+          href="/pasajero/cupones"
+          className="text-center text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          Mis cupones
+        </Link>
+
         {active ? (
           <Link
             href="/pasajero/buscar"

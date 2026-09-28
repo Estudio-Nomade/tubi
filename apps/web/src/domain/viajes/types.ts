@@ -29,6 +29,7 @@ export type ViajeListItem = {
 };
 
 export type ViajeDetail = ViajeListItem & {
+  rutaId: string;
   etaLlegada: string | null;
   conductor: {
     id: string;

@@ -197,10 +197,16 @@ export default async function PasajeroReservasPage({ searchParams }: PageProps) 
                           {item.precioViaje != null
                             ? ` · Viaje ${formatArs(item.precioViaje)}`
                             : null}
+                          {item.descuentoMonto != null && item.descuentoMonto > 0
+                            ? ` · Cupón −${formatArs(item.descuentoMonto)}`
+                            : null}
                         </p>
                       ) : item.precioViaje != null ? (
                         <p className="text-sm font-medium text-muted-foreground">
                           Viaje {formatArs(item.precioViaje)}
+                          {item.descuentoMonto != null && item.descuentoMonto > 0
+                            ? ` · Cupón −${formatArs(item.descuentoMonto)}`
+                            : null}
                         </p>
                       ) : null}
                     </div>

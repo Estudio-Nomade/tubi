@@ -32,6 +32,8 @@ export type Reserva = {
   recogidaLng: number | null;
   recogidaPlaceId: string | null;
   recogidaMode: PickupMode | null;
+  descuentoMonto: number;
+  cuponUsuarioId: string | null;
   createdAt: string;
 };
 
@@ -73,6 +75,7 @@ export type ReservaListItem = {
   fechaSalida: string;
   montoSena: number;
   precioViaje?: number;
+  descuentoMonto?: number;
   politicaCancelacion?: PoliticaCancelacionSnapshot;
   /** Pending refund amount after cancel (operator settles out-of-band). */
   montoDevolucion?: number;

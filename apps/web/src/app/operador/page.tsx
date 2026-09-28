@@ -99,6 +99,13 @@ export default async function OperadorPage({ searchParams }: PageProps) {
           </ul>
         )}
 
+        <Link
+          href="/operador/cupones"
+          className="text-center text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+        >
+          Cupones
+        </Link>
+
         <div className="flex-1" aria-hidden />
       </main>
       <TabBar variant="operador" active="senas" />

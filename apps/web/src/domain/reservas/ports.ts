@@ -13,6 +13,7 @@ export interface ReservasRepository {
   createForPassenger(
     viajeId: string,
     recogida?: RecogidaInput,
+    cuponUsuarioId?: string | null,
   ): Promise<Reserva>;
   findByIdForPassenger(
     id: string,

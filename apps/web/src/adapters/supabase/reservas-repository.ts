@@ -62,6 +62,8 @@ function mapReserva(row: ReservaRow): Reserva {
     recogidaLng: row.recogida_lng == null ? null : Number(row.recogida_lng),
     recogidaPlaceId: row.recogida_place_id ?? null,
     recogidaMode: (row.recogida_mode as PickupMode | null) ?? null,
+    descuentoMonto: Number(row.descuento_monto ?? 0),
+    cuponUsuarioId: row.cupon_usuario_id ?? null,
     createdAt: row.created_at,
   };
 }
@@ -93,6 +95,13 @@ function mapRpcError(message: string): Error {
   }
   if (message.includes("PARADA_ORIGEN_MISSING")) {
     return new Error("PARADA_ORIGEN_MISSING");
+  }
+  if (message.includes("CUPON_")) {
+    const match = message.match(/CUPON_[A-Z0-9_]+/);
+    if (match) return new Error(match[0]);
+  }
+  if (message.includes("CUPONES_DESHABILITADOS")) {
+    return new Error("CUPONES_DESHABILITADOS");
   }
   return new Error(message);
 }
@@ -135,6 +144,7 @@ export function createSupabaseReservasRepository(
     async createForPassenger(
       viajeId: string,
       recogida?: RecogidaInput,
+      cuponUsuarioId?: string | null,
     ): Promise<Reserva> {
       const { data, error } = await client.rpc("crear_reserva", {
         p_viaje_id: viajeId,
@@ -142,6 +152,7 @@ export function createSupabaseReservasRepository(
         p_recogida_lat: recogida?.lat ?? null,
         p_recogida_lng: recogida?.lng ?? null,
         p_recogida_place_id: recogida?.placeId ?? null,
+        p_cupon_usuario_id: cuponUsuarioId ?? null,
       });
 
       if (error) {
@@ -308,6 +319,7 @@ export function createSupabaseReservasRepository(
           id,
           estado,
           monto_sena,
+          descuento_monto,
           monto_devolucion,
           politica_cancelacion,
           viaje!inner (
@@ -507,6 +519,7 @@ function mapListItem(data: unknown): ReservaListItem | null {
     id: string;
     estado: string;
     monto_sena: number | string;
+    descuento_monto?: number | string | null;
     monto_devolucion?: number | string | null;
     politica_cancelacion?: Json;
     viaje:
@@ -545,6 +558,8 @@ function mapListItem(data: unknown): ReservaListItem | null {
 
   const montoDev =
     row.monto_devolucion == null ? undefined : Number(row.monto_devolucion);
+  const descuento =
+    row.descuento_monto == null ? undefined : Number(row.descuento_monto);
 
   return {
     reservaId: row.id,
@@ -554,6 +569,8 @@ function mapListItem(data: unknown): ReservaListItem | null {
     fechaSalida: viaje.fecha_salida,
     montoSena: Number(row.monto_sena),
     precioViaje: Number(viaje.precio),
+    descuentoMonto:
+      descuento != null && Number.isFinite(descuento) ? descuento : undefined,
     politicaCancelacion,
     montoDevolucion:
       montoDev != null && Number.isFinite(montoDev) && montoDev > 0

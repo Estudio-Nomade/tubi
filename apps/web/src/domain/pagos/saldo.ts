@@ -1,6 +1,11 @@
-/** RN-02 — balance due at boarding (pure). */
-export function computeSaldo(precioViaje: number, montoSena: number): number {
-  return precioViaje - montoSena;
+/** RN-02 — balance due at boarding (pure). Descuento de cupón no toca la seña. */
+export function computeSaldo(
+  precioViaje: number,
+  montoSena: number,
+  descuentoMonto: number = 0,
+): number {
+  const d = Number.isFinite(descuentoMonto) ? Math.max(0, descuentoMonto) : 0;
+  return Math.max(0, precioViaje - montoSena - d);
 }
 
 export type SaldoErrorCode =

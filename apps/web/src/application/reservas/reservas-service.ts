@@ -12,8 +12,12 @@ import {
 
 export function createReservasService(repo: ReservasRepository) {
   return {
-    crear(viajeId: string, recogida?: RecogidaInput): Promise<Reserva> {
-      return repo.createForPassenger(viajeId, recogida);
+    crear(
+      viajeId: string,
+      recogida?: RecogidaInput,
+      cuponUsuarioId?: string | null,
+    ): Promise<Reserva> {
+      return repo.createForPassenger(viajeId, recogida, cuponUsuarioId);
     },
     getByIdForPassenger(
       id: string,

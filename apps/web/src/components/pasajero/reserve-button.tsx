@@ -9,6 +9,7 @@ import type { RecogidaInput } from "@/domain/reservas";
 type ReserveButtonProps = {
   viajeId: string;
   pickup?: RecogidaInput | null;
+  cuponUsuarioId?: string | null;
   disabled?: boolean;
   disabledReason?: string;
 };
@@ -16,6 +17,7 @@ type ReserveButtonProps = {
 export function ReserveButton({
   viajeId,
   pickup = null,
+  cuponUsuarioId = null,
   disabled = false,
   disabledReason,
 }: ReserveButtonProps) {
@@ -25,7 +27,11 @@ export function ReserveButton({
   function onClick() {
     setError(null);
     startTransition(async () => {
-      const result = await createReservaAction(viajeId, pickup ?? undefined);
+      const result = await createReservaAction(
+        viajeId,
+        pickup ?? undefined,
+        cuponUsuarioId || null,
+      );
       if (result?.error) {
         setError(result.error);
       }

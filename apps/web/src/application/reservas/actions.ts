@@ -11,6 +11,10 @@ import {
   TANDIL_BBOX,
   TANDIL_CENTER,
 } from "@/domain/geo";
+import {
+  cuponErrorUserMessage,
+  mapCuponErrorMessage,
+} from "@/domain/cupones";
 import type { RecogidaInput } from "@/domain/reservas";
 import { requireProfile } from "@/lib/auth/require-profile";
 import { createClient } from "@/lib/supabase/server";
@@ -90,6 +94,7 @@ function isNextRedirect(err: unknown): boolean {
 export async function createReservaAction(
   viajeId: string,
   recogida?: RecogidaInput,
+  cuponUsuarioId?: string | null,
 ): Promise<CreateReservaResult | void> {
   if (!viajeId || typeof viajeId !== "string") {
     return { error: "Ese viaje no es válido." };
@@ -102,7 +107,7 @@ export async function createReservaAction(
   );
 
   try {
-    const reserva = await service.crear(viajeId, recogida);
+    const reserva = await service.crear(viajeId, recogida, cuponUsuarioId);
     revalidatePath("/pasajero");
     revalidatePath(`/pasajero/viajes/${viajeId}`);
     revalidatePath("/pasajero/resultados");
@@ -131,6 +136,14 @@ export async function createReservaAction(
     }
     if (message === "PARADA_ORIGEN_MISSING") {
       return { error: "Esta ruta no tiene punto de recogida definido. Avisá al operador." };
+    }
+    if (
+      message.includes("CUPON_") ||
+      message === "CUPONES_DESHABILITADOS"
+    ) {
+      return {
+        error: cuponErrorUserMessage(mapCuponErrorMessage(message)),
+      };
     }
     return { error: "No se pudo crear la reserva. Probá de nuevo." };
   }

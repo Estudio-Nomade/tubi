@@ -57,6 +57,7 @@ export type SaldoContext = {
   fechaSalida: string;
   precioViaje: number;
   montoSena: number;
+  descuentoMonto: number;
   saldo: number;
   estado: "verificada";
 };

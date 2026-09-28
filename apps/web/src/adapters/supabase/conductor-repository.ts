@@ -205,6 +205,7 @@ export function createSupabaseConductorRepository(
           id,
           estado,
           monto_sena,
+          descuento_monto,
           pasajero:profiles!reserva_pasajero_id_fkey ( nombre, apellido ),
           viaje!inner (
             id,
@@ -229,6 +230,7 @@ export function createSupabaseConductorRepository(
         id: string;
         estado: string;
         monto_sena: number;
+        descuento_monto: number | string | null;
         pasajero:
           | { nombre: string; apellido: string | null }
           | { nombre: string; apellido: string | null }[]
@@ -268,6 +270,9 @@ export function createSupabaseConductorRepository(
 
       const precioViaje = Number(viaje.precio);
       const montoSena = Number(typed.monto_sena);
+      const rawDescuento = Number(typed.descuento_monto ?? 0);
+      const descuentoMonto =
+        Number.isFinite(rawDescuento) && rawDescuento > 0 ? rawDescuento : 0;
       return {
         reservaId: typed.id,
         viajeId: viaje.id,
@@ -277,7 +282,8 @@ export function createSupabaseConductorRepository(
         fechaSalida: viaje.fecha_salida,
         precioViaje,
         montoSena,
-        saldo: computeSaldo(precioViaje, montoSena),
+        descuentoMonto,
+        saldo: computeSaldo(precioViaje, montoSena, descuentoMonto),
         estado: "verificada",
       };
     },

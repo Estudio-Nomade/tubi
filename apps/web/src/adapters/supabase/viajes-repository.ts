@@ -191,6 +191,7 @@ export function createSupabaseViajesRepository(client: Client): ViajesRepository
 
       const typed = data as unknown as {
         id: string;
+        ruta_id: string;
         fecha_salida: string;
         precio: number;
         estado: EstadoViaje;
@@ -211,7 +212,7 @@ export function createSupabaseViajesRepository(client: Client): ViajesRepository
         throw new Error("viaje row missing conductor embed");
       }
 
-      const rutaId = (data as { ruta_id: string }).ruta_id;
+      const rutaId = typed.ruta_id;
       const { data: paradasData, error: paradasError } = await client
         .from("parada")
         .select("id, nombre, ciudad, orden, tipo")
@@ -226,6 +227,7 @@ export function createSupabaseViajesRepository(client: Client): ViajesRepository
 
       return {
         ...base,
+        rutaId,
         etaLlegada: eta,
         conductor: {
           id: conductor.id,

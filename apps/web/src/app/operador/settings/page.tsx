@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { getSettings } from "@/application/settings";
 import { OperadorSettingsForm } from "@/components/operador/settings-form";
 import { AppHeader, TabBar } from "@/components/design";
@@ -28,6 +30,13 @@ export default async function OperadorSettingsPage({ searchParams }: PageProps) 
         <h1 className="font-heading text-[22px] font-semibold leading-tight text-foreground">
           Configuración
         </h1>
+
+        <Link
+          href="/operador/cupones"
+          className="rounded-2xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground shadow-[0_4px_16px_rgba(28,25,23,0.06)] transition-colors hover:border-primary/25"
+        >
+          Cupones · campañas de descuento
+        </Link>
 
         {ok === "1" ? (
           <p

@@ -2,12 +2,19 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Car, UserRound } from "lucide-react";
 
+import { createSupabaseCuponesRepository } from "@/adapters/supabase/cupones-repository";
 import { createSupabaseViajesRepository } from "@/adapters/supabase/viajes-repository";
+import { getCurrentProfile } from "@/application/auth";
+import { createCuponesService } from "@/application/cupones";
+import { getSettingsService } from "@/application/settings";
 import { createViajesService } from "@/application/viajes";
 import { AppHeader, InfoRow } from "@/components/design";
 import { ReservePanel } from "@/components/pasajero/reserve-panel";
 import { pickupModeForOrigen } from "@/domain/geo";
+import { readSenaMonto } from "@/domain/reservas";
+import type { Setting } from "@/domain/settings";
 import {
+  formatArs,
   formatHoraAr,
   formatHoraLlegadaAr,
   formatPersonaNombre,
@@ -23,6 +30,10 @@ type PageProps = {
 function first(value: string | string[] | undefined): string {
   if (Array.isArray(value)) return value[0] ?? "";
   return value ?? "";
+}
+
+function settingsToMap(items: Setting[]): Map<string, Setting> {
+  return new Map(items.map((s) => [s.clave, s]));
 }
 
 /** Prefer results with the same search filters; else search form. */
@@ -59,6 +70,28 @@ export default async function ViajeDetailPage({
   const viaje = await service.getById(id);
 
   if (!viaje) notFound();
+
+  const settingsService = await getSettingsService();
+  const settingsMap = settingsToMap(await settingsService.getSettings());
+  const montoSena = readSenaMonto(settingsMap);
+
+  const profile = await getCurrentProfile();
+  let cupones: Array<{ id: string; label: string; montoDescuento: number }> =
+    [];
+  if (profile?.rol === "pasajero") {
+    const cuponesService = createCuponesService(
+      createSupabaseCuponesRepository(supabase),
+    );
+    const disponibles = await cuponesService.listDisponiblesForRuta(
+      profile.id,
+      viaje.rutaId,
+    );
+    cupones = disponibles.map((c) => ({
+      id: c.id,
+      label: `${c.codigoCampania} · −${formatArs(c.montoDescuento)}`,
+      montoDescuento: c.montoDescuento,
+    }));
+  }
 
   const canReserve = viaje.estado === "programado" && viaje.asientosLibres > 0;
   const conductorNombre = formatPersonaNombre(
@@ -176,6 +209,8 @@ export default async function ViajeDetailPage({
           pickupMode={pickupMode}
           fixedLabel={fixedLabel}
           precio={viaje.precio}
+          montoSena={montoSena}
+          cupones={cupones}
           disabled={!canReserve}
           disabledReason={
             viaje.estado !== "programado"

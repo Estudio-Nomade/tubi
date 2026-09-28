@@ -45,7 +45,7 @@
 - Test: `apps/web/src/domain/cupones/code.test.ts`
 - Test: `apps/web/src/domain/cupones/errors.test.ts`
 
-- [ ] **Step 1: Write failing tests for `computeSaldo`**
+- [x] **Step 1: Write failing tests for `computeSaldo`**
 
 ```ts
 // apps/web/src/domain/pagos/saldo.test.ts
@@ -70,7 +70,7 @@ describe("computeSaldo", () => {
 });
 ```
 
-- [ ] **Step 2: Run test — expect FAIL (arity / flooring)**
+- [x] **Step 2: Run test — expect FAIL (arity / flooring)**
 
 ```bash
 cd apps/web && bun test src/domain/pagos/saldo.test.ts
@@ -78,7 +78,7 @@ cd apps/web && bun test src/domain/pagos/saldo.test.ts
 
 Expected: FAIL (function does not accept third arg or no floor).
 
-- [ ] **Step 3: Implement `computeSaldo`**
+- [x] **Step 3: Implement `computeSaldo`**
 
 ```ts
 /** RN-02 — balance due at boarding (pure). Descuento de cupón no toca la seña. */
@@ -92,7 +92,7 @@ export function computeSaldo(
 }
 ```
 
-- [ ] **Step 4: Write cupón code + error tests and implement**
+- [x] **Step 4: Write cupón code + error tests and implement**
 
 ```ts
 // apps/web/src/domain/cupones/code.ts
@@ -207,7 +207,7 @@ export * from "./code";
 
 Tests mínimos: `normalizeCuponCodigo(" tubi1 ") === "TUBI1"`; `cuponErrorUserMessage("CUPON_SIN_CUPOS")` match `/agotaron/i`.
 
-- [ ] **Step 5: Run all domain tests**
+- [x] **Step 5: Run all domain tests**
 
 ```bash
 cd apps/web && bun test src/domain/pagos/saldo.test.ts src/domain/cupones
@@ -215,7 +215,7 @@ cd apps/web && bun test src/domain/pagos/saldo.test.ts src/domain/cupones
 
 Expected: PASS.
 
-- [ ] **Step 6: Stage for commit (human signs)**
+- [x] **Step 6: Stage for commit (human signs)**
 
 ```bash
 git add apps/web/src/domain/pagos/saldo.ts apps/web/src/domain/pagos/saldo.test.ts \
@@ -230,7 +230,7 @@ git add apps/web/src/domain/pagos/saldo.ts apps/web/src/domain/pagos/saldo.test.
 **Files:**
 - Create: `supabase/migrations/0031_cupones.sql`
 
-- [ ] **Step 1: Write migration**
+- [x] **Step 1: Write migration**
 
 ```sql
 -- 0031_cupones.sql
@@ -404,7 +404,7 @@ end;
 $$;
 ```
 
-- [ ] **Step 2: Apply locally**
+- [x] **Step 2: Apply locally**
 
 ```bash
 npx supabase db reset
@@ -417,7 +417,7 @@ Expected: migrations apply without error. Verify:
 psql "postgresql://postgres:postgres@127.0.0.1:54322/postgres" -c "\d cupon_campania" -c "\d cupon_usuario" -c "select clave from settings where clave = 'cupones.enabled';"
 ```
 
-- [ ] **Step 3: Stage**
+- [x] **Step 3: Stage**
 
 ```bash
 git add supabase/migrations/0031_cupones.sql
@@ -431,7 +431,7 @@ git add supabase/migrations/0031_cupones.sql
 **Files:**
 - Create: `supabase/migrations/0032_cupones_canjear.sql`
 
-- [ ] **Step 1: Write `canjear_cupon`**
+- [x] **Step 1: Write `canjear_cupon`**
 
 ```sql
 -- 0032_cupones_canjear.sql
@@ -652,9 +652,9 @@ where not exists (
 );
 ```
 
-- [ ] **Step 2: Apply and smoke canje as pasajero** (optional SQL with `set_config` jwt like seña flow)
+- [x] **Step 2: Apply and smoke canje as pasajero** (optional SQL with `set_config` jwt like seña flow)
 
-- [ ] **Step 3: Stage**
+- [x] **Step 3: Stage**
 
 ```bash
 git add supabase/migrations/0032_cupones_canjear.sql
@@ -668,7 +668,7 @@ git add supabase/migrations/0032_cupones_canjear.sql
 **Files:**
 - Create: `supabase/migrations/0033_cupones_crear_reserva.sql`
 
-- [ ] **Step 1: Drop old signature and recreate with `p_cupon_usuario_id`**
+- [x] **Step 1: Drop old signature and recreate with `p_cupon_usuario_id`**
 
 Read current full body from `0028_reserva_recogida.sql` and produce a new `create or replace` that:
 
@@ -727,9 +727,9 @@ Read current full body from `0028_reserva_recogida.sql` and produce a new `creat
 
 6. Grant execute on new 6-arg signature.
 
-- [ ] **Step 2: Apply migration; verify `crear_reserva` without cupón still works** (regression smoke).
+- [x] **Step 2: Apply migration; verify `crear_reserva` without cupón still works** (regression smoke).
 
-- [ ] **Step 3: Stage**
+- [x] **Step 3: Stage**
 
 ```bash
 git add supabase/migrations/0033_cupones_crear_reserva.sql
@@ -743,7 +743,7 @@ git add supabase/migrations/0033_cupones_crear_reserva.sql
 **Files:**
 - Create: `supabase/migrations/0034_cupones_lifecycle.sql`
 
-- [ ] **Step 1: Patch each RPC** (read current functions from migrations `0015`, `0016`, `0013`, `0020` and `create or replace` full bodies with these hooks):
+- [x] **Step 1: Patch each RPC** (read current functions from migrations `0015`, `0016`, `0013`, `0020` and `create or replace` full bodies with these hooks):
 
 **`cancelar_reserva`:** after marking reserva cancelada, call  
 `perform public.cupon_liberar_si_reservado(p_reserva_id);`
@@ -767,9 +767,9 @@ If `v_monto = 0`: **do not insert** `pago` tipo saldo; still set reserva `aborda
 If `v_monto > 0`: insert pago as today.  
 Always: `perform public.cupon_marcar_usado(v_reserva.id);`
 
-- [ ] **Step 2: Apply and manual SQL smoke** (optional).
+- [x] **Step 2: Apply and manual SQL smoke** (optional).
 
-- [ ] **Step 3: Stage**
+- [x] **Step 3: Stage**
 
 ```bash
 git add supabase/migrations/0034_cupones_lifecycle.sql
@@ -787,7 +787,7 @@ git add supabase/migrations/0034_cupones_lifecycle.sql
 - Modify: `apps/web/src/application/reservas/reservas-service.ts` + `actions.ts` — accept cupón; map `CUPON_*` errors
 - Modify: `apps/web/src/lib/supabase/types.ts` — Functions + Tables stubs for cupones and new `crear_reserva` args; `reserva` columns
 
-- [ ] **Step 1: Update `mapReserva` and RPC call**
+- [x] **Step 1: Update `mapReserva` and RPC call**
 
 ```ts
 // createForPassenger
@@ -803,11 +803,11 @@ const { data, error } = await client.rpc("crear_reserva", {
 
 Map `descuento_monto` → `descuentoMonto`, `cupon_usuario_id` → `cuponUsuarioId`.
 
-- [ ] **Step 2: `createReservaAction(viajeId, recogida?, cuponUsuarioId?)`** map errors via `mapCuponErrorMessage` / `cuponErrorUserMessage`.
+- [x] **Step 2: `createReservaAction(viajeId, recogida?, cuponUsuarioId?)`** map errors via `mapCuponErrorMessage` / `cuponErrorUserMessage`.
 
-- [ ] **Step 3: `bun test` + `npm run type-check --workspace=web`**
+- [x] **Step 3: `bun test` + `npm run type-check --workspace=web`**
 
-- [ ] **Step 4: Stage**
+- [x] **Step 4: Stage**
 
 ```bash
 git add apps/web/src/domain/reservas apps/web/src/adapters/supabase/reservas-repository.ts \
@@ -826,7 +826,7 @@ git add apps/web/src/domain/reservas apps/web/src/adapters/supabase/reservas-rep
 - Create: `apps/web/src/application/cupones/actions.ts`
 - Create: `apps/web/src/application/cupones/index.ts`
 
-- [ ] **Step 1: Port**
+- [x] **Step 1: Port**
 
 ```ts
 // ports.ts
@@ -854,9 +854,9 @@ export type CuponesRepository = {
 };
 ```
 
-- [ ] **Step 2: Repository** — `rpc('canjear_cupon')`, select `cupon_usuario` join `cupon_campania(codigo, ruta_id)`, expire lazy via select filter `estado = disponible and vence_en >= now()` plus optional rpc expire; operador list/create/set.
+- [x] **Step 2: Repository** — `rpc('canjear_cupon')`, select `cupon_usuario` join `cupon_campania(codigo, ruta_id)`, expire lazy via select filter `estado = disponible and vence_en >= now()` plus optional rpc expire; operador list/create/set.
 
-- [ ] **Step 3: Service + actions**
+- [x] **Step 3: Service + actions**
 
 ```ts
 // actions.ts (pasajero)
@@ -867,9 +867,9 @@ export async // list is RSC via service, not necessarily action
 
 `requireProfile(["pasajero"])` for canje; revalidate `/pasajero/cupones`.
 
-- [ ] **Step 4: type-check**
+- [x] **Step 4: type-check**
 
-- [ ] **Step 5: Stage**
+- [x] **Step 5: Stage**
 
 ```bash
 git add apps/web/src/domain/cupones apps/web/src/adapters/supabase/cupones-repository.ts \
@@ -887,13 +887,13 @@ git add apps/web/src/domain/cupones apps/web/src/adapters/supabase/cupones-repos
 - Modify: `apps/web/src/app/pasajero/page.tsx` or profile nav — link “Mis cupones”
 - Modify: TabBar / header if there is a natural entry (prefer link from home pasajero card area)
 
-- [ ] **Step 1: Page RSC** loads `listMine`, shows disponibles first with `formatArs(monto)` + `vence_en` via `formatFechaHoraAr`.
+- [x] **Step 1: Page RSC** loads `listMine`, shows disponibles first with `formatArs(monto)` + `vence_en` via `formatFechaHoraAr`.
 
-- [ ] **Step 2: Client form** input código → `canjearCuponAction` → refresh / toast error.
+- [x] **Step 2: Client form** input código → `canjearCuponAction` → refresh / toast error.
 
-- [ ] **Step 3: Manual check** login pasajero → canjear `TUBI1` → aparece en lista.
+- [x] **Step 3: Manual check** login pasajero → canjear `TUBI1` → aparece en lista.
 
-- [ ] **Step 4: Stage**
+- [x] **Step 4: Stage**
 
 ```bash
 git add apps/web/src/app/pasajero/cupones apps/web/src/components/pasajero/canjear-cupon-form.tsx \
@@ -911,7 +911,7 @@ git add apps/web/src/app/pasajero/cupones apps/web/src/components/pasajero/canje
 - Modify: `apps/web/src/app/pasajero/viajes/[id]/page.tsx` — load disponibles for `rutaId`, pass `montoSena` from settings or viaje context, show breakdown
 - Modify: reservation detail pages to show `descuentoMonto` + `computeSaldo(...)`
 
-- [ ] **Step 1: ReservePanel props**
+- [x] **Step 1: ReservePanel props**
 
 ```ts
 type Props = {
@@ -932,11 +932,11 @@ Saldo al subir: formatArs(computeSaldo(precio, montoSena, selected?.monto ?? 0))
 
 Copy: “La seña no cambia; el descuento se descuenta del saldo al subir.”
 
-- [ ] **Step 2: ReserveButton** passes `cuponUsuarioId` to `createReservaAction`.
+- [x] **Step 2: ReserveButton** passes `cuponUsuarioId` to `createReservaAction`.
 
-- [ ] **Step 3: Smoke** reservar con cupón → DB `descuento_monto=5000`, cupón `reservado`.
+- [x] **Step 3: Smoke** reservar con cupón → DB `descuento_monto=5000`, cupón `reservado`.
 
-- [ ] **Step 4: Stage**
+- [x] **Step 4: Stage**
 
 ```bash
 git add apps/web/src/components/pasajero/reserve-panel.tsx \
@@ -954,11 +954,11 @@ git add apps/web/src/components/pasajero/reserve-panel.tsx \
 - Modify any display of saldo to `computeSaldo(precio, sena, descuentoMonto)`
 - Ensure repository selects `descuento_monto` on reserva for conductor views
 
-- [ ] **Step 1: Find and update** all saldo labels.
+- [x] **Step 1: Find and update** all saldo labels.
 
-- [ ] **Step 2: type-check + manual** conductor cobrar shows $15.000 if precio 25k sena 5k desc 5k.
+- [x] **Step 2: type-check + manual** conductor cobrar shows $15.000 if precio 25k sena 5k desc 5k.
 
-- [ ] **Step 3: Stage**
+- [x] **Step 3: Stage**
 
 ```bash
 git add apps/web/src/app/conductor apps/web/src/components/conductor \
@@ -976,13 +976,13 @@ git add apps/web/src/app/conductor apps/web/src/components/conductor \
 - Modify: operador nav / `app/operador` links (settings sibling or home link “Cupones”)
 - Create: `apps/web/src/application/operador/cupones-actions.ts` or reuse `application/cupones/actions.ts` with `requireProfile(["operador"])`
 
-- [ ] **Step 1: List campañas** codigo, monto, cupos usados/totales, activa, toggle.
+- [x] **Step 1: List campañas** codigo, monto, cupos usados/totales, activa, toggle.
 
-- [ ] **Step 2: Form create** fields matching `crear_cupon_campania`.
+- [x] **Step 2: Form create** fields matching `crear_cupon_campania`.
 
-- [ ] **Step 3: Smoke** crear `PLAZA` 5000 / 10 cupos.
+- [x] **Step 3: Smoke** crear `PLAZA` 5000 / 10 cupos.
 
-- [ ] **Step 4: Stage**
+- [x] **Step 4: Stage**
 
 ```bash
 git add apps/web/src/app/operador/cupones apps/web/src/components/operador \
@@ -999,7 +999,7 @@ git add apps/web/src/app/operador/cupones apps/web/src/components/operador \
 - Create: `docs/24-cupones-status.md` (short status like other slices)
 - Modify: `docs/06-reglas-y-estados.md` — RN-02 extend one line with descuento; optional RN-CUPON pointer to spec
 
-- [ ] **Step 1: Acceptance checklist (manual)**
+- [x] **Step 1: Acceptance checklist (manual)**
 
 1. Canje `TUBI1` → wallet.  
 2. Segundo canje → error ya canjeado.  
@@ -1009,9 +1009,9 @@ git add apps/web/src/app/operador/cupones apps/web/src/components/operador \
 6. Sin cupón → flujo idéntico a antes.  
 7. `cupones.enabled=false` → canje falla.
 
-- [ ] **Step 2: `bun test` + `npm run type-check --workspace=web` + `npm run lint --workspace=web`**
+- [x] **Step 2: `bun test` + `npm run type-check --workspace=web` + `npm run lint --workspace=web`**
 
-- [ ] **Step 3: Stage docs**
+- [x] **Step 3: Stage docs**
 
 ```bash
 git add docs/24-cupones-status.md docs/06-reglas-y-estados.md \
