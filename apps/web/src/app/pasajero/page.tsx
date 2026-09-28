@@ -7,6 +7,7 @@ import { createReservasService } from "@/application/reservas";
 import {
   AppHeader,
   BtnPrimary,
+  BtnSecondary,
   EmptyHint,
   StatusPill,
   TabBar,
@@ -138,29 +139,35 @@ export default async function PasajeroPage({ searchParams }: PageProps) {
               </p>
             ) : null}
 
-            {hasConfirmedPass && !isAbordada ? (
-              <BtnPrimary asChild>
-                <Link href="/pasajero/pase">Ver mi QR</Link>
-              </BtnPrimary>
-            ) : null}
+            <div className="flex flex-col gap-2 pt-1">
+              {hasConfirmedPass && !isAbordada ? (
+                <BtnPrimary asChild>
+                  <Link href="/pasajero/pase">Ver mi QR</Link>
+                </BtnPrimary>
+              ) : null}
 
-            {isPendienteSena && !senaEnRevision ? (
-              <BtnPrimary asChild>
-                <Link href={`/pasajero/reservas/${active.reserva.id}/sena`}>
-                  {senaRechazada ? "Reenviar comprobante" : "Completar seña"}
-                </Link>
-              </BtnPrimary>
-            ) : null}
+              {isPendienteSena && !senaEnRevision ? (
+                <BtnPrimary asChild>
+                  <Link href={`/pasajero/reservas/${active.reserva.id}/sena`}>
+                    {senaRechazada ? "Reenviar comprobante" : "Completar seña"}
+                  </Link>
+                </BtnPrimary>
+              ) : null}
 
-            {senaEnRevision ? (
-              <BtnPrimary asChild>
-                <Link
-                  href={`/pasajero/reservas/${active.reserva.id}/en-revision`}
-                >
-                  Ver estado de seña
-                </Link>
-              </BtnPrimary>
-            ) : null}
+              {senaEnRevision ? (
+                <BtnPrimary asChild>
+                  <Link
+                    href={`/pasajero/reservas/${active.reserva.id}/en-revision`}
+                  >
+                    Ver estado de seña
+                  </Link>
+                </BtnPrimary>
+              ) : null}
+
+              <BtnSecondary asChild>
+                <Link href="/pasajero/buscar">Buscar otro viaje</Link>
+              </BtnSecondary>
+            </div>
           </section>
         ) : (
           <>
@@ -182,19 +189,10 @@ export default async function PasajeroPage({ searchParams }: PageProps) {
 
         <Link
           href="/pasajero/cupones"
-          className="text-center text-sm font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+          className="inline-flex h-11 w-full items-center justify-center rounded-[14px] border border-border bg-card text-sm font-semibold text-foreground"
         >
           Mis cupones
         </Link>
-
-        {active ? (
-          <Link
-            href="/pasajero/buscar"
-            className="text-center text-sm font-medium text-primary underline-offset-4 hover:underline"
-          >
-            Buscar otro viaje
-          </Link>
-        ) : null}
 
         <div className="flex-1" aria-hidden />
       </main>
