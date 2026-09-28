@@ -168,10 +168,13 @@ begin
 end;
 $$;
 
+-- Internal helpers only: no execute for authenticated/anon (see 0035).
 revoke all on function public.cupon_liberar_si_reservado(uuid) from public;
+revoke all on function public.cupon_liberar_si_reservado(uuid) from authenticated;
+revoke all on function public.cupon_liberar_si_reservado(uuid) from anon;
 revoke all on function public.cupon_marcar_usado(uuid) from public;
+revoke all on function public.cupon_marcar_usado(uuid) from authenticated;
+revoke all on function public.cupon_marcar_usado(uuid) from anon;
 revoke all on function public.cupon_expire_disponibles(uuid) from public;
-
-grant execute on function public.cupon_liberar_si_reservado(uuid) to authenticated;
-grant execute on function public.cupon_marcar_usado(uuid) to authenticated;
-grant execute on function public.cupon_expire_disponibles(uuid) to authenticated;
+revoke all on function public.cupon_expire_disponibles(uuid) from authenticated;
+revoke all on function public.cupon_expire_disponibles(uuid) from anon;
