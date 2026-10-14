@@ -25,7 +25,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
   const authError = first(params.error);
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
+    <div className="mx-auto flex h-dvh max-h-dvh w-full max-w-md flex-col overflow-hidden bg-background">
       <AppHeader showBack backHref="/" backLabel="Ir al inicio" />
       <LoginForm rol={rol} authError={authError} />
     </div>

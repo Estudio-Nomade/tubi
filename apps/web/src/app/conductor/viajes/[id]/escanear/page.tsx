@@ -26,13 +26,13 @@ export default async function ConductorEscanearPage({ params }: PageProps) {
   if (!trip) notFound();
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
+    <div className="mx-auto flex h-dvh max-h-dvh w-full max-w-md flex-col overflow-hidden bg-background">
       <AppHeader
         showBack
         backHref={`/conductor/viajes/${id}`}
         roleLabel="Conductor"
       />
-      <main className="flex flex-1 flex-col px-5 pb-6 pt-2">
+      <main className="flex min-h-0 flex-1 flex-col px-5 pb-6 pt-2 overflow-y-auto overscroll-y-contain">
         <QrScanner viajeId={id} />
       </main>
     </div>

@@ -57,7 +57,7 @@ export function LoginForm({ rol: rolParam, authError }: LoginFormProps) {
   return (
     <form
       action={formAction}
-      className="flex flex-1 flex-col gap-5 px-5 py-6"
+      className="flex min-h-0 flex-1 flex-col gap-5 px-5 py-6 overflow-y-auto overscroll-y-contain"
     >
       <div className="flex flex-col gap-2">
         <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">

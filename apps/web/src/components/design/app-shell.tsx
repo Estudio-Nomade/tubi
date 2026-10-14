@@ -5,20 +5,22 @@ import { cn } from "@/lib/utils"
 type AppShellProps = {
   children: ReactNode
   className?: string
-  /** Prefer dvh; landing may pass min-h-screen. */
+  /** Prefer h-dvh max-h-dvh; landing may override. */
   minHeightClassName?: string
 }
 
-/** Full-bleed on phones; centered column on wider viewports (max 28rem). */
+/** Full-bleed on phones; centered column on wider viewports (max 28rem).
+ * Locks to the viewport so browser chrome rubber-band doesn't lift the tab bar.
+ */
 export function AppShell({
   children,
   className,
-  minHeightClassName = "min-h-dvh",
+  minHeightClassName = "h-dvh max-h-dvh",
 }: AppShellProps) {
   return (
     <div
       className={cn(
-        "mx-auto flex w-full max-w-md flex-col bg-background",
+        "mx-auto flex w-full max-w-md flex-col overflow-hidden bg-background",
         minHeightClassName,
         className,
       )}

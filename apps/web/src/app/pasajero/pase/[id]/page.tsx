@@ -48,7 +48,7 @@ export default async function PasajeroPaseDetallePage({ params }: PageProps) {
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
+    <div className="mx-auto flex h-dvh max-h-dvh w-full max-w-md flex-col overflow-hidden bg-background">
       {/* Pencil CompactHeader: pad [16,20,8,20] gap 12 */}
       <header className="flex items-center gap-3 bg-background px-5 pb-2 pt-4">
         <Link
@@ -63,7 +63,7 @@ export default async function PasajeroPaseDetallePage({ params }: PageProps) {
         </h1>
       </header>
 
-      <main className="flex flex-1 flex-col items-center justify-center gap-5 px-5 pb-6 pt-3">
+      <main className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5 px-5 pb-6 pt-3 overflow-y-auto overscroll-y-contain">
         <QRPass
           route={`${pass.origen} → ${pass.destino}`}
           metaLine={metaLine}

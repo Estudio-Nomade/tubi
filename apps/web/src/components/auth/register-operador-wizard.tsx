@@ -99,7 +99,7 @@ export function RegisterOperadorWizard() {
     <form
       action={isFinalStep ? formAction : undefined}
       onSubmit={handleSubmit}
-      className="flex flex-1 flex-col gap-6 px-5 pb-6 pt-3"
+      className="flex min-h-0 flex-1 flex-col gap-6 px-5 pb-6 pt-3 overflow-y-auto overscroll-y-contain"
     >
       <input type="hidden" name="nombre" value={nombre} />
       <input type="hidden" name="apellido" value={apellido} />

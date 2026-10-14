@@ -59,9 +59,9 @@ export default async function CheckoutSenaPage({ params }: PageProps) {
   ];
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
+    <div className="mx-auto flex h-dvh max-h-dvh w-full max-w-md flex-col overflow-hidden bg-background">
       <AppHeader showBack backHref="/pasajero" />
-      <main className="flex flex-1 flex-col gap-5 px-5 pb-8 pt-2">
+      <main className="flex min-h-0 flex-1 flex-col gap-5 px-5 pb-8 pt-2 overflow-y-auto overscroll-y-contain">
         <ProgressDots step={2} total={3} />
 
         <div className="flex flex-col gap-1">

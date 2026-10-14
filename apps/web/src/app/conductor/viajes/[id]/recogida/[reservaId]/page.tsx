@@ -48,13 +48,13 @@ export default async function ConductorRecogidaPage({ params }: PageProps) {
     esperaMaxMin === 1 ? "1 min" : `${esperaMaxMin} min`;
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
+    <div className="mx-auto flex h-dvh max-h-dvh w-full max-w-md flex-col overflow-hidden bg-background">
       <AppHeader
         showBack
         backHref={`/conductor/viajes/${viajeId}`}
         roleLabel="Conductor"
       />
-      <main className="flex flex-1 flex-col gap-5 px-5 pb-8 pt-3">
+      <main className="flex min-h-0 flex-1 flex-col gap-5 px-5 pb-8 pt-3 overflow-y-auto overscroll-y-contain">
         <div className="flex flex-col gap-2">
           <h1 className="font-heading text-[22px] font-semibold text-foreground">
             {ctx.recogidaLabel ?? ctx.paradaLabel}

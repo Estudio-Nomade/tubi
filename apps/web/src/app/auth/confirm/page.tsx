@@ -81,7 +81,7 @@ export default function AuthConfirmPage() {
   }, [router]);
 
   return (
-    <main className="mx-auto flex min-h-dvh w-full max-w-md flex-col items-center justify-center gap-3 px-5">
+    <main className="mx-auto flex h-dvh max-h-dvh w-full max-w-md flex-col items-center justify-center gap-3 overflow-y-auto overscroll-y-contain px-5">
       <p className="text-center text-sm font-medium text-foreground">{message}</p>
     </main>
   );

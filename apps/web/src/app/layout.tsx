@@ -71,7 +71,7 @@ export default async function RootLayout({
       suppressHydrationWarning
       className={`${dmSans.variable} ${fraunces.variable} h-full antialiased`}
     >
-      <body className="flex min-h-full flex-col">
+      <body className="flex h-full flex-col overflow-hidden">
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

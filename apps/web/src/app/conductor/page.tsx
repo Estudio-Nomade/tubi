@@ -81,9 +81,9 @@ export default async function ConductorPage({
   const estadoPill = detail ? tripEstadoPill(detail.estado) : null;
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
+    <div className="mx-auto flex h-dvh max-h-dvh w-full max-w-md flex-col overflow-hidden bg-background">
       <AppHeader />
-      <main className="flex flex-1 flex-col gap-5 px-5 pb-6 pt-4">
+      <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-y-contain px-5 pb-6 pt-4">
         <div className="flex flex-col gap-2">
           <h1 className="font-heading text-[28px] font-semibold leading-tight tracking-tight text-foreground">
             Hola, {displayName || profile.nombre}

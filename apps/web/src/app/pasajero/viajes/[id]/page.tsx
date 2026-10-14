@@ -116,7 +116,7 @@ export default async function ViajeDetailPage({
     : horaSalida;
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
+    <div className="mx-auto flex h-dvh max-h-dvh w-full max-w-md flex-col overflow-hidden bg-background">
       <AppHeader showBack backHref={back.href} />
       {/* Explicit Volver keeps filters when coming from results */}
       <div className="px-5 pt-1">
@@ -128,7 +128,7 @@ export default async function ViajeDetailPage({
         </Link>
       </div>
 
-      <main className="flex flex-1 flex-col gap-5 px-5 pb-0 pt-3">
+      <main className="flex min-h-0 flex-1 flex-col gap-5 px-5 pb-0 pt-3 overflow-y-auto overscroll-y-contain">
         <header className="flex flex-col gap-1.5">
           <h1 className="font-heading text-[28px] font-semibold leading-[1.15] tracking-tight text-foreground">
             {viaje.origen} → {viaje.destino}
@@ -203,7 +203,7 @@ export default async function ViajeDetailPage({
         <div className="flex-1" aria-hidden />
       </main>
 
-      <div className="sticky bottom-0 border-t border-border bg-background px-5 pb-6 pt-4">
+      <div className="shrink-0 border-t border-border bg-background px-5 pb-6 pt-4">
         <ReservePanel
           viajeId={viaje.id}
           pickupMode={pickupMode}

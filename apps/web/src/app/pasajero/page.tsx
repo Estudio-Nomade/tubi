@@ -46,9 +46,9 @@ export default async function PasajeroPage({ searchParams }: PageProps) {
   const hasConfirmedPass = await reservas.hasConfirmedBoardingPass(profile.id);
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
+    <div className="mx-auto flex h-dvh max-h-dvh w-full max-w-md flex-col overflow-hidden bg-background">
       <AppHeader />
-      <main className="flex flex-1 flex-col gap-5 px-5 pt-4">
+      <main className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-y-contain px-5 pt-4">
         <div className="flex flex-col gap-1">
           <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">
             Hola, {profile.nombre}

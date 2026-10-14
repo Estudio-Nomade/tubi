@@ -79,7 +79,7 @@ export function TabBar({ variant, active, className, viajesHref }: TabBarProps) 
   return (
     <nav
       className={cn(
-        "sticky bottom-0 z-40 flex h-16 w-full flex-col border-t border-border bg-card",
+        "z-40 flex h-16 w-full shrink-0 flex-col border-t border-border bg-card",
         className
       )}
       aria-label="Navegación principal"
