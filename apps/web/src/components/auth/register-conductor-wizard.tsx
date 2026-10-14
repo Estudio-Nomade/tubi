@@ -8,7 +8,7 @@ import {
   type AuthActionResult,
 } from "@/application/auth";
 import { BtnPrimary, Field, ProgressDots } from "@/components/design";
-import { registerConductorSchema } from "@/domain/auth";
+import { PASSWORD_HINT, registerConductorSchema } from "@/domain/auth";
 
 const TOTAL_STEPS = 4;
 
@@ -171,6 +171,7 @@ export function RegisterConductorWizard() {
               name="password"
               type="password"
               autoComplete="new-password"
+              hint={PASSWORD_HINT}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               error={errors.password}

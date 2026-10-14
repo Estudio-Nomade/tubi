@@ -39,6 +39,15 @@ const EMAIL_NOT_CONFIRMED_PATTERNS = [
 const EMAIL_NOT_CONFIRMED_MESSAGE =
   "Todavía no confirmaste el email. Abrí el link del correo en este teléfono (revisá spam) y después volvé a ingresar.";
 
+const WEAK_PASSWORD_PATTERNS = [
+  /password should (contain|be)/i,
+  /weak.?password/i,
+  /password is too weak/i,
+] as const;
+
+const WEAK_PASSWORD_MESSAGE =
+  "La contraseña es muy débil. Usá al menos 8 caracteres con mayúscula, minúscula y un número.";
+
 export function isAuthNetworkError(message: string): boolean {
   const m = message.trim();
   if (!m) return false;
@@ -53,6 +62,9 @@ export function mapAuthError(message: string | null | undefined, fallback: strin
   if (CREDENTIALS_PATTERNS.some((re) => re.test(raw))) return CREDENTIALS_MESSAGE;
   if (EMAIL_NOT_CONFIRMED_PATTERNS.some((re) => re.test(raw))) {
     return EMAIL_NOT_CONFIRMED_MESSAGE;
+  }
+  if (WEAK_PASSWORD_PATTERNS.some((re) => re.test(raw))) {
+    return WEAK_PASSWORD_MESSAGE;
   }
   return raw;
 }

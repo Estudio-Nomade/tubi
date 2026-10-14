@@ -8,7 +8,11 @@ import {
   type AuthActionResult,
 } from "@/application/auth";
 import { BtnPrimary, Field, ProgressDots } from "@/components/design";
-import { registerPasajeroSchema } from "@/domain/auth";
+import {
+  formatDniInput,
+  PASSWORD_HINT,
+  registerPasajeroSchema,
+} from "@/domain/auth";
 
 const TOTAL_STEPS = 4;
 
@@ -20,8 +24,8 @@ async function registerAction(
   return result ?? null;
 }
 
-const STEP_TITLES = [
-  "¿Cómo te llamás?",
+  const STEP_TITLES = [
+  "¿Cuál es tu nombre completo?",
   "¿Cuál es tu DNI?",
   "¿Cómo te contactamos?",
   "Creá tu cuenta",
@@ -112,8 +116,10 @@ export function RegisterPasajeroWizard() {
       <div className="flex flex-col gap-4">
         {step === 1 ? (
           <Field
-            label="Nombre"
-            autoComplete="given-name"
+            label="Nombre completo"
+            autoComplete="name"
+            placeholder="Nombre y apellido"
+            hint="Como figura en tu DNI (nombre y apellido)."
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             error={errors.nombre}
@@ -127,8 +133,9 @@ export function RegisterPasajeroWizard() {
             label="DNI"
             inputMode="numeric"
             autoComplete="off"
+            placeholder="12.345.678"
             value={dni}
-            onChange={(e) => setDni(e.target.value)}
+            onChange={(e) => setDni(formatDniInput(e.target.value))}
             error={errors.dni}
             disabled={pending}
             required
@@ -168,6 +175,7 @@ export function RegisterPasajeroWizard() {
               name="password"
               type="password"
               autoComplete="new-password"
+              hint={PASSWORD_HINT}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               error={errors.password}
