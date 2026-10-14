@@ -1,13 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useActionState, useState, type FormEvent } from "react";
 
 import {
   signUpConductorAction,
   type AuthActionResult,
 } from "@/application/auth";
-import { BtnPrimary, Field, ProgressDots } from "@/components/design";
+import {
+  AppHeader,
+  BtnPrimary,
+  Field,
+  ProgressDots,
+} from "@/components/design";
 import { PASSWORD_HINT, registerConductorSchema } from "@/domain/auth";
 
 const TOTAL_STEPS = 4;
@@ -29,6 +35,7 @@ const STEP_TITLES = [
 
 /** Pencil C1 — same shell as P1; no “Ya tengo cuenta” in frame (we keep it for UX). */
 export function RegisterConductorWizard() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [nombre, setNombre] = useState("");
   const [apellido, setApellido] = useState("");
@@ -38,6 +45,15 @@ export function RegisterConductorWizard() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [state, formAction, pending] = useActionState(registerAction, null);
+
+  function handleHeaderBack() {
+    if (step > 1) {
+      setErrors({});
+      setStep((s) => s - 1);
+      return;
+    }
+    router.push("/");
+  }
 
   function validateCurrentStep(): boolean {
     let parsed;
@@ -96,11 +112,17 @@ export function RegisterConductorWizard() {
     : "Continuar";
 
   return (
-    <form
-      action={isFinalStep ? formAction : undefined}
-      onSubmit={handleSubmit}
-      className="flex flex-1 flex-col gap-6 px-5 pb-6 pt-3"
-    >
+    <>
+      <AppHeader
+        showBack
+        onBack={handleHeaderBack}
+        backLabel={step > 1 ? "Paso anterior" : "Ir al inicio"}
+      />
+      <form
+        action={isFinalStep ? formAction : undefined}
+        onSubmit={handleSubmit}
+        className="flex flex-1 flex-col gap-6 px-5 pb-6 pt-3"
+      >
       <input type="hidden" name="nombre" value={nombre} />
       <input type="hidden" name="apellido" value={apellido} />
       <input type="hidden" name="telefono" value={telefono} />
@@ -228,12 +250,13 @@ export function RegisterConductorWizard() {
         {step === 1 ? (
           <Link
             href="/registro"
-            className="text-center text-xs font-medium text-muted-foreground"
+            className="text-center text-sm font-medium text-muted-foreground"
           >
-            Soy pasajero
+            Registrarme como pasajero
           </Link>
         ) : null}
       </div>
     </form>
+    </>
   );
 }

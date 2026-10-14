@@ -1,11 +1,21 @@
+"use client"
+
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+const backControlClass =
+  "inline-flex size-11 items-center justify-center rounded-xl bg-muted text-foreground transition-colors hover:bg-muted/80"
+
 type AppHeaderProps = {
   showBack?: boolean
+  /** Link target when back is navigation (default `/`). */
   backHref?: string
+  /** If set, back is a button (e.g. previous wizard step) instead of a link. */
+  onBack?: () => void
+  /** Accessible name for the back control. */
+  backLabel?: string
   roleLabel?: string
   className?: string
 }
@@ -14,6 +24,8 @@ type AppHeaderProps = {
 export function AppHeader({
   showBack = false,
   backHref = "/",
+  onBack,
+  backLabel = "Volver",
   roleLabel,
   className,
 }: AppHeaderProps) {
@@ -26,13 +38,24 @@ export function AppHeader({
     >
       <div className="flex w-11 shrink-0 items-center justify-start">
         {showBack ? (
-          <Link
-            href={backHref}
-            className="inline-flex size-11 items-center justify-center rounded-xl bg-muted text-foreground transition-colors hover:bg-muted/80"
-            aria-label="Volver"
-          >
-            <ChevronLeft className="size-5" />
-          </Link>
+          onBack ? (
+            <button
+              type="button"
+              onClick={onBack}
+              className={backControlClass}
+              aria-label={backLabel}
+            >
+              <ChevronLeft className="size-5" />
+            </button>
+          ) : (
+            <Link
+              href={backHref}
+              className={backControlClass}
+              aria-label={backLabel}
+            >
+              <ChevronLeft className="size-5" />
+            </Link>
+          )
         ) : (
           <span className="size-11" aria-hidden />
         )}

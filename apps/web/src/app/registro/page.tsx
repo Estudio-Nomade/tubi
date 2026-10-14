@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import { RegisterPasajeroWizard } from "@/components/auth/register-pasajero-wizard";
-import { AppHeader } from "@/components/design";
 
 export const metadata: Metadata = {
   title: "Crear cuenta",
@@ -11,7 +10,6 @@ export const metadata: Metadata = {
 export default function RegistroPasajeroPage() {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
-      <AppHeader showBack backHref="/login?rol=pasajero" />
       <RegisterPasajeroWizard />
     </div>
   );

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
+import { Car } from "lucide-react";
 
 import {
   signInAction,
@@ -111,18 +112,19 @@ export function LoginForm({ rol: rolParam, authError }: LoginFormProps) {
           </Link>
         ) : null}
 
-        {isConductor || isOperador ? (
+        {isConductor ? (
           <Link
-            href="/login?rol=pasajero"
-            className="text-center text-xs font-medium text-muted-foreground"
+            href="/login"
+            className="text-center text-sm font-medium text-muted-foreground"
           >
-            Soy pasajero
+            Ingresar como pasajero
           </Link>
-        ) : (
+        ) : isOperador ? null : (
           <Link
             href="/login?rol=conductor"
-            className="text-center text-xs font-medium text-muted-foreground"
+            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
           >
+            <Car className="size-4 shrink-0 text-muted-foreground" aria-hidden />
             Soy conductor
           </Link>
         )}

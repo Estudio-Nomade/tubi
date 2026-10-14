@@ -1,13 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useActionState, useState, type FormEvent } from "react";
 
 import {
   signUpPasajeroAction,
   type AuthActionResult,
 } from "@/application/auth";
-import { BtnPrimary, Field, ProgressDots } from "@/components/design";
+import {
+  AppHeader,
+  BtnPrimary,
+  Field,
+  ProgressDots,
+} from "@/components/design";
 import {
   formatDniInput,
   PASSWORD_HINT,
@@ -33,6 +39,7 @@ const STEP_TITLES = [
 
 /** Pencil P1 — ProgressDots, title, field, spacer, CTA, “Ya tengo cuenta”. */
 export function RegisterPasajeroWizard() {
+  const router = useRouter();
   const [step, setStep] = useState(1);
   const [nombre, setNombre] = useState("");
   const [dni, setDni] = useState("");
@@ -42,6 +49,15 @@ export function RegisterPasajeroWizard() {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [state, formAction, pending] = useActionState(registerAction, null);
+
+  function handleHeaderBack() {
+    if (step > 1) {
+      setErrors({});
+      setStep((s) => s - 1);
+      return;
+    }
+    router.push("/");
+  }
 
   function validateCurrentStep(): boolean {
     let parsed;
@@ -98,11 +114,17 @@ export function RegisterPasajeroWizard() {
     : "Continuar";
 
   return (
-    <form
-      action={isFinalStep ? formAction : undefined}
-      onSubmit={handleSubmit}
-      className="flex flex-1 flex-col gap-6 px-5 pb-6 pt-3"
-    >
+    <>
+      <AppHeader
+        showBack
+        onBack={handleHeaderBack}
+        backLabel={step > 1 ? "Paso anterior" : "Ir al inicio"}
+      />
+      <form
+        action={isFinalStep ? formAction : undefined}
+        onSubmit={handleSubmit}
+        className="flex flex-1 flex-col gap-6 px-5 pb-6 pt-3"
+      >
       <input type="hidden" name="nombre" value={nombre} />
       <input type="hidden" name="dni" value={dni} />
       <input type="hidden" name="telefono" value={telefono} />
@@ -232,12 +254,13 @@ export function RegisterPasajeroWizard() {
         {step === 1 ? (
           <Link
             href="/registro/conductor"
-            className="text-center text-xs font-medium text-muted-foreground"
+            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
           >
             Soy conductor
           </Link>
         ) : null}
       </div>
     </form>
+    </>
   );
 }
