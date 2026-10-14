@@ -24,7 +24,7 @@ async function registerAction(
   return result ?? null;
 }
 
-  const STEP_TITLES = [
+const STEP_TITLES = [
   "¿Cuál es tu nombre completo?",
   "¿Cuál es tu DNI?",
   "¿Cómo te contactamos?",

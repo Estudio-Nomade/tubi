@@ -35,15 +35,19 @@ const dniSchema = z
       .regex(/^\d+$/, "DNI solo puede contener números"),
   );
 
-/** Nombre + apellido (al menos dos palabras). */
+/** Nombre + apellido (al menos dos palabras); colapsa espacios internos. */
 const nombreCompletoSchema = z
   .string()
-  .trim()
-  .min(1, "Nombre completo requerido")
-  .max(100)
-  .refine((v) => v.split(/\s+/).filter(Boolean).length >= 2, {
-    message: "Escribí nombre y apellido",
-  });
+  .transform((v) => v.trim().replace(/\s+/g, " "))
+  .pipe(
+    z
+      .string()
+      .min(1, "Nombre completo requerido")
+      .max(100)
+      .refine((v) => v.split(" ").filter(Boolean).length >= 2, {
+        message: "Escribí nombre y apellido",
+      }),
+  );
 
 export const loginSchema = z.object({
   email: emailSchema,
