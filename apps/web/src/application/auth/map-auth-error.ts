@@ -31,6 +31,14 @@ const CREDENTIALS_PATTERNS = [
 const CREDENTIALS_MESSAGE =
   "Email o contraseña incorrectos.";
 
+const EMAIL_NOT_CONFIRMED_PATTERNS = [
+  /email not confirmed/i,
+  /email_not_confirmed/i,
+] as const;
+
+const EMAIL_NOT_CONFIRMED_MESSAGE =
+  "Todavía no confirmaste el email. Abrí el link del correo en este teléfono (revisá spam) y después volvé a ingresar.";
+
 export function isAuthNetworkError(message: string): boolean {
   const m = message.trim();
   if (!m) return false;
@@ -43,5 +51,8 @@ export function mapAuthError(message: string | null | undefined, fallback: strin
   if (!raw) return fallback;
   if (isAuthNetworkError(raw)) return NETWORK_MESSAGE;
   if (CREDENTIALS_PATTERNS.some((re) => re.test(raw))) return CREDENTIALS_MESSAGE;
+  if (EMAIL_NOT_CONFIRMED_PATTERNS.some((re) => re.test(raw))) {
+    return EMAIL_NOT_CONFIRMED_MESSAGE;
+  }
   return raw;
 }
