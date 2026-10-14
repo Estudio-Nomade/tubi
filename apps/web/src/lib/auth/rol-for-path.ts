@@ -1,8 +1,8 @@
 /**
- * Maps a role-area path to its role, so the auth middleware can preserve role
- * context when it bounces an anonymous user to /login (e.g. /operador → login
- * "Cuenta de operador" → /registro/operador).
- */
+  * Maps a role-area path to its role, so the auth middleware can preserve role
+  * context when it bounces an anonymous user to /login (e.g. /operador →
+  * /login?rol=operador). Operator self-signup is closed; login only.
+  */
 
 export type RolContext = "pasajero" | "conductor" | "operador";
 

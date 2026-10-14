@@ -38,11 +38,8 @@ export function LoginForm({ rol: rolParam }: LoginFormProps) {
   const rol = parseRol(rolParam);
   const isConductor = rol === "conductor";
   const isOperador = rol === "operador";
-  const createHref = isConductor
-    ? "/registro/conductor"
-    : isOperador
-      ? "/registro/operador"
-      : "/registro";
+  const createHref = isConductor ? "/registro/conductor" : "/registro";
+  const showCreateAccount = !isOperador;
   const subtitle = isConductor
     ? "Cuenta de conductor"
     : isOperador
@@ -100,12 +97,14 @@ export function LoginForm({ rol: rolParam }: LoginFormProps) {
           {pending ? "Ingresando…" : "Continuar"}
         </BtnPrimary>
 
-        <Link
-          href={createHref}
-          className="text-center text-sm font-medium text-primary"
-        >
-          Crear cuenta
-        </Link>
+        {showCreateAccount ? (
+          <Link
+            href={createHref}
+            className="text-center text-sm font-medium text-primary"
+          >
+            Crear cuenta
+          </Link>
+        ) : null}
 
         {isConductor || isOperador ? (
           <Link

@@ -57,3 +57,7 @@ supabase/.temp/
 _bmad/render/
 # Git worktrees
 .worktrees/
+
+.codegraph/
+.vercel/
+apps/web/.vercel/

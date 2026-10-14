@@ -25,11 +25,9 @@ export default async function LoginPage({ searchParams }: PageProps) {
   const backHref =
     rol === "conductor"
       ? "/registro/conductor"
-      : rol === "operador"
-        ? "/registro/operador"
-        : rol === "pasajero"
-          ? "/registro"
-          : "/";
+      : rol === "pasajero"
+        ? "/registro"
+        : "/";
 
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">

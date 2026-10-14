@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowUpDown } from "lucide-react";
 
-import { BtnPrimary, Field } from "@/components/design";
+import { BtnPrimary } from "@/components/design";
+import { CityField } from "@/components/pasajero/city-field";
 
 type SearchFormProps = {
   defaultOrigen?: string;
@@ -18,18 +19,28 @@ export function SearchForm({
   const router = useRouter();
   const [origen, setOrigen] = useState(defaultOrigen);
   const [destino, setDestino] = useState(defaultDestino);
+  const [error, setError] = useState<string | null>(null);
 
   function swap() {
     setOrigen(destino);
     setDestino(origen);
+    setError(null);
   }
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const params = new URLSearchParams({
-      origen: origen.trim(),
-      destino: destino.trim(),
-    });
+    const o = origen.trim();
+    const d = destino.trim();
+    if (!o || !d) {
+      setError("Elegí origen y destino de la lista.");
+      return;
+    }
+    if (o.toLowerCase() === d.toLowerCase()) {
+      setError("Origen y destino tienen que ser distintos.");
+      return;
+    }
+    setError(null);
+    const params = new URLSearchParams({ origen: o, destino: d });
     router.push(`/pasajero/resultados?${params.toString()}`);
   }
 
@@ -41,13 +52,12 @@ export function SearchForm({
       className="flex flex-col gap-5"
     >
       <div className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-4 shadow-sm">
-        <Field
+        <CityField
           label="Origen"
           name="origen"
           value={origen}
-          onChange={(e) => setOrigen(e.target.value)}
+          onChange={setOrigen}
           required
-          autoComplete="off"
         />
         <div className="flex justify-center">
           <button
@@ -59,19 +69,24 @@ export function SearchForm({
             <ArrowUpDown className="size-5" strokeWidth={1.75} />
           </button>
         </div>
-        <Field
+        <CityField
           label="Destino"
           name="destino"
           value={destino}
-          onChange={(e) => setDestino(e.target.value)}
+          onChange={setDestino}
           required
-          autoComplete="off"
         />
       </div>
 
+      {error ? (
+        <p className="text-sm font-medium text-destructive" role="alert">
+          {error}
+        </p>
+      ) : null}
+
       <BtnPrimary type="submit">Ver viajes</BtnPrimary>
       <p className="text-center text-xs font-medium text-muted-foreground">
-        Vas a ver los días con viajes cargados por Tubi.
+        Escribí unas letras y elegí la ciudad de la lista.
       </p>
     </form>
   );
