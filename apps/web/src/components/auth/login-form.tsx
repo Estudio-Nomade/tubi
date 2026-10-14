@@ -28,14 +28,19 @@ function parseRol(value: string | undefined): LoginRolContext | null {
 
 type LoginFormProps = {
   rol?: string;
+  authError?: string;
 };
 
 /** Pencil P10 — title, sub, fields, spacer, CTA, create link. */
-export function LoginForm({ rol: rolParam }: LoginFormProps) {
+export function LoginForm({ rol: rolParam, authError }: LoginFormProps) {
   const [state, formAction, pending] = useActionState(loginAction, null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const rol = parseRol(rolParam);
+  const callbackError =
+    authError === "auth_callback"
+      ? "No se pudo confirmar el email. Probá de nuevo o pedí otro link."
+      : null;
   const isConductor = rol === "conductor";
   const isOperador = rol === "operador";
   const createHref = isConductor ? "/registro/conductor" : "/registro";
@@ -84,9 +89,9 @@ export function LoginForm({ rol: rolParam }: LoginFormProps) {
         />
       </div>
 
-      {state?.error ? (
+      {callbackError || state?.error ? (
         <p className="text-sm text-destructive" role="alert">
-          {state.error}
+          {callbackError ?? state?.error}
         </p>
       ) : null}
 

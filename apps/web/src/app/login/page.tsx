@@ -22,6 +22,7 @@ function first(
 export default async function LoginPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const rol = first(params.rol);
+  const authError = first(params.error);
   const backHref =
     rol === "conductor"
       ? "/registro/conductor"
@@ -32,7 +33,7 @@ export default async function LoginPage({ searchParams }: PageProps) {
   return (
     <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col bg-background">
       <AppHeader showBack backHref={backHref} />
-      <LoginForm rol={rol} />
+      <LoginForm rol={rol} authError={authError} />
     </div>
   );
 }

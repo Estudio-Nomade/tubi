@@ -187,16 +187,35 @@ export function RegisterConductorWizard() {
         </p>
       ) : null}
 
+      {state?.needsEmailConfirmation ? (
+        <div
+          className="rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground"
+          role="status"
+        >
+          <p>Te enviamos un email para confirmar tu cuenta.</p>
+          <p className="mt-1 text-muted-foreground">
+            Abrí el link del correo y vas a entrar a Tubi. Revisá spam si no lo
+            ves.
+          </p>
+        </div>
+      ) : null}
+
       <div className="flex-1" aria-hidden />
 
       <div className="flex flex-col gap-4">
-        <BtnPrimary
-          type={isFinalStep ? "submit" : "button"}
-          onClick={isFinalStep ? undefined : handleContinue}
-          disabled={pending}
-        >
-          {ctaLabel}
-        </BtnPrimary>
+        {state?.needsEmailConfirmation ? (
+          <BtnPrimary asChild>
+            <Link href="/login?rol=conductor">Ir a ingresar</Link>
+          </BtnPrimary>
+        ) : (
+          <BtnPrimary
+            type={isFinalStep ? "submit" : "button"}
+            onClick={isFinalStep ? undefined : handleContinue}
+            disabled={pending}
+          >
+            {ctaLabel}
+          </BtnPrimary>
+        )}
 
         <Link
           href="/login?rol=conductor"

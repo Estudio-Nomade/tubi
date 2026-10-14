@@ -21,13 +21,18 @@ import {
   registerPasajeroSchema,
 } from "@/domain/auth";
 import type { Profile } from "@/domain/auth";
+import { getAuthCallbackUrl } from "@/lib/auth/app-origin";
 import { normalizarNombrePila } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
 import { createAuthService, homePathForRol } from "./auth-service";
 import { mapAuthError } from "./map-auth-error";
 
-export type AuthActionResult = { error: string };
+export type AuthActionResult = {
+  error?: string;
+  /** Email confirmation required — show message, do not redirect yet. */
+  needsEmailConfirmation?: boolean;
+};
 
 function formString(formData: FormData, key: string): string {
   const value = formData.get(key);
@@ -129,30 +134,32 @@ export async function signUpPasajeroAction(
   const { nombre, dni, telefono, email, password } = parsed.data;
   const { supabase, service } = await getAuthService();
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: getAuthCallbackUrl("/pasajero"),
+      data: {
+        rol: "pasajero",
+        nombre,
+        telefono,
+        dni,
+      },
+    },
+  });
 
   if (error) {
     return { error: mapAuthError(error.message, "No se pudo crear la cuenta") };
   }
 
-  let userId = data.user?.id ?? null;
-
-  // No session after signUp (email confirm ON) — sign in so RLS insert works.
-  if (!data.session) {
-    const signIn = await supabase.auth.signInWithPassword({ email, password });
-    if (signIn.error || !signIn.data.user) {
-      return {
-        error: mapAuthError(
-          signIn.error?.message,
-          "Cuenta creada. Confirmá el email antes de continuar.",
-        ),
-      };
-    }
-    userId = signIn.data.user.id;
-  }
-
+  const userId = data.user?.id ?? null;
   if (!userId) {
     return { error: "No se pudo crear la cuenta" };
+  }
+
+  // Email confirmation ON → no session until the user clicks the mail link.
+  if (!data.session) {
+    return { needsEmailConfirmation: true };
   }
 
   try {
@@ -193,29 +200,31 @@ export async function signUpConductorAction(
   const nombreNormalizado = normalizarNombrePila(nombre, apellido);
   const { supabase, service } = await getAuthService();
 
-  const { data, error } = await supabase.auth.signUp({ email, password });
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      emailRedirectTo: getAuthCallbackUrl("/conductor"),
+      data: {
+        rol: "conductor",
+        nombre: nombreNormalizado,
+        apellido,
+        telefono,
+      },
+    },
+  });
 
   if (error) {
     return { error: mapAuthError(error.message, "No se pudo crear la cuenta") };
   }
 
-  let userId = data.user?.id ?? null;
-
-  if (!data.session) {
-    const signIn = await supabase.auth.signInWithPassword({ email, password });
-    if (signIn.error || !signIn.data.user) {
-      return {
-        error: mapAuthError(
-          signIn.error?.message,
-          "Cuenta creada. Confirmá el email antes de continuar.",
-        ),
-      };
-    }
-    userId = signIn.data.user.id;
-  }
-
+  const userId = data.user?.id ?? null;
   if (!userId) {
     return { error: "No se pudo crear la cuenta" };
+  }
+
+  if (!data.session) {
+    return { needsEmailConfirmation: true };
   }
 
   try {
