@@ -27,11 +27,11 @@ export function QRPass({
   return (
     <article
       className={cn(
-        "flex w-full max-w-[335px] flex-col items-center gap-4 rounded-2xl border border-border/60 bg-[#FFFCF7] px-5 py-5 shadow-[0_4px_16px_rgba(28,25,23,0.06)]",
+        "flex w-full max-w-[335px] flex-col items-center gap-4 rounded-2xl border border-border/60 bg-card px-5 py-5 shadow-[0_4px_16px_rgba(0,0,0,0.06)]",
         className
       )}
     >
-      <span className="inline-flex items-center justify-center rounded-full bg-[#E4EDE5] px-2.5 py-1.5 text-xs font-semibold tracking-wide text-[#5F7A61]">
+      <span className="inline-flex items-center justify-center rounded-full bg-[#E8F5E9] px-2.5 py-1.5 text-xs font-semibold tracking-wide text-[#1B5E20]">
         Confirmada
       </span>
 
@@ -49,14 +49,14 @@ export function QRPass({
         ) : null}
       </div>
 
-      <div className="flex size-[200px] shrink-0 items-center justify-center rounded-xl bg-[#EFE8DC] p-2.5">
+      <div className="flex size-[200px] shrink-0 items-center justify-center rounded-xl bg-muted p-2.5">
         {qrToken ? (
           <QRCodeSVG
             value={qrToken}
             size={180}
             level="M"
-            bgColor="#EFE8DC"
-            fgColor="#1C1917"
+            bgColor="#EEEEEE"
+            fgColor="#000000"
             marginSize={0}
             title="Código QR de abordaje"
             className="size-full max-h-[180px] max-w-[180px]"

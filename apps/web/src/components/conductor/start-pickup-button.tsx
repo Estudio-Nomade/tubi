@@ -33,7 +33,7 @@ export function StartPickupButton({
         {pending ? "Abriendo…" : label}
       </BtnPrimary>
       {error ? (
-        <p className="text-center text-sm font-medium text-[#B42318]" role="alert">
+        <p className="text-center text-sm font-medium text-[#E11900]" role="alert">
           {error}
         </p>
       ) : null}

@@ -37,7 +37,7 @@ export function PickupActions({
       <div className="mt-auto flex w-full flex-col gap-3">
         {timerDone ? (
           <p
-            className="rounded-xl bg-[#FCEBEA] px-3 py-2 text-center text-sm font-semibold text-[#B42318]"
+            className="rounded-xl bg-[#FCE8E6] px-3 py-2 text-center text-sm font-semibold text-[#E11900]"
             role="status"
           >
             Se acabó la espera. Si no está, marcá “No llegó” y seguí.

@@ -75,7 +75,7 @@ export default async function ConfirmarSenaPage({ params }: PageProps) {
         </section>
 
         {/* Comprobante preview — Pencil h 160 surface-2 */}
-        <section className="flex min-h-40 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-2xl bg-[#EFE8DC]">
+        <section className="flex min-h-40 flex-col items-center justify-center gap-2.5 overflow-hidden rounded-2xl bg-muted">
           {detail.signedComprobanteUrl && detail.comprobanteIsImage ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img

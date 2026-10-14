@@ -151,19 +151,19 @@ export function QrScanner({ viajeId }: QrScannerProps) {
       <div
         className={`flex items-center justify-center rounded-xl px-3.5 py-2.5 transition-colors ${
           pending
-            ? "bg-[#F3E0D4]"
+            ? "bg-muted"
             : formError
-              ? "bg-[#FCEBEA]"
-              : "bg-[#E4EDE5]"
+              ? "bg-[#FCE8E6]"
+              : "bg-[#E8F5E9]"
         }`}
       >
         <p
           className={`text-sm font-semibold ${
             pending
-              ? "text-[#C45C26]"
+              ? "text-foreground"
               : formError
-                ? "text-[#B42318]"
-                : "text-[#5F7A61]"
+                ? "text-destructive"
+                : "text-[#1B5E20]"
           }`}
         >
           {pending
@@ -174,7 +174,7 @@ export function QrScanner({ viajeId }: QrScannerProps) {
         </p>
       </div>
 
-      <div className="relative flex min-h-[300px] flex-1 flex-col items-center justify-center overflow-hidden rounded-2xl bg-[#292524]">
+      <div className="relative flex min-h-[300px] flex-1 flex-col items-center justify-center overflow-hidden rounded-2xl bg-black">
         <div
           id={regionId}
           className="absolute inset-0 w-full overflow-hidden [&_video]:h-full [&_video]:w-full [&_video]:object-cover"
@@ -187,15 +187,15 @@ export function QrScanner({ viajeId }: QrScannerProps) {
             <div
               className={`flex size-[220px] items-center justify-center rounded-2xl border-[3px] transition-colors ${
                 pending
-                  ? "border-[#C45C26]"
+                  ? "border-white"
                   : formError
-                    ? "border-[#B42318]"
-                    : "border-primary"
+                    ? "border-destructive"
+                    : "border-white"
               }`}
             >
               {!pending ? (
                 <Scan
-                  className="size-12 text-primary-foreground/40"
+                  className="size-12 text-white/40"
                   strokeWidth={1.5}
                 />
               ) : null}
@@ -209,9 +209,9 @@ export function QrScanner({ viajeId }: QrScannerProps) {
         )}
 
         {pending ? (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-[#292524]/75">
-            <Loader2 className="size-10 animate-spin text-primary" />
-            <p className="text-sm font-semibold text-[#FFFCF7]">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/75">
+            <Loader2 className="size-10 animate-spin text-white" />
+            <p className="text-sm font-semibold text-white">
               Validando reserva…
             </p>
           </div>
@@ -243,9 +243,9 @@ export function QrScanner({ viajeId }: QrScannerProps) {
           />
         </label>
         {formError ? (
-          <div className="rounded-xl bg-[#FCEBEA] px-3.5 py-3" role="alert">
-            <p className="text-sm font-semibold text-[#B42318]">Error</p>
-            <p className="text-[13px] font-normal text-[#B42318]">{formError}</p>
+          <div className="rounded-xl bg-[#FCE8E6] px-3.5 py-3" role="alert">
+            <p className="text-sm font-semibold text-[#E11900]">Error</p>
+            <p className="text-[13px] font-normal text-[#E11900]">{formError}</p>
           </div>
         ) : null}
         <BtnPrimary type="submit" disabled={pending || !manual.trim()}>

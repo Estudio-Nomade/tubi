@@ -95,7 +95,7 @@ export default async function ConductorPage({
 
         {ok === "vehiculo" ? (
           <p
-            className="rounded-xl bg-[#E4EDE5] px-3 py-2 text-sm font-medium text-[#5F7A61]"
+            className="rounded-xl bg-[#E8F5E9] px-3 py-2 text-sm font-medium text-[#1B5E20]"
             role="status"
           >
             Vehículo registrado. Cuando el operador te asigne un viaje, aparece acá.

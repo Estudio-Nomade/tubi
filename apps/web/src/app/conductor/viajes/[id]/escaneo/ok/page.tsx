@@ -50,8 +50,8 @@ export default async function ConductorEscaneoOkPage({
         roleLabel="Conductor"
       />
       <main className="flex flex-1 flex-col items-center gap-5 px-5 pb-8 pt-4">
-        <div className="flex size-[72px] items-center justify-center rounded-full bg-[#E4EDE5] shadow-[0_0_0_8px_rgba(228,237,229,0.55)]">
-          <Check className="size-8 text-[#5F7A61]" strokeWidth={2.5} />
+        <div className="flex size-[72px] items-center justify-center rounded-full bg-[#E8F5E9] shadow-[0_0_0_8px_rgba(232,245,233,0.55)]">
+          <Check className="size-8 text-[#1B5E20]" strokeWidth={2.5} />
         </div>
 
         <div className="flex flex-col items-center gap-2.5">

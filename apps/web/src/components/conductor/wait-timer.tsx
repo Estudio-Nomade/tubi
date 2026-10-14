@@ -77,7 +77,7 @@ export function WaitTimer({ maxMinutes, storageKey, onExpired, className }: Prop
     <div
       className={cn(
         "flex flex-col items-center justify-center gap-1",
-        isExpired && "rounded-2xl bg-[#FCEBEA] px-4 py-6",
+        isExpired && "rounded-2xl bg-[#FCE8E6] px-4 py-6",
         className,
       )}
       role="timer"
@@ -87,7 +87,7 @@ export function WaitTimer({ maxMinutes, storageKey, onExpired, className }: Prop
       <p
         className={cn(
           "font-heading text-[40px] font-semibold tabular-nums leading-none",
-          isExpired ? "text-[#B42318]" : "text-foreground",
+          isExpired ? "text-[#E11900]" : "text-foreground",
         )}
       >
         {formatMmSs(display)}
@@ -95,7 +95,7 @@ export function WaitTimer({ maxMinutes, storageKey, onExpired, className }: Prop
       <p
         className={cn(
           "text-xs font-medium",
-          isExpired ? "text-[#B42318]" : "text-muted-foreground",
+          isExpired ? "text-[#E11900]" : "text-muted-foreground",
         )}
       >
         {isExpired ? "tiempo agotado" : "tiempo de espera"}

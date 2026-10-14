@@ -21,7 +21,7 @@ export function BtnDanger({
       data-slot="btn-danger"
       type={asChild ? undefined : type}
       className={cn(
-        "inline-flex h-13 w-full shrink-0 items-center justify-center rounded-[14px] bg-[#FCEBEA] px-4 text-[17px] font-semibold text-[#B42318] transition-all outline-none select-none hover:bg-[#FCEBEA]/85 focus-visible:ring-3 focus-visible:ring-destructive/30 active:translate-y-px disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex h-13 w-full shrink-0 items-center justify-center rounded-[14px] bg-[#FCE8E6] px-4 text-[17px] font-semibold text-[#E11900] transition-all outline-none select-none hover:bg-[#FCE8E6]/85 focus-visible:ring-3 focus-visible:ring-destructive/30 active:translate-y-px disabled:pointer-events-none disabled:opacity-50",
         className
       )}
       {...props}

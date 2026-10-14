@@ -100,7 +100,7 @@ export default async function ConductorViajePage({
 
         {okAbordada ? (
           <p
-            className="rounded-xl bg-[#E4EDE5] px-3 py-2 text-sm font-medium text-[#5F7A61]"
+            className="rounded-xl bg-[#E8F5E9] px-3 py-2 text-sm font-medium text-[#1B5E20]"
             role="status"
           >
             {viajeEnCurso
@@ -111,7 +111,7 @@ export default async function ConductorViajePage({
 
         {okNoshow ? (
           <p
-            className="rounded-xl bg-[#FCEBEA] px-3 py-2 text-sm font-medium text-[#B42318]"
+            className="rounded-xl bg-[#FCE8E6] px-3 py-2 text-sm font-medium text-[#E11900]"
             role="status"
           >
             {viajeEnCurso
@@ -122,7 +122,7 @@ export default async function ConductorViajePage({
 
         {okCompletado || trip.estado === "completado" ? (
           <p
-            className="rounded-xl bg-[#E4EDE5] px-3 py-2 text-sm font-medium text-[#5F7A61]"
+            className="rounded-xl bg-[#E8F5E9] px-3 py-2 text-sm font-medium text-[#1B5E20]"
             role="status"
           >
             {okCompletado

@@ -133,7 +133,7 @@ export function CrearViajeForm({
     <form action={formAction} className="flex flex-col gap-4">
       {state?.error ? (
         <p
-          className="rounded-xl bg-[#FCEBEA] px-3 py-2 text-sm font-medium text-[#B42318]"
+          className="rounded-xl bg-[#FCE8E6] px-3 py-2 text-sm font-medium text-[#E11900]"
           role="alert"
         >
           {state.error}

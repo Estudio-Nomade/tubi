@@ -46,8 +46,8 @@ export default async function ConductorEscaneoErrorPage({
         roleLabel="Conductor"
       />
       <main className="flex flex-1 flex-col items-center gap-5 px-5 pb-8 pt-4">
-        <div className="flex size-[72px] items-center justify-center rounded-full bg-[#FCEBEA] shadow-[0_0_0_8px_rgba(252,235,234,0.55)]">
-          <X className="size-8 text-[#B42318]" strokeWidth={2.5} />
+        <div className="flex size-[72px] items-center justify-center rounded-full bg-[#FCE8E6] shadow-[0_0_0_8px_rgba(252,232,230,0.55)]">
+          <X className="size-8 text-[#E11900]" strokeWidth={2.5} />
         </div>
 
         <div className="flex flex-col items-center gap-2">
@@ -59,11 +59,11 @@ export default async function ConductorEscaneoErrorPage({
           </p>
         </div>
 
-        <div className="flex w-full flex-col gap-1 rounded-xl bg-[#FCEBEA] p-3.5">
-          <p className="text-sm font-semibold text-[#B42318]">
+        <div className="flex w-full flex-col gap-1 rounded-xl bg-[#FCE8E6] p-3.5">
+          <p className="text-sm font-semibold text-[#E11900]">
             {isAlready ? "Sin cambios" : "No autorizado"}
           </p>
-          <p className="text-[13px] font-normal leading-snug text-[#B42318]">
+          <p className="text-[13px] font-normal leading-snug text-[#E11900]">
             {isAlready
               ? "Este pasajero ya figura como verificado en el viaje."
               : "Pedile que abra el QR de esta reserva en Tubi."}

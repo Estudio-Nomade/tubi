@@ -19,7 +19,7 @@ export function CampaniaActivaToggle({ id, activa }: Props) {
   return (
     <div className="flex flex-col gap-1.5">
       {error ? (
-        <p className="text-xs font-medium text-[#B42318]" role="alert">
+        <p className="text-xs font-medium text-[#E11900]" role="alert">
           {error}
         </p>
       ) : null}

@@ -27,7 +27,7 @@ export function Segmented<T extends string>({
     <div
       role="radiogroup"
       className={cn(
-        "flex h-11 w-full items-center gap-1 rounded-xl bg-[#EFE8DC] p-1",
+        "flex h-11 w-full items-center gap-1 rounded-xl bg-muted p-1",
         className
       )}
     >
@@ -44,7 +44,7 @@ export function Segmented<T extends string>({
             className={cn(
               "flex h-full flex-1 items-center justify-center rounded-lg text-sm transition-colors",
               active
-                ? "bg-[#FFFCF7] font-semibold text-foreground shadow-sm"
+                ? "bg-card font-semibold text-foreground shadow-sm"
                 : "font-medium text-muted-foreground hover:text-foreground",
               disabled && "pointer-events-none opacity-60"
             )}

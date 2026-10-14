@@ -58,7 +58,7 @@ export default async function PasajeroPage({ searchParams }: PageProps) {
 
         {justCreated ? (
           <p
-            className="rounded-xl bg-[#E4EDE5] px-3 py-2 text-sm font-medium text-[#5F7A61]"
+            className="rounded-xl bg-[#E8F5E9] px-3 py-2 text-sm font-medium text-[#1B5E20]"
             role="status"
           >
             Reserva creada. Pendiente de seña.
@@ -101,9 +101,9 @@ export default async function PasajeroPage({ searchParams }: PageProps) {
             </div>
 
             {isPendienteSena ? (
-              <div className="flex items-center justify-between gap-3 rounded-xl bg-[#F3E0D4]/70 px-3 py-2.5">
+              <div className="flex items-center justify-between gap-3 rounded-xl bg-muted px-3 py-2.5">
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-xs font-medium text-[#C45C26]">
+                  <span className="text-xs font-medium text-foreground">
                     {senaEnRevision
                       ? "Seña enviada"
                       : senaRechazada

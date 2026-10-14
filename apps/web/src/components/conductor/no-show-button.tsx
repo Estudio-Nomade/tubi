@@ -34,8 +34,8 @@ export function NoShowButton({ viajeId, reservaId, timerDone }: Props) {
   return (
     <div className="flex w-full flex-col gap-2">
       {error ? (
-        <div className="rounded-xl bg-[#FCEBEA] px-3.5 py-3" role="alert">
-          <p className="text-sm font-semibold text-[#B42318]">{error}</p>
+        <div className="rounded-xl bg-[#FCE8E6] px-3.5 py-3" role="alert">
+          <p className="text-sm font-semibold text-[#E11900]">{error}</p>
         </div>
       ) : null}
       <BtnDanger type="button" disabled={pending} onClick={markNoShow}>

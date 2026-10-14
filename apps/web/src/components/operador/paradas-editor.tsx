@@ -128,7 +128,7 @@ function ParadaForm({
 
       {error ? (
         <p
-          className="rounded-xl bg-[#FCEBEA] px-3 py-2 text-sm font-medium text-[#B42318]"
+          className="rounded-xl bg-[#FCE8E6] px-3 py-2 text-sm font-medium text-[#E11900]"
           role="alert"
         >
           {error}
@@ -182,14 +182,14 @@ export function ParadasEditor({ ruta, paradas }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="rounded-xl bg-[#EFE8DC] px-3 py-2 text-sm font-medium text-[#1C1917]">
+      <p className="rounded-xl bg-muted px-3 py-2 text-sm font-medium text-foreground">
         Paradas de la ruta {ruta.origen} ↔ {ruta.destino} — aplica a todos los
         viajes de esta ruta.
       </p>
 
       {error ? (
         <p
-          className="rounded-xl bg-[#FCEBEA] px-3 py-2 text-sm font-medium text-[#B42318]"
+          className="rounded-xl bg-[#FCE8E6] px-3 py-2 text-sm font-medium text-destructive"
           role="alert"
         >
           {error}

@@ -1,11 +1,10 @@
 import { cn } from "@/lib/utils"
 
 const VARIANT_CLASS = {
-  ok: "bg-[#E4EDE5] text-[#5F7A61]",
-  /** Pencil accent-soft + accent — pendiente seña */
-  pending: "bg-[#F3E0D4] text-[#C45C26]",
-  neutral: "bg-[#EFE8DC] text-[#1C1917]",
-  danger: "bg-[#FCEBEA] text-[#B42318]",
+  ok: "bg-[#E8F5E9] text-[#1B5E20]",
+  pending: "bg-[#EEEEEE] text-[#000000]",
+  neutral: "bg-[#EEEEEE] text-[#000000]",
+  danger: "bg-[#FCE8E6] text-[#E11900]",
 } as const
 
 export type StatusPillVariant = keyof typeof VARIANT_CLASS
