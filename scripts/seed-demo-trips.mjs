@@ -96,7 +96,7 @@ async function main() {
       email: DEMO_EMAIL,
       password: crypto.randomUUID() + "Aa1!",
       email_confirm: true,
-      user_metadata: { name: "Demo Conductor" },
+      user_metadata: { name: "Martín González" },
     });
     conductorId = created.id;
     console.log("created demo conductor", conductorId);
@@ -109,8 +109,8 @@ async function main() {
     {
       id: conductorId,
       rol: "conductor",
-      nombre: "Demo",
-      apellido: "Conductor",
+      nombre: "Martín",
+      apellido: "González",
       telefono: "2494000000",
     },
     { Prefer: "resolution=merge-duplicates,return=minimal" },
