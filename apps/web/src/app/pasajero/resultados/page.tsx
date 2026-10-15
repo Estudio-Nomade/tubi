@@ -115,6 +115,7 @@ export default async function ResultadosPage({ searchParams }: PageProps) {
               {grupo.items.map((viaje) => (
                 <li key={viaje.id}>
                   <TripCard
+                    offerSource={viaje.offerSource}
                     origen={viaje.origen}
                     destino={viaje.destino}
                     horaLabel={formatHoraAr(viaje.fechaSalida)}

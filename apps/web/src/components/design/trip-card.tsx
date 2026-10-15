@@ -1,7 +1,10 @@
 import Link from "next/link"
 import { ChevronRight } from "lucide-react"
 
+import type { OfferSource } from "@/domain/viajes/types"
 import { cn } from "@/lib/utils"
+
+import { OfferBadge } from "./offer-badge"
 
 type TripCardProps = {
   origen: string
@@ -10,6 +13,7 @@ type TripCardProps = {
   asientosLabel: string
   precioLabel: string
   href: string
+  offerSource?: OfferSource
   className?: string
 }
 
@@ -23,6 +27,7 @@ export function TripCard({
   asientosLabel,
   precioLabel,
   href,
+  offerSource = "tubi_operated",
   className,
 }: TripCardProps) {
   return (
@@ -38,9 +43,12 @@ export function TripCard({
       )}
     >
       <div className="flex w-full items-start justify-between gap-3">
-        <p className="font-heading min-w-0 flex-1 text-lg font-semibold leading-snug tracking-tight text-foreground">
-          {origen} → {destino}
-        </p>
+        <div className="min-w-0 flex-1 flex flex-col gap-1.5">
+          <p className="font-heading text-lg font-semibold leading-snug tracking-tight text-foreground">
+            {origen} → {destino}
+          </p>
+          <OfferBadge offerSource={offerSource} />
+        </div>
         <ChevronRight
           className="mt-0.5 size-5 shrink-0 text-muted-foreground transition-colors group-hover:text-primary"
           strokeWidth={1.75}

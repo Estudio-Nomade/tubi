@@ -61,6 +61,7 @@ function toListItem(
     fecha_salida: string;
     precio: number;
     estado: EstadoViaje;
+    offer_source?: "peer" | "tubi_operated" | null;
     ruta: RutaEmbed | RutaEmbed[] | null;
     vehiculo: VehiculoEmbed | VehiculoEmbed[] | null;
   },
@@ -78,6 +79,8 @@ function toListItem(
     fechaSalida: row.fecha_salida,
     precio: Number(row.precio),
     estado: row.estado,
+    offerSource:
+      row.offer_source === "peer" ? "peer" : "tubi_operated",
     asientosLibres,
     vehiculo: {
       patente: vehiculo.patente,
@@ -113,6 +116,7 @@ export function createSupabaseViajesRepository(client: Client): ViajesRepository
           fecha_salida,
           precio,
           estado,
+          offer_source,
           ruta!inner ( origen, destino ),
           vehiculo!inner ( patente, marca, modelo, color, capacidad )
         `,
@@ -151,6 +155,7 @@ export function createSupabaseViajesRepository(client: Client): ViajesRepository
             fecha_salida: string;
             precio: number;
             estado: EstadoViaje;
+            offer_source?: "peer" | "tubi_operated" | null;
             ruta: RutaEmbed | RutaEmbed[] | null;
             vehiculo: VehiculoEmbed | VehiculoEmbed[] | null;
           };
@@ -176,6 +181,7 @@ export function createSupabaseViajesRepository(client: Client): ViajesRepository
           eta_llegada,
           precio,
           estado,
+          offer_source,
           ruta!inner ( origen, destino ),
           vehiculo!inner ( patente, marca, modelo, color, capacidad ),
           conductor:profiles!viaje_conductor_id_fkey ( id, nombre, apellido )
@@ -195,6 +201,7 @@ export function createSupabaseViajesRepository(client: Client): ViajesRepository
         fecha_salida: string;
         precio: number;
         estado: EstadoViaje;
+        offer_source?: "peer" | "tubi_operated" | null;
         ruta: RutaEmbed | RutaEmbed[] | null;
         vehiculo: VehiculoEmbed | VehiculoEmbed[] | null;
         conductor?: ConductorEmbed | ConductorEmbed[] | null;

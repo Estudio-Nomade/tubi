@@ -100,6 +100,168 @@ export type Database = {
         };
         Relationships: [];
       };
+      driver_kyc_sessions: {
+        Row: {
+          id: string;
+          user_id: string;
+          external_session_id: string;
+          provider: string;
+          status: string;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          external_session_id: string;
+          provider?: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          external_session_id?: string;
+          provider?: string;
+          status?: string;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      chat_thread: {
+        Row: {
+          id: string;
+          reserva_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          reserva_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          reserva_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      chat_message: {
+        Row: {
+          id: string;
+          thread_id: string;
+          sender_id: string;
+          body: string;
+          created_at: string;
+          flagged_bypass: boolean;
+        };
+        Insert: {
+          id?: string;
+          thread_id: string;
+          sender_id: string;
+          body: string;
+          created_at?: string;
+          flagged_bypass?: boolean;
+        };
+        Update: {
+          id?: string;
+          thread_id?: string;
+          sender_id?: string;
+          body?: string;
+          created_at?: string;
+          flagged_bypass?: boolean;
+        };
+        Relationships: [];
+      };
+      push_subscription: {
+        Row: {
+          id: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          endpoint?: string;
+          p256dh?: string;
+          auth?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      notification_outbox: {
+        Row: {
+          id: string;
+          user_id: string;
+          title: string;
+          body: string;
+          href: string | null;
+          created_at: string;
+          sent_at: string | null;
+          read_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          user_id: string;
+          title: string;
+          body: string;
+          href?: string | null;
+          created_at?: string;
+          sent_at?: string | null;
+          read_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          user_id?: string;
+          title?: string;
+          body?: string;
+          href?: string | null;
+          created_at?: string;
+          sent_at?: string | null;
+          read_at?: string | null;
+        };
+        Relationships: [];
+      };
+      detective_signal: {
+        Row: {
+          id: string;
+          kind: string;
+          payload: Json;
+          status: string;
+          created_at: string;
+          resolved_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          kind: string;
+          payload?: Json;
+          status?: string;
+          created_at?: string;
+          resolved_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          kind?: string;
+          payload?: Json;
+          status?: string;
+          created_at?: string;
+          resolved_at?: string | null;
+        };
+        Relationships: [];
+      };
       settings: {
         Row: {
           clave: string;
@@ -227,6 +389,7 @@ export type Database = {
           eta_llegada: string | null;
           precio: number;
           estado: EstadoViaje;
+          offer_source: "peer" | "tubi_operated";
           created_at: string;
           updated_at: string;
         };
@@ -239,6 +402,7 @@ export type Database = {
           eta_llegada?: string | null;
           precio: number;
           estado?: EstadoViaje;
+          offer_source?: "peer" | "tubi_operated";
           created_at?: string;
           updated_at?: string;
         };
@@ -248,6 +412,7 @@ export type Database = {
           conductor_id?: string;
           vehiculo_id?: string;
           fecha_salida?: string;
+          offer_source?: "peer" | "tubi_operated";
           eta_llegada?: string | null;
           precio?: number;
           estado?: EstadoViaje;
@@ -277,6 +442,10 @@ export type Database = {
           recogida_mode: string | null;
           cupon_usuario_id: string | null;
           descuento_monto: number;
+          request_status: string | null;
+          request_expires_at: string | null;
+          accepted_at: string | null;
+          deposit_pay_expires_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -300,6 +469,10 @@ export type Database = {
           recogida_mode?: string | null;
           cupon_usuario_id?: string | null;
           descuento_monto?: number;
+          request_status?: string | null;
+          request_expires_at?: string | null;
+          accepted_at?: string | null;
+          deposit_pay_expires_at?: string | null;
           created_at?: string;
           updated_at?: string;
         };
@@ -524,6 +697,20 @@ export type Database = {
       asientos_libres_viaje: {
         Args: { p_viaje_id: string };
         Returns: number;
+      };
+      publicar_viaje_peer: {
+        Args: {
+          p_ruta_id: string;
+          p_vehiculo_id: string;
+          p_fecha_salida: string;
+          p_precio: number;
+          p_eta_llegada?: string | null;
+        };
+        Returns: Json;
+      };
+      driver_is_verified: {
+        Args: { p_user_id: string };
+        Returns: boolean;
       };
       resolver_sena: {
         Args: { p_pago_id: string; p_accion: string };

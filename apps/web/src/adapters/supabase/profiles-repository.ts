@@ -8,6 +8,7 @@ import { z } from "zod";
 
 import {
   legacyRolFromCapabilities,
+  type DriverKycUpdate,
   type Profile,
   type ProfileInsert,
   type ProfilesRepository,
@@ -105,6 +106,35 @@ export function createSupabaseProfilesRepository(
 
       if (error) {
         throw new Error(`profiles.insert failed: ${error.message}`);
+      }
+
+      return toProfile(profileRowSchema.parse(data));
+    },
+
+    async updateDriverKyc(userId: string, update: DriverKycUpdate) {
+      const patch: {
+        driver_kyc_status: typeof update.driverKycStatus;
+        is_driver?: boolean;
+        dni_verificado?: boolean;
+      } = {
+        driver_kyc_status: update.driverKycStatus,
+      };
+      if (update.isDriver !== undefined) patch.is_driver = update.isDriver;
+      if (update.dniVerificado !== undefined) {
+        patch.dni_verificado = update.dniVerificado;
+      }
+
+      const { data, error } = await client
+        .from("profiles")
+        .update(patch)
+        .eq("id", userId)
+        .select(PROFILE_COLUMNS)
+        .single();
+
+      if (error) {
+        throw new Error(
+          `profiles.updateDriverKyc(${userId}) failed: ${error.message}`,
+        );
       }
 
       return toProfile(profileRowSchema.parse(data));

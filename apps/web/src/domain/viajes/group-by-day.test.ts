@@ -14,6 +14,7 @@ function item(id: string, fechaSalida: string): ViajeListItem {
     fechaSalida,
     precio: 25000,
     estado: "programado",
+    offerSource: "tubi_operated",
     asientosLibres: 2,
     vehiculo: {
       patente: "ABC123",

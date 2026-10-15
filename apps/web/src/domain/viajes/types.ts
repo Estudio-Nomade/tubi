@@ -11,6 +11,8 @@ export type SearchViajesQuery = {
   horaDesde?: string;
 };
 
+export type OfferSource = "peer" | "tubi_operated";
+
 export type ViajeListItem = {
   id: string;
   origen: string;
@@ -18,6 +20,8 @@ export type ViajeListItem = {
   fechaSalida: string;
   precio: number;
   estado: EstadoViaje;
+  /** peer = particular; tubi_operated = badge Operado por Tubi */
+  offerSource: OfferSource;
   /** Slice 2A: equals vehicle capacity until reservas count exists in 2B */
   asientosLibres: number;
   vehiculo: {

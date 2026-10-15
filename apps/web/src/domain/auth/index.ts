@@ -5,7 +5,7 @@ export type {
   Profile,
   ProfileInsert,
 } from "./types";
-export type { ProfilesRepository } from "./ports";
+export type { ProfilesRepository, DriverKycUpdate } from "./ports";
 export {
   canTravel,
   canDrive,

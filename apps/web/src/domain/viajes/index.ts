@@ -1,5 +1,6 @@
 export type {
   EstadoViaje,
+  OfferSource,
   SearchViajesQuery,
   TipoParada,
   ViajeDetail,
