@@ -63,6 +63,10 @@ Abrir un **marketplace mínimo** al costado del MVP actual para:
 - Policía de motivo del viaje (línea vacía vs “voy igual”).
 - Priorizar Tubi en el sort solo por ser Tubi (la **confiabilidad** sí puede influir después).
 
+### Peer y viaje con pocos pasajeros
+- No hay obligación de plataforma de “salir igual con un solo pasajero” en peer (eso es política Operado por Tubi / etapa a pérdida del PRD actual).
+- El conductor peer decide si mantiene, cancela o espera más solicitudes; si cancela con señas activas, aplica §5 cancelación de viaje completo.
+
 ---
 
 ## 4. Identidad, roles y UX dual-modo
@@ -104,7 +108,9 @@ Abrir un **marketplace mínimo** al costado del MVP actual para:
 - Crear viaje Operado por Tubi: buscar conductor verified → asignar → `offer_source = tubi_operated`.
 
 ### Solapamiento
-- Por defecto **no** se permite ser pasajero y conductor en el **mismo tramo temporal** (bloqueo de conflicto de agenda).
+- Por defecto **no** se permite ser pasajero activo y conductor activo en ventanas que se solapan.
+- Definición operativa (settings): una participación “activa” es solicitud aceptada con seña confirmada, o viaje en estados `programado|recogida|en_curso` como conductor, cuyo intervalo `[salida_estimada - margen, llegada_estimada + margen]` (márgenes en settings, default p.ej. 1h) se intersecta con otra participación activa de la misma persona.
+- Al detectar conflicto: se bloquea la nueva solicitud o la nueva publicación/asignación con mensaje claro.
 
 ### Estados conductor (capability)
 `unverified` → `pending_kyc` → `verified` | `rejected` | `suspended`
@@ -112,6 +118,10 @@ Abrir un **marketplace mínimo** al costado del MVP actual para:
 ### Pasajero
 - Registro mínimo actual (nombre + DNI + contacto).
 - KYC fuerte de pasajero **fuera** de este corte.
+
+### Conductores Tubi ya existentes (migración KYC)
+- Los conductores operativos previos deben pasar por el mismo funnel Didit antes de volver a ser asignados o de publicar.
+- Hasta estar `verified`: no asignables a nuevos viajes Operado por Tubi ni pueden publicar peer (viajes ya en curso se definen en plan de migración: terminar o reasignar).
 
 ---
 
@@ -141,6 +151,20 @@ o `rejected` | `expired` | `cancelled` (con tipificación de quién canceló).
 
 ### Incentivo del conductor
 Precio de intermedios menor (proporción por distancia) + derecho a rechazar → puede esperar solicitudes de tramo completo si le rinde más. No hace falta regla extra de “solo destino final”.
+
+### Cupos, concurrencia y seña no pagada
+- Al **solicitar**, el cupo no se quema en firme: varias solicitudes pueden coexistir sobre el mismo asiento hasta aceptación.
+- Al **aceptar**, ese asiento/cupo queda **hold** para esa solicitud (otras solicitudes al mismo cupo pasan a rechazadas o “cupo no disponible”).
+- Tras aceptar: ventana de pago de seña (`deposit.pay_timeout` setting). Si el pasajero no inicia/completa la seña a tiempo → solicitud `expired`, hold liberado, push al conductor.
+- Capacidad del viaje = cupos libres − holds activos por aceptaciones con seña pendiente/confirmada.
+- **Mismo flujo con marketplace flag off:** si solo hay oferta Operado por Tubi, igual rige solicitud → aceptación (no se reintroduce reserva unilateral).
+
+### Cancelación de viaje completo (conductor o operador)
+- Si se cancela el viaje entero con solicitudes/señas activas: seña según política tipificada `cancelled_by_driver` / `cancelled_by_platform` (default: devolución 100% de seña al pasajero cuando cancela la oferta); métrica de confiabilidad impacta al conductor si fue él; no nace comisión peer.
+
+### Auto-aceptación
+- Default: **manual** (conductor toca aceptar/rechazar).
+- Setting futuro opcional `request.auto_accept` (por conductor o por viaje Operado por Tubi) — **fuera del corte mínimo**, pero el modelo de estados no lo impide.
 
 ---
 
@@ -180,12 +204,42 @@ En publicación, aceptación y post-viaje el conductor ve en grande:
 
 Post-viaje: no “debés castigo a la app”, sino **“Liquidá tu comisión — te quedaste $X”** con CTA único, monto exacto, datos de transferencia Tubi, estados `pending` → `submitted` → `confirmed`.
 
-### Efectivo
-- El conductor peer cobra el saldo en mano; Tubi no intercepta ese cash.
-- La comisión queda como obligación del conductor hacia Tubi.
+### Efectivo y transferencia del saldo
+- **Efectivo:** el conductor peer cobra el saldo en mano; Tubi no intercepta ese cash.
+- **Transferencia del saldo (peer):** el pasajero transfiere al **alias/CBU del conductor** (visible solo con seña confirmada), o registra comprobante en app; no es custodia Tubi.
+- La comisión queda como obligación del conductor hacia Tubi en ambos casos.
+
+### Waterfall de plata (peer) — invariante contable
+
+La seña **no es un fee aparte apilado encima del 15%**. Es un **anticipo del precio del tramo** que recibe Tubi; al cerrar el viaje se compensa con la comisión.
+
+Notación, por pasajero abordado y viaje completado:
+
+- `P` = precio del tramo aceptado  
+- `s` = `deposit.pct` (seña) → monto seña `S = P * s` (con floor/ceiling si aplican)  
+- `c` = `commission.peer_pct` (default 0.15) → comisión `C = P * c`  
+- Saldo al subir `B = P - S` (lo paga el pasajero al conductor en efectivo o transferencia directa)
+
+**Al completar:**
+
+| Bolsillo | Monto |
+|---|---|
+| Pasajero pagó en total | `P` (= `S` a Tubi + `B` al conductor) |
+| Tubi debe terminar con | `C` (comisión) |
+| Conductor debe terminar con | `P - C` |
+
+**Liquidación conductor → Tubi post-viaje:**
+
+- Si `S >= C`: Tubi ya cubrió la comisión con la seña. Tubi **devuelve / acredita al conductor** el excedente `S - C` (o lo deja a favor en cuenta interna). El conductor **no** transfiere comisión adicional. UX: “Ya está liquidado — te quedaste $P−C” (y si hubo excedente de seña, “Tubi te acredita $S−C”).
+- Si `S < C`: el conductor **transfiere a Tubi** la diferencia `C - S`. UX: “Liquidá $C−S — te quedaste $P−C”.
+- Si `S == C`: neto cero de liquidación post-viaje.
+
+Así no hay doble cobro seña+comisión. La seña sigue cumpliendo rol de compromiso (política de cancelación/no-show sobre `S`); la comisión es el take-rate sobre viajes completados.
+
+**Operado por Tubi:** no aplica este waterfall de comisión peer; seña y tarifa según acuerdo interno / settings de precio Tubi (sin `CommissionObligation` al chofer).
 
 ### Fuera de este corte
-- Escrow / custodia de seña (evolución deseable más adelante).
+- Escrow / custodia de seña más allá del anticipo contable anterior (liberación automática tipo BlaBlaCar).
 - Pasarela automática.
 
 ---
@@ -203,10 +257,10 @@ Que el bypass sea más caro/riesgoso que cerrar en Tubi — sin pretender 0%.
 | Seña confirmada | Contacto y/o chat in-app desbloqueado |
 | En viaje | QR, GPS, estados (valor off-app no replica) |
 
-### Chat (mínimo si entra)
-- Solo con seña confirmada.
-- Filtro básico de patrones de teléfono / “mandame al WhatsApp”.
-- CTA **Reportar intento de eludir la plataforma**.
+### Contacto post-seña (alcance de este corte)
+- **Día 1 obligatorio:** desbloqueo de **teléfono/WhatsApp** (o canal de contacto del perfil) solo con seña confirmada + CTA **Reportar bypass**.
+- **Chat in-app:** opcional en el mismo corte si es barato; si no, se posterga. No es blocker del marketplace mínimo.
+- Si hay chat: solo post-seña; filtro básico de patrones de teléfono / “mandame al WhatsApp”.
 
 ### Cancelaciones como contraincentivo
 Tipificación (reutiliza política actual de seña/ventanas):
@@ -237,6 +291,10 @@ Si la cola está vacía, no molesta; si no, no depende de que el operador “se 
 - Conductor: strikes → pausa de publicación; comisión impaga → no publica.
 - Pasajero: strikes graves → limitar solicitudes.
 - Multicuenta: mitigada por KYC conductor.
+
+### ToS (producto)
+- Condiciones de uso explícitas: prohibido eludir la plataforma para cerrar el viaje; el contacto off-app para coordinar logistica puntual post-seña no equivale a cobrar/pagar el viaje afuera sin liquidar comisión.
+- Violación reiterada + señales detective → pausa/suspensión (humano en el loop al inicio).
 
 ---
 
@@ -291,15 +349,18 @@ Columna transversal; incentivan instalar la PWA.
 
 Todo configurable sin redeploy, entre otros:
 
-- `marketplace.enabled` (feature flag)
-- `commission.peer_pct` (default 15)
+- `marketplace.enabled` (feature flag de oferta peer; el flujo solicitud→aceptación aplica igual)
+- `commission.peer_pct` (default 15; rango configurable p.ej. 0–15 o el que defina el operador)
+- `commission.on_noshow` (default false)
 - `deposit.pct` (seña % del tramo)
 - `deposit.floor` / `deposit.ceiling` (opcionales)
+- `deposit.pay_timeout` (plazo post-aceptación para pagar seña)
 - `request.accept_timeout` (tiempo del conductor para responder)
+- `schedule.conflict_margin_*` (solapamiento pasajero/conductor)
 - `reliability.cancel_rate_threshold_*`
 - `detective.*` (ventanas, umbrales de duplas)
-- `maps.*` (tolerancia de match localidad si aplica a nivel provider, no radio de producto arbitrario)
-- Política de devolución existente (se mantiene y se tipifica)
+- `maps.*` (tolerancia de match localidad a nivel provider)
+- Política de devolución existente (se mantiene y se tipifica; + causa `cancelled_by_driver` / `cancelled_by_platform`)
 
 ---
 
@@ -409,7 +470,63 @@ Orientativo para el plan posterior:
 - [x] MapLibre + OSM; waypoints auto-ordenados; búsqueda A→B  
 - [x] Detective mínimo + notificaciones PWA  
 - [x] Cancelaciones tipificadas como contraincentivo  
+- [x] Waterfall seña↔comisión sin doble cobro  
+- [x] Hold de cupo al aceptar + timeout de seña  
+- [x] Solicitud→aceptación también con marketplace flag off  
+- [x] Solapamiento agenda con márgenes en settings  
+- [x] Migración KYC conductores Tubi existentes  
+- [x] Contacto post-seña día 1; chat in-app no blocker  
 
 ---
 
-*Documento generado en sesión de brainstorming. Próximo paso tras aprobación del archivo: plan de implementación (`writing-plans`).*
+## 17. Self-review (2026-10-14, post-commit)
+
+### Hallazgos corregidos en este archivo
+1. **Waterfall seña vs comisión** — era el hueco más grave: seña a Tubi + 15% extra podía leerse como doble take. Quedó invariante contable: seña = anticipo de `P`; Tubi termina en `C`; conductor en `P−C`; liquidación = `C−S` o crédito `S−C`.
+2. **Concurrencia de cupos** — hold al aceptar; multi-solicitud hasta aceptación; timeout de seña.
+3. **Flag marketplace** — peer se apaga con flag; solicitud→aceptación **no**.
+4. **Solapamiento** — definición con intervalos y márgenes en settings.
+5. **KYC conductores legacy Tubi** — deben verificarse antes de nuevas asignaciones.
+6. **Chat** — desbloqueado como no-blocker; contacto post-seña sí es día 1.
+7. **Cancelación de viaje completo** y **peer sin obligación de salir con 1 pax**.
+8. **Saldo por transferencia peer** — al conductor, no custodia Tubi.
+9. **ToS anti-bypass** — párrafo explícito.
+
+### Invariantes de sesión — cobertura
+
+| Decisión de brainstorming | ¿En spec? |
+|---|---|
+| Objetivos A+B (+C badge) | §1 |
+| Listado igualdad + badge “Operado por Tubi” | §3 |
+| Precio peer libre; Tubi fija operados | §3 |
+| Intermedios por distancia | §6, §8 |
+| Comisión 15% solo peer; liquida conductor | §6 |
+| Seña a Tubi; % del tramo; no escrow big-bang | §2, §6 |
+| No deuda de comisión del pasajero (era B) | §6 |
+| Solicitud→aceptación flujo único | §5 |
+| KYC Didit todos los conductores | §4 |
+| Identidad ≠ aval (offer_source en viaje) | §3, §4 |
+| Una cuenta; switch visible; no long-press | §4 |
+| No regular línea vacía | §2, §3 |
+| MapLibre+OSM; waypoints auto; búsqueda A→B | §8 |
+| Anti-bypass + cancelaciones + detective mínimo | §7 |
+| Notificaciones PWA | §9 |
+| UX “tu parte” optimista | §6 |
+| Operator asigna → tubi_operated | §3, §4 |
+| Acuerdo interno chofer Tubi sin 15% | §3, §6 |
+
+### Riesgos / bordes aún deliberadamente abiertos (plan, no spec bloqueante)
+- Montos exactos default de `deposit.pct`, márgenes de solapamiento y timeouts (settings de operador al implementar).
+- Algoritmo fino de “parada alineada a localidad” del geocoder (detalle de `MapsProvider`).
+- UI concreta de bottom nav por modo (wireframes).
+- Fusión mecánica de users legacy duplicados (paso de migración en plan).
+- Si Operado por Tubi usa auto-accept más adelante (`request.auto_accept`).
+
+### Consistencia interna
+- Sin TBD/TODO.
+- §12 (fuera de alcance) alineado con chat no-blocker y sin escrow pasarela.
+- §16 checklist actualizado con invariantes del self-review.
+
+---
+
+*Documento generado en sesión de brainstorming. Self-review post-commit aplicado. Próximo paso tras OK del archivo: plan de implementación (`writing-plans`).*
