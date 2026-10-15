@@ -2,7 +2,7 @@ import { AppHeader, AppShell, BtnPrimary } from "@/components/design";
 import { startDriverKycAction } from "@/application/identity/start-kyc-action";
 import { isDiditConfigured } from "@/adapters/identity/create-identity-verifier";
 import { requireProfile } from "@/lib/auth/require-profile";
-import { canDrive } from "@/domain/auth";
+import { canDrive, driverKycStatusLabel } from "@/domain/auth";
 import { redirect } from "next/navigation";
 
 /**
@@ -36,7 +36,7 @@ export default async function ConductorKycPage({
         <p className="text-sm text-muted-foreground">
           Estado:{" "}
           <span className="font-semibold text-foreground">
-            {profile.driverKycStatus}
+            {driverKycStatusLabel(profile.driverKycStatus)}
           </span>
         </p>
         {!didit ? (

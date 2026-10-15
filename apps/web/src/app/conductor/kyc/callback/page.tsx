@@ -1,15 +1,37 @@
+import { headers } from "next/headers";
 import Link from "next/link";
 
 import { AppHeader, AppShell, BtnPrimary, BtnSecondary } from "@/components/design";
+import { syncDriverKycFromProvider } from "@/application/identity/sync-kyc-from-provider";
+import { canDrive, driverKycStatusLabel } from "@/domain/auth";
 import { requireProfile } from "@/lib/auth/require-profile";
-import { canDrive } from "@/domain/auth";
+
+function appOriginFromHeaders(h: Headers): string {
+  const host = h.get("x-forwarded-host") ?? h.get("host");
+  const proto = h.get("x-forwarded-proto") ?? "http";
+  if (host) return `${proto}://${host}`;
+  return (
+    process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "") ?? "http://localhost:3000"
+  );
+}
 
 /**
- * Return URL after Didit hosted flow. Webhook is source of truth;
- * this page just reflects current profile state.
+ * Return URL after Didit hosted flow.
+ * Webhook is the async source of truth; we also poll Didit decision here so
+ * approval applies immediately without waiting for the webhook or a human.
  */
 export default async function ConductorKycCallbackPage() {
-  const profile = await requireProfile({ allowKycOnboarding: true });
+  let profile = await requireProfile({ allowKycOnboarding: true });
+
+  if (!canDrive(profile)) {
+    const h = await headers();
+    await syncDriverKycFromProvider({
+      userId: profile.id,
+      appOrigin: appOriginFromHeaders(h),
+    });
+    profile = await requireProfile({ allowKycOnboarding: true });
+  }
+
   const ok = canDrive(profile);
 
   return (
@@ -22,12 +44,12 @@ export default async function ConductorKycCallbackPage() {
         <p className="text-sm font-medium text-muted-foreground">
           {ok
             ? "Tu identidad quedó verificada. Ya podés usar el modo Conducir."
-            : "Si terminaste el flujo, el resultado llega en segundos. Si sigue pendiente, esperá o reintentá más tarde."}
+            : "Didit está procesando el resultado. Si ya terminaste el flujo, refrescá en unos segundos."}
         </p>
         <p className="text-sm text-muted-foreground">
           Estado:{" "}
           <span className="font-semibold text-foreground">
-            {profile.driverKycStatus}
+            {driverKycStatusLabel(profile.driverKycStatus)}
           </span>
         </p>
         {ok ? (
@@ -37,7 +59,7 @@ export default async function ConductorKycCallbackPage() {
         ) : (
           <>
             <BtnPrimary asChild>
-              <Link href="/conductor/kyc">Volver a verificación</Link>
+              <Link href="/conductor/kyc/callback">Actualizar estado</Link>
             </BtnPrimary>
             <BtnSecondary asChild>
               <Link href="/pasajero">Viajar</Link>
