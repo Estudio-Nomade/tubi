@@ -235,6 +235,48 @@ export type Database = {
         };
         Relationships: [];
       };
+      commission_obligation: {
+        Row: {
+          id: string;
+          reserva_id: string;
+          viaje_id: string;
+          conductor_id: string;
+          price: number;
+          seña: number;
+          commission: number;
+          settlement_driver_to_tubi: number;
+          status: string;
+          created_at: string;
+          settled_at: string | null;
+        };
+        Insert: {
+          id?: string;
+          reserva_id: string;
+          viaje_id: string;
+          conductor_id: string;
+          price: number;
+          seña: number;
+          commission: number;
+          settlement_driver_to_tubi: number;
+          status?: string;
+          created_at?: string;
+          settled_at?: string | null;
+        };
+        Update: {
+          id?: string;
+          reserva_id?: string;
+          viaje_id?: string;
+          conductor_id?: string;
+          price?: number;
+          seña?: number;
+          commission?: number;
+          settlement_driver_to_tubi?: number;
+          status?: string;
+          created_at?: string;
+          settled_at?: string | null;
+        };
+        Relationships: [];
+      };
       detective_signal: {
         Row: {
           id: string;
@@ -732,6 +774,44 @@ export type Database = {
           p_href?: string | null;
         };
         Returns: string;
+      };
+      set_driver_kyc_pending: {
+        Args: Record<string, never>;
+        Returns: Database["public"]["Tables"]["profiles"]["Row"];
+      };
+      apply_driver_kyc_result: {
+        Args: {
+          p_user_id: string;
+          p_status: string;
+          p_dni_verificado?: boolean | null;
+        };
+        Returns: Database["public"]["Tables"]["profiles"]["Row"];
+      };
+      vencer_solicitudes: {
+        Args: Record<string, never>;
+        Returns: Json;
+      };
+      search_viajes_places: {
+        Args: {
+          p_origen: string;
+          p_destino: string;
+          p_fecha_desde?: string;
+          p_fecha_hasta?: string | null;
+          p_limit?: number;
+        };
+        Returns: Database["public"]["Tables"]["viaje"]["Row"][];
+      };
+      resolve_detective_signal: {
+        Args: { p_signal_id: string; p_status: string };
+        Returns: Json;
+      };
+      compute_peer_commission: {
+        Args: { p_precio: number };
+        Returns: number;
+      };
+      driver_has_overdue_commission: {
+        Args: { p_uid: string };
+        Returns: boolean;
       };
       publicar_viaje_peer: {
         Args: {

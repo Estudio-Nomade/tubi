@@ -18,6 +18,14 @@ export type RecogidaInput = {
   placeId?: string | null;
 };
 
+export type RequestStatus =
+  | "requested"
+  | "accepted"
+  | "rejected"
+  | "expired"
+  | "cancelled"
+  | null;
+
 export type Reserva = {
   id: string;
   viajeId: string;
@@ -34,6 +42,9 @@ export type Reserva = {
   recogidaMode: PickupMode | null;
   descuentoMonto: number;
   cuponUsuarioId: string | null;
+  /** null = legacy tubi book; marketplace uses requested|accepted|… */
+  requestStatus: RequestStatus;
+  depositPayExpiresAt: string | null;
   createdAt: string;
 };
 

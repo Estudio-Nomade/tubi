@@ -48,6 +48,7 @@ function parsePolitica(raw: Json): PoliticaCancelacionSnapshot {
 }
 
 function mapReserva(row: ReservaRow): Reserva {
+  const rs = row.request_status;
   return {
     id: row.id,
     viajeId: row.viaje_id,
@@ -64,6 +65,15 @@ function mapReserva(row: ReservaRow): Reserva {
     recogidaMode: (row.recogida_mode as PickupMode | null) ?? null,
     descuentoMonto: Number(row.descuento_monto ?? 0),
     cuponUsuarioId: row.cupon_usuario_id ?? null,
+    requestStatus:
+      rs === "requested" ||
+      rs === "accepted" ||
+      rs === "rejected" ||
+      rs === "expired" ||
+      rs === "cancelled"
+        ? rs
+        : null,
+    depositPayExpiresAt: row.deposit_pay_expires_at ?? null,
     createdAt: row.created_at,
   };
 }

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 import { verifyDiditWebhook } from "@/adapters/identity/didit-webhook-signature";
-import { createSupabaseProfilesRepository } from "@/adapters/supabase/profiles-repository";
 import {
   mapProviderStatus,
   toDriverKycStatus,
@@ -107,11 +106,10 @@ export async function POST(req: Request) {
     );
 
   if (kycStatus) {
-    const profiles = createSupabaseProfilesRepository(admin);
-    await profiles.updateDriverKyc(userId, {
-      isDriver: kycStatus === "verified" ? true : undefined,
-      driverKycStatus: kycStatus,
-      dniVerificado: kycStatus === "verified" ? true : undefined,
+    await admin.rpc("apply_driver_kyc_result", {
+      p_user_id: userId,
+      p_status: kycStatus,
+      p_dni_verificado: kycStatus === "verified" ? true : null,
     });
   }
 

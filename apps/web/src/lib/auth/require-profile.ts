@@ -86,13 +86,14 @@ function enforceLegacyRols(profile: Profile, allowed: Rol[]): Profile {
 
   const ok = allowed.some((rol) => {
     if (rol === "pasajero") return canTravel(profile);
-    if (rol === "conductor") return canDrive(profile) || profile.isDriver;
+    // Drive ops require verified KYC (canDrive), not mere isDriver aspirant
+    if (rol === "conductor") return canDrive(profile);
     if (rol === "operador") return canOperate(profile);
     return false;
   });
 
   if (!ok) {
-    // Conductor pages with legacy ["conductor"] before KYC → kyc funnel
+    // Conductor pages before KYC → kyc funnel
     if (allowed.includes("conductor") && !canDrive(profile)) {
       redirect("/conductor/kyc");
     }

@@ -3,7 +3,6 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { enqueueNotification } from "@/application/notifications/enqueue";
 import type { RecogidaInput } from "@/domain/reservas";
 import { requireProfile } from "@/lib/auth/require-profile";
 import { createClient } from "@/lib/supabase/server";
@@ -54,7 +53,8 @@ function mapSolicitarError(message: string): string {
 }
 
 /**
- * Passenger requests a seat on a peer trip (does not hold capacity until accept).
+ * Passenger requests a seat on a peer trip.
+ * Driver notification is enqueued inside the RPC (security definer).
  */
 export async function solicitarAsientoAction(
   viajeId: string,
@@ -85,21 +85,6 @@ export async function solicitarAsientoAction(
         ? String((data as { id: string }).id)
         : null;
 
-    const { data: viaje } = await supabase
-      .from("viaje")
-      .select("conductor_id")
-      .eq("id", viajeId)
-      .maybeSingle();
-
-    if (viaje?.conductor_id) {
-      await enqueueNotification(supabase, {
-        userId: viaje.conductor_id,
-        title: "Nueva solicitud",
-        body: "Alguien pidió un asiento en tu viaje",
-        href: "/conductor/solicitudes",
-      });
-    }
-
     revalidatePath("/pasajero");
     revalidatePath("/conductor");
     revalidatePath(`/pasajero/viajes/${viajeId}`);
@@ -114,7 +99,8 @@ export async function solicitarAsientoAction(
 }
 
 export async function aceptarSolicitudAction(formData: FormData): Promise<void> {
-  await requireProfile(["conductor"]);
+  // canDrive only — no isDriver-without-KYC
+  await requireProfile({ area: "drive" });
   const reservaId = formString(formData, "reservaId");
   if (!reservaId) redirect("/conductor/solicitudes");
 
@@ -124,24 +110,12 @@ export async function aceptarSolicitudAction(formData: FormData): Promise<void> 
   });
 
   if (error) {
-    redirect(
-      `/conductor/solicitudes?error=${encodeURIComponent(error.message)}`,
-    );
-  }
-
-  const { data: res } = await supabase
-    .from("reserva")
-    .select("pasajero_id, viaje_id")
-    .eq("id", reservaId)
-    .maybeSingle();
-
-  if (res?.pasajero_id) {
-    await enqueueNotification(supabase, {
-      userId: res.pasajero_id,
-      title: "Te aceptaron",
-      body: "Pagá la seña para confirmar tu lugar",
-      href: `/pasajero/reservas/${reservaId}/sena`,
-    });
+    const msg = error.message.includes("SOLICITUD_VENCIDA")
+      ? "La solicitud venció"
+      : error.message.includes("SIN_CUPOS")
+        ? "No quedan cupos"
+        : "No se pudo aceptar";
+    redirect(`/conductor/solicitudes?error=${encodeURIComponent(msg)}`);
   }
 
   revalidatePath("/conductor");
@@ -150,34 +124,19 @@ export async function aceptarSolicitudAction(formData: FormData): Promise<void> 
 }
 
 export async function rechazarSolicitudAction(formData: FormData): Promise<void> {
-  await requireProfile(["conductor"]);
+  await requireProfile({ area: "drive" });
   const reservaId = formString(formData, "reservaId");
   if (!reservaId) redirect("/conductor/solicitudes");
 
   const supabase = await createClient();
-  const { data: before } = await supabase
-    .from("reserva")
-    .select("pasajero_id")
-    .eq("id", reservaId)
-    .maybeSingle();
-
   const { error } = await supabase.rpc("rechazar_solicitud", {
     p_reserva_id: reservaId,
   });
 
   if (error) {
     redirect(
-      `/conductor/solicitudes?error=${encodeURIComponent(error.message)}`,
+      `/conductor/solicitudes?error=${encodeURIComponent("No se pudo rechazar")}`,
     );
-  }
-
-  if (before?.pasajero_id) {
-    await enqueueNotification(supabase, {
-      userId: before.pasajero_id,
-      title: "Solicitud rechazada",
-      body: "El conductor no pudo aceptarte en este viaje",
-      href: "/pasajero",
-    });
   }
 
   revalidatePath("/conductor");

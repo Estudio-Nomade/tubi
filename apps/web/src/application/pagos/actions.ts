@@ -77,6 +77,24 @@ export async function submitSenaComprobanteAction(
   if (reserva.estado !== "pendiente_sena") {
     return { error: "Esta reserva ya no acepta comprobante de seña." };
   }
+  // Marketplace: seña only after conductor accept (legacy requestStatus null OK)
+  if (
+    reserva.requestStatus != null &&
+    reserva.requestStatus !== "accepted"
+  ) {
+    return {
+      error:
+        reserva.requestStatus === "requested"
+          ? "Esperá a que el conductor acepte tu solicitud."
+          : "Esta solicitud ya no acepta seña.",
+    };
+  }
+  if (
+    reserva.depositPayExpiresAt &&
+    new Date(reserva.depositPayExpiresAt).getTime() < Date.now()
+  ) {
+    return { error: "Se venció el plazo para pagar la seña." };
+  }
 
   const existing = await pagos.getSenaByReserva(reservaId);
   if (existing?.estado === "pendiente" || existing?.estado === "confirmado") {
