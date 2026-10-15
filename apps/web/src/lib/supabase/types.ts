@@ -5,6 +5,14 @@
 
 export type Rol = "pasajero" | "conductor" | "operador";
 
+export type DriverKycStatus =
+  | "unverified"
+  | "pending_kyc"
+  | "verified"
+  | "rejected"
+  | "suspended";
+
+
 export type EstadoViaje =
   | "programado"
   | "recogida"
@@ -53,6 +61,10 @@ export type Database = {
           telefono: string;
           dni: string | null;
           dni_verificado: boolean;
+          is_passenger: boolean;
+          is_driver: boolean;
+          is_operator: boolean;
+          driver_kyc_status: DriverKycStatus;
           created_at: string;
           updated_at: string;
         };
@@ -64,6 +76,10 @@ export type Database = {
           telefono: string;
           dni?: string | null;
           dni_verificado?: boolean;
+          is_passenger?: boolean;
+          is_driver?: boolean;
+          is_operator?: boolean;
+          driver_kyc_status?: DriverKycStatus;
           created_at?: string;
           updated_at?: string;
         };
@@ -75,6 +91,10 @@ export type Database = {
           telefono?: string;
           dni?: string | null;
           dni_verificado?: boolean;
+          is_passenger?: boolean;
+          is_driver?: boolean;
+          is_operator?: boolean;
+          driver_kyc_status?: DriverKycStatus;
           created_at?: string;
           updated_at?: string;
         };

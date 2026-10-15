@@ -228,7 +228,7 @@ export function RegisterConductorWizard() {
       <div className="flex flex-col gap-4">
         {state?.needsEmailConfirmation ? (
           <BtnPrimary asChild>
-            <Link href="/login?rol=conductor">Ir a ingresar</Link>
+            <Link href="/login">Ir a ingresar</Link>
           </BtnPrimary>
         ) : (
           <BtnPrimary
@@ -241,7 +241,7 @@ export function RegisterConductorWizard() {
         )}
 
         <Link
-          href="/login?rol=conductor"
+          href="/login"
           className="text-center text-sm font-medium text-primary"
         >
           Ya tengo cuenta

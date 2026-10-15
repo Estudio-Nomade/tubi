@@ -9,6 +9,7 @@
  */
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { createSupabaseConductorRepository } from "@/adapters/supabase/conductor-repository";
@@ -16,6 +17,7 @@ import { createSupabaseProfilesRepository } from "@/adapters/supabase/profiles-r
 import { createConductorService } from "@/application/conductor";
 import { conductorLandingPath } from "@/application/conductor/landing-path";
 import {
+  canDrive,
   loginSchema,
   registerConductorSchema,
   registerPasajeroSchema,
@@ -25,8 +27,13 @@ import { getAuthCallbackUrl } from "@/lib/auth/app-origin";
 import { normalizarNombrePila } from "@/lib/format";
 import { createClient } from "@/lib/supabase/server";
 
-import { createAuthService, homePathForRol } from "./auth-service";
+import { createAuthService } from "./auth-service";
 import { mapAuthError } from "./map-auth-error";
+import {
+  parseUiModeCookie,
+  resolvePostLoginPath,
+  UI_MODE_COOKIE,
+} from "./post-login-path";
 
 export type AuthActionResult = {
   error?: string;
@@ -99,21 +106,24 @@ export async function signInAction(
 
   revalidatePath("/", "layout");
 
-  if (profile.rol === "conductor") {
+  const cookieStore = await cookies();
+  const mode = parseUiModeCookie(cookieStore.get(UI_MODE_COOKIE)?.value);
+
+  let hasVehiculo: boolean | undefined;
+  if (canDrive(profile) && mode === "drive") {
     const conductorService = createConductorService(
       createSupabaseConductorRepository(supabase),
     );
-    let vehiculos: Awaited<ReturnType<typeof conductorService.listMisVehiculos>>;
     try {
-      vehiculos = await conductorService.listMisVehiculos(profile.id);
+      const vehiculos = await conductorService.listMisVehiculos(profile.id);
+      hasVehiculo = vehiculos.length > 0;
     } catch (err) {
       const message = err instanceof Error ? err.message : "";
       return { error: mapAuthError(message, "No se pudo cargar tu información") };
     }
-    redirect(conductorLandingPath(vehiculos.length > 0));
   }
 
-  redirect(homePathForRol(profile.rol));
+  redirect(resolvePostLoginPath(profile, mode, { hasVehiculo }));
 }
 
 export async function signUpPasajeroAction(
@@ -166,11 +176,14 @@ export async function signUpPasajeroAction(
     // profiles.apellido is NOT NULL; pasajeros have no apellido field — empty string.
     await service.createProfile({
       id: userId,
-      rol: "pasajero",
       nombre,
       apellido: "",
       telefono,
       dni,
+      isPassenger: true,
+      isDriver: false,
+      isOperator: false,
+      driverKycStatus: "unverified",
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error al crear perfil";
@@ -230,11 +243,14 @@ export async function signUpConductorAction(
   try {
     await service.createProfile({
       id: userId,
-      rol: "conductor",
       nombre: nombreNormalizado,
       apellido,
       telefono,
       dni: null,
+      isPassenger: true,
+      isDriver: true,
+      isOperator: false,
+      driverKycStatus: "unverified",
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Error al crear perfil";

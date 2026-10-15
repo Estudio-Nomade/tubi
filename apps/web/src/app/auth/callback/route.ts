@@ -3,7 +3,6 @@ import type { EmailOtpType } from "@supabase/supabase-js";
 
 import { createSupabaseProfilesRepository } from "@/adapters/supabase/profiles-repository";
 import { createAuthService, homePathForRol } from "@/application/auth/auth-service";
-import type { Rol } from "@/domain/auth";
 import { createClient } from "@/lib/supabase/server";
 
 function safeNext(raw: string | null): string {
@@ -85,8 +84,8 @@ export async function GET(request: Request) {
   if (!profile) {
     const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
     const rolRaw = metaString(meta, "rol");
-    const rol: Rol =
-      rolRaw === "conductor" || rolRaw === "pasajero" ? rolRaw : "pasajero";
+    const isDriver = rolRaw === "conductor";
+    const isPassenger = true;
     const nombre = metaString(meta, "nombre") || "Usuario";
     const apellido = metaString(meta, "apellido");
     const telefono = metaString(meta, "telefono") || "0000000000";
@@ -95,11 +94,14 @@ export async function GET(request: Request) {
     try {
       profile = await service.createProfile({
         id: user.id,
-        rol,
         nombre,
-        apellido: rol === "pasajero" ? "" : apellido || "",
+        apellido: isDriver ? apellido || "" : "",
         telefono,
-        dni: rol === "pasajero" ? dni : null,
+        dni: isDriver ? null : dni,
+        isPassenger,
+        isDriver,
+        isOperator: false,
+        driverKycStatus: "unverified",
       });
     } catch {
       profile = await service.getProfileById(user.id);

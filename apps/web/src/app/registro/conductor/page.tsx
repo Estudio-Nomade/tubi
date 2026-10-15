@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
-
-import { RegisterConductorWizard } from "@/components/auth/register-conductor-wizard";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
-  title: "Registro conductor",
+  title: "Registro",
 };
 
-/** Pencil C1 · Registro conductor */
+/** Conductor-only self-signup deprecated — F0 public signup is passenger only. */
 export default function RegistroConductorPage() {
-  return (
-    <div className="mx-auto flex h-dvh max-h-dvh w-full max-w-md flex-col overflow-hidden bg-background">
-      <RegisterConductorWizard />
-    </div>
-  );
+  redirect("/registro");
 }

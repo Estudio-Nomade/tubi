@@ -232,7 +232,7 @@ export function RegisterPasajeroWizard() {
       <div className="flex flex-col gap-4">
         {state?.needsEmailConfirmation ? (
           <BtnPrimary asChild>
-            <Link href="/login?rol=pasajero">Ir a ingresar</Link>
+            <Link href="/login">Ir a ingresar</Link>
           </BtnPrimary>
         ) : (
           <BtnPrimary
@@ -245,20 +245,11 @@ export function RegisterPasajeroWizard() {
         )}
 
         <Link
-          href="/login?rol=pasajero"
+          href="/login"
           className="text-center text-sm font-medium text-primary"
         >
           Ya tengo cuenta
         </Link>
-
-        {step === 1 ? (
-          <Link
-            href="/registro/conductor"
-            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 text-sm font-semibold text-foreground shadow-sm transition-colors hover:bg-muted"
-          >
-            Soy conductor
-          </Link>
-        ) : null}
       </div>
     </form>
     </>

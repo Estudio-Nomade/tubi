@@ -199,20 +199,11 @@ export function RegisterOperadorWizard() {
         </BtnPrimary>
 
         <Link
-          href="/login?rol=operador"
+          href="/login"
           className="text-center text-sm font-medium text-primary"
         >
           Ya tengo cuenta
         </Link>
-
-        {step === 1 ? (
-          <Link
-            href="/registro/conductor"
-            className="text-center text-xs font-medium text-muted-foreground"
-          >
-            Soy conductor
-          </Link>
-        ) : null}
       </div>
     </form>
   );

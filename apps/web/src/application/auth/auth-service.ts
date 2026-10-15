@@ -19,7 +19,10 @@ export function createAuthService(repo: ProfilesRepository) {
 
 export type AuthService = ReturnType<typeof createAuthService>;
 
-/** Home path per role after successful auth. */
+/**
+ * Home path per legacy role after successful auth.
+ * @deprecated Prefer `primaryHomePath` / `resolvePostLoginPath` (capabilities + UI mode).
+ */
 export function homePathForRol(rol: Profile["rol"]): string {
   switch (rol) {
     case "pasajero":

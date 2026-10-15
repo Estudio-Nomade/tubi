@@ -6,7 +6,7 @@ export default async function OperadorLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const profile = await requireProfile(["operador"]);
+  const profile = await requireProfile({ area: "operate" });
   return (
     <SessionProvider key={profile.id} profile={profile}>
       {children}

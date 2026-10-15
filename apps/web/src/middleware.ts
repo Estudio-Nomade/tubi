@@ -15,7 +15,6 @@
 
 import { NextResponse, type NextRequest } from "next/server";
 
-import { rolForPath } from "@/lib/auth/rol-for-path";
 import { updateSession } from "@/lib/supabase/middleware";
 
 /** Path prefixes that require an authenticated session (role checked in layouts). */
@@ -64,13 +63,12 @@ export async function middleware(request: NextRequest) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
     loginUrl.searchParams.set("next", pathname);
-    const rol = rolForPath(pathname);
-    if (rol) {
-      loginUrl.searchParams.set("rol", rol);
-    }
+    // Unified login — no ?rol= (capabilities, not dual login)
     return NextResponse.redirect(loginUrl);
   }
 
+  // Expose pathname to server layouts (e.g. conductor KYC vs ops)
+  response.headers.set("x-pathname", pathname);
   return response;
 }
 

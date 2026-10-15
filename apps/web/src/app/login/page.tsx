@@ -18,16 +18,15 @@ function first(
   return value;
 }
 
-/** Pencil P10 · Login */
+/** Unified login — role query ignored for UX (deep links still land here). */
 export default async function LoginPage({ searchParams }: PageProps) {
   const params = await searchParams;
-  const rol = first(params.rol);
   const authError = first(params.error);
 
   return (
     <div className="mx-auto flex h-dvh max-h-dvh w-full max-w-md flex-col overflow-hidden bg-background">
       <AppHeader showBack backHref="/" backLabel="Ir al inicio" />
-      <LoginForm rol={rol} authError={authError} />
+      <LoginForm authError={authError} />
     </div>
   );
 }
