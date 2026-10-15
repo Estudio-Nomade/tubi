@@ -102,6 +102,13 @@ export default async function ConductorPage({
           </p>
         ) : null}
 
+        <Link
+          href="/conductor/solicitudes"
+          className="rounded-xl border border-border bg-card px-4 py-3 text-sm font-semibold text-foreground transition-colors hover:border-primary/30"
+        >
+          Ver solicitudes de asiento →
+        </Link>
+
         {!primary || !detail ? (
           <div className="flex flex-1 flex-col gap-6">
             <div className="rounded-2xl border border-border bg-card px-5 py-10 shadow-[0_4px_16px_rgba(28,25,23,0.06)]">

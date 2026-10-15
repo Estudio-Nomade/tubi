@@ -10,3 +10,9 @@ export {
   type CreateReservaResult,
   type ResolvePickupResult,
 } from "./actions";
+export {
+  aceptarSolicitudAction,
+  rechazarSolicitudAction,
+  solicitarAsientoAction,
+  type SolicitarAsientoResult,
+} from "./request-actions";

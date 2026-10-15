@@ -23,6 +23,8 @@ type Props = {
   fixedLabel: string | null;
   precio: number;
   montoSena: number;
+  /** peer trips use request flow; tubi uses instant book */
+  bookMode?: "book" | "request";
   cupones?: ReserveCuponOption[];
   disabled: boolean;
   disabledReason?: string;
@@ -35,6 +37,7 @@ export function ReservePanel({
   fixedLabel,
   precio,
   montoSena,
+  bookMode = "book",
   cupones = [],
   disabled,
   disabledReason,
@@ -149,8 +152,9 @@ export function ReservePanel({
 
       <ReserveButton
         viajeId={viajeId}
+        mode={bookMode}
         pickup={isTandil ? pickup : null}
-        cuponUsuarioId={cuponId || null}
+        cuponUsuarioId={bookMode === "book" ? cuponId || null : null}
         disabled={reserveDisabled}
         disabledReason={reason}
       />

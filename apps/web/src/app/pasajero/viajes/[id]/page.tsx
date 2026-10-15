@@ -36,6 +36,21 @@ function settingsToMap(items: Setting[]): Map<string, Setting> {
   return new Map(items.map((s) => [s.clave, s]));
 }
 
+/** Peer deposit fraction from settings (default 0.2). */
+function readDepositPct(settings: Map<string, Setting>): number {
+  const row = settings.get("deposit.pct");
+  if (!row) return 0.2;
+  const raw = row.valor;
+  const n =
+    typeof raw === "number"
+      ? raw
+      : typeof raw === "string"
+        ? Number(raw)
+        : Number.NaN;
+  if (!Number.isFinite(n) || n <= 0 || n > 1) return 0.2;
+  return n;
+}
+
 /** Prefer results with the same search filters; else search form. */
 function buildBackHref(
   searchParams: Record<string, string | string[] | undefined>,
@@ -73,7 +88,10 @@ export default async function ViajeDetailPage({
 
   const settingsService = await getSettingsService();
   const settingsMap = settingsToMap(await settingsService.getSettings());
-  const montoSena = readSenaMonto(settingsMap);
+  const isPeer = viaje.offerSource === "peer";
+  const montoSena = isPeer
+    ? Math.max(1, Math.round(viaje.precio * readDepositPct(settingsMap) * 100) / 100)
+    : readSenaMonto(settingsMap);
 
   const profile = await getCurrentProfile();
   let cupones: Array<{ id: string; label: string; montoDescuento: number }> =
@@ -210,7 +228,8 @@ export default async function ViajeDetailPage({
           fixedLabel={fixedLabel}
           precio={viaje.precio}
           montoSena={montoSena}
-          cupones={cupones}
+          bookMode={isPeer ? "request" : "book"}
+          cupones={isPeer ? [] : cupones}
           disabled={!canReserve}
           disabledReason={
             viaje.estado !== "programado"

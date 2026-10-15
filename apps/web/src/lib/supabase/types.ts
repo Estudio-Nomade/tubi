@@ -698,6 +698,41 @@ export type Database = {
         Args: { p_viaje_id: string };
         Returns: number;
       };
+      solicitar_asiento: {
+        Args: {
+          p_viaje_id: string;
+          p_recogida_label?: string | null;
+          p_recogida_lat?: number | null;
+          p_recogida_lng?: number | null;
+          p_recogida_place_id?: string | null;
+        };
+        Returns: Json;
+      };
+      aceptar_solicitud: {
+        Args: { p_reserva_id: string };
+        Returns: Json;
+      };
+      rechazar_solicitud: {
+        Args: { p_reserva_id: string };
+        Returns: Json;
+      };
+      ensure_chat_thread: {
+        Args: { p_reserva_id: string };
+        Returns: string;
+      };
+      enviar_mensaje_chat: {
+        Args: { p_thread_id: string; p_body: string };
+        Returns: Json;
+      };
+      enqueue_notification: {
+        Args: {
+          p_user_id: string;
+          p_title: string;
+          p_body: string;
+          p_href?: string | null;
+        };
+        Returns: string;
+      };
       publicar_viaje_peer: {
         Args: {
           p_ruta_id: string;

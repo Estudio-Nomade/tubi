@@ -4,6 +4,7 @@ import type { Database } from "@/lib/supabase/types";
 
 /**
  * Enqueue in-app notification (outbox). Push delivery is Fase 7 worker.
+ * Uses security-definer RPC so callers can notify other users under RLS.
  */
 export async function enqueueNotification(
   client: SupabaseClient<Database>,
@@ -14,14 +15,13 @@ export async function enqueueNotification(
     href?: string;
   },
 ): Promise<void> {
-  const { error } = await client.from("notification_outbox").insert({
-    user_id: input.userId,
-    title: input.title,
-    body: input.body,
-    href: input.href ?? null,
+  const { error } = await client.rpc("enqueue_notification", {
+    p_user_id: input.userId,
+    p_title: input.title,
+    p_body: input.body,
+    p_href: input.href ?? null,
   });
   if (error) {
-    // Non-fatal for callers — log-shaped throw for server logs
     console.error("enqueueNotification failed", error.message);
   }
 }
