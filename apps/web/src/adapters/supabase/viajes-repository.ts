@@ -108,6 +108,74 @@ async function fetchAsientosLibres(
 export function createSupabaseViajesRepository(client: Client): ViajesRepository {
   return {
     async search(query: SearchViajesQuery): Promise<ViajeListItem[]> {
+      // A→B via ordered stops (places); falls back to exact ruta O/D if RPC missing
+      let fechaDesde = new Date().toISOString();
+      let fechaHasta: string | null = null;
+      if (query.fecha) {
+        const { startIso, endIso } = dayBoundsIso(query.fecha, query.horaDesde);
+        const nowIso = new Date().toISOString();
+        fechaDesde =
+          new Date(startIso).getTime() > Date.now() ? startIso : nowIso;
+        fechaHasta = endIso;
+      }
+
+      const { data: placeRows, error: placeErr } = await client.rpc(
+        "search_viajes_places",
+        {
+          p_origen: query.origen,
+          p_destino: query.destino,
+          p_fecha_desde: fechaDesde,
+          p_fecha_hasta: fechaHasta,
+          p_limit: query.fecha ? 100 : 50,
+        },
+      );
+
+      if (!placeErr && placeRows?.length) {
+        const ids = placeRows.map((r) => r.id);
+        const { data, error } = await client
+          .from("viaje")
+          .select(
+            `
+            id,
+            fecha_salida,
+            precio,
+            estado,
+            offer_source,
+            ruta!inner ( origen, destino ),
+            vehiculo!inner ( patente, marca, modelo, color, capacidad )
+          `,
+          )
+          .in("id", ids)
+          .order("fecha_salida", { ascending: true });
+
+        if (error) {
+          throw new Error(`viajes.search failed: ${error.message}`);
+        }
+
+        const rows = data ?? [];
+        return Promise.all(
+          rows.map(async (row) => {
+            const typed = row as unknown as {
+              id: string;
+              fecha_salida: string;
+              precio: number;
+              estado: EstadoViaje;
+              offer_source?: "peer" | "tubi_operated" | null;
+              ruta: RutaEmbed | RutaEmbed[] | null;
+              vehiculo: VehiculoEmbed | VehiculoEmbed[] | null;
+            };
+            const vehiculo = one(typed.vehiculo);
+            const libres = await fetchAsientosLibres(
+              client,
+              typed.id,
+              vehiculo?.capacidad ?? 0,
+            );
+            return toListItem(typed, libres);
+          }),
+        );
+      }
+
+      // Fallback: exact ruta origen/destino (pre-places)
       let q = client
         .from("viaje")
         .select(
@@ -127,7 +195,6 @@ export function createSupabaseViajesRepository(client: Client): ViajesRepository
 
       if (query.fecha) {
         const { startIso, endIso } = dayBoundsIso(query.fecha, query.horaDesde);
-        // Nunca ofrecer salidas ya pasadas, incluso con un día "hoy".
         const nowIso = new Date().toISOString();
         const start =
           new Date(startIso).getTime() > Date.now() ? startIso : nowIso;

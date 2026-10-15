@@ -9,6 +9,11 @@ export type {
 export type { ViajesRepository } from "./ports";
 export { searchViajesSchema, type SearchViajesInput } from "./schemas";
 export {
+  matchesPlaceSequence,
+  filterTripsByPlaceSequence,
+  type StopCity,
+} from "./place-sequence";
+export {
   groupViajesByFechaLocal,
   type ViajeGrupo,
 } from "./group-by-day";

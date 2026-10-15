@@ -31,9 +31,17 @@ export default async function OperadorPage({ searchParams }: PageProps) {
       <AppHeader roleLabel="Operador" />
       <main className="flex min-h-0 flex-1 flex-col gap-5 px-5 pb-4 pt-3 overflow-y-auto overscroll-y-contain">
         <div className="flex flex-col gap-1">
-          <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">
-            Señas pendientes
-          </h1>
+          <div className="flex items-baseline justify-between gap-2">
+            <h1 className="font-heading text-[28px] font-semibold leading-tight text-foreground">
+              Señas pendientes
+            </h1>
+            <Link
+              href="/operador/detective"
+              className="shrink-0 text-sm font-semibold text-primary"
+            >
+              Detective
+            </Link>
+          </div>
           <p className="text-sm font-medium text-muted-foreground">
             {items.length === 0
               ? "Nada para revisar"
