@@ -126,11 +126,18 @@ export async function POST(req: Request) {
   );
 
   if (kycStatus) {
-    await admin.rpc("apply_driver_kyc_result", {
+    const { error: applyErr } = await admin.rpc("apply_driver_kyc_result", {
       p_user_id: userId,
       p_status: kycStatus,
       p_dni_verificado: kycStatus === "verified" ? true : null,
     });
+    if (applyErr) {
+      console.error("didit apply_driver_kyc_result", applyErr.message);
+      return NextResponse.json(
+        { error: "apply_kyc_failed", detail: applyErr.message },
+        { status: 500 },
+      );
+    }
   }
 
   return NextResponse.json({ ok: true });
