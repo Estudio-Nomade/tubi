@@ -61,3 +61,5 @@ _bmad/render/
 .codegraph/
 .vercel/
 apps/web/.vercel/
+.vercel
+.env*
