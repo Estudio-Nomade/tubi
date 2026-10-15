@@ -277,6 +277,27 @@ export type Database = {
         };
         Relationships: [];
       };
+      didit_webhook_events: {
+        Row: {
+          event_id: string;
+          session_id: string | null;
+          status: string | null;
+          processed_at: string;
+        };
+        Insert: {
+          event_id: string;
+          session_id?: string | null;
+          status?: string | null;
+          processed_at?: string;
+        };
+        Update: {
+          event_id?: string;
+          session_id?: string | null;
+          status?: string | null;
+          processed_at?: string;
+        };
+        Relationships: [];
+      };
       detective_signal: {
         Row: {
           id: string;

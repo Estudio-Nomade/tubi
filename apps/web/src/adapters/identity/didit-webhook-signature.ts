@@ -1,8 +1,9 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 
 /**
- * Didit webhook signature helpers (docs.didit.me integration/webhooks).
- * Prefer X-Signature-V2 + canonical JSON; fallback X-Signature-Simple.
+ * Didit webhook signature (docs.didit.me + official integration prompt).
+ * X-Signature-V2 over canonical JSON; freshness from SIGNED body.timestamp
+ * (never the unsigned X-Timestamp header).
  */
 
 function shortenFloats(data: unknown): unknown {
@@ -44,34 +45,60 @@ function safeEqualHex(a: string, b: string): boolean {
   }
 }
 
+/** Canonical JSON matching Didit server signing. */
+export function diditCanonicalJson(jsonBody: unknown): string {
+  return JSON.stringify(sortKeys(shortenFloats(jsonBody)));
+}
+
+export function isDiditTimestampFresh(
+  bodyTimestamp: unknown,
+  nowSec = Math.floor(Date.now() / 1000),
+  maxSkewSec = 300,
+): boolean {
+  const ts = typeof bodyTimestamp === "number"
+    ? bodyTimestamp
+    : typeof bodyTimestamp === "string"
+      ? Number.parseInt(bodyTimestamp, 10)
+      : Number.NaN;
+  if (!Number.isFinite(ts) || ts <= 0) return false;
+  return Math.abs(nowSec - ts) <= maxSkewSec;
+}
+
+/**
+ * Verify X-Signature-V2. Freshness must use body.timestamp (signed), not headers.
+ */
 export function verifyDiditSignatureV2(
   jsonBody: unknown,
   signatureHeader: string,
-  timestampHeader: string,
   secret: string,
 ): boolean {
-  const ts = Number.parseInt(timestampHeader, 10);
-  if (!Number.isFinite(ts)) return false;
-  const now = Math.floor(Date.now() / 1000);
-  if (Math.abs(now - ts) > 300) return false;
+  if (!signatureHeader || !secret) return false;
+  if (
+    !jsonBody ||
+    typeof jsonBody !== "object" ||
+    !isDiditTimestampFresh((jsonBody as Record<string, unknown>).timestamp)
+  ) {
+    return false;
+  }
 
-  const canonical = JSON.stringify(sortKeys(shortenFloats(jsonBody)));
+  const canonical = diditCanonicalJson(jsonBody);
   const expected = createHmac("sha256", secret)
     .update(canonical, "utf8")
     .digest("hex");
   return safeEqualHex(expected, signatureHeader);
 }
 
+/**
+ * Fallback X-Signature-Simple (envelope only — decision not authenticated).
+ * Still requires fresh body.timestamp.
+ */
 export function verifyDiditSignatureSimple(
   jsonBody: Record<string, unknown>,
   signatureHeader: string,
-  timestampHeader: string,
   secret: string,
 ): boolean {
-  const ts = Number.parseInt(timestampHeader, 10);
-  if (!Number.isFinite(ts)) return false;
-  const now = Math.floor(Date.now() / 1000);
-  if (Math.abs(now - ts) > 300) return false;
+  if (!signatureHeader || !secret) return false;
+  if (!isDiditTimestampFresh(jsonBody.timestamp)) return false;
 
   const canonical = [
     jsonBody.timestamp ?? "",
@@ -88,29 +115,28 @@ export function verifyDiditWebhook(
   headers: {
     signatureV2: string | null;
     signatureSimple: string | null;
-    timestamp: string | null;
   },
   secret: string,
 ): boolean {
-  if (!headers.timestamp || !secret) return false;
+  if (!secret || !body || typeof body !== "object") return false;
+
   if (
     headers.signatureV2 &&
-    verifyDiditSignatureV2(body, headers.signatureV2, headers.timestamp, secret)
+    verifyDiditSignatureV2(body, headers.signatureV2, secret)
   ) {
     return true;
   }
+
   if (
     headers.signatureSimple &&
-    body &&
-    typeof body === "object" &&
     verifyDiditSignatureSimple(
       body as Record<string, unknown>,
       headers.signatureSimple,
-      headers.timestamp,
       secret,
     )
   ) {
     return true;
   }
+
   return false;
 }

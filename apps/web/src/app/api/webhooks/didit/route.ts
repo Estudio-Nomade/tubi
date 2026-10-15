@@ -10,9 +10,10 @@ import { createServiceClient } from "@/lib/supabase/service";
 export const runtime = "nodejs";
 
 /**
- * Didit webhook: status.updated → update driver_kyc_sessions + profiles.
- * Configure destination URL to https://<host>/api/webhooks/didit
- * Env: DIDIT_WEBHOOK_SECRET (secret_shared_key from Didit destination)
+ * Didit webhook (v3 destination).
+ * URL: https://www.tubi.autos/api/webhooks/didit
+ * Events: status.updated, data.updated
+ * Verify X-Signature-V2; freshness from signed body.timestamp; dedupe event_id.
  */
 export async function POST(req: Request) {
   const secret = process.env.DIDIT_WEBHOOK_SECRET?.trim();
@@ -35,7 +36,6 @@ export async function POST(req: Request) {
     {
       signatureV2: req.headers.get("x-signature-v2"),
       signatureSimple: req.headers.get("x-signature-simple"),
-      timestamp: req.headers.get("x-timestamp"),
     },
     secret,
   );
@@ -65,9 +65,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "missing session_id" }, { status: 400 });
   }
 
-  const domainStatus = mapProviderStatus(rawStatus);
-  const kycStatus = toDriverKycStatus(domainStatus);
-
   let admin;
   try {
     admin = createServiceClient();
@@ -77,6 +74,31 @@ export async function POST(req: Request) {
       { status: 503 },
     );
   }
+
+  // Idempotency: unique event_id (Didit retries)
+  if (event.event_id) {
+    const { error: dedupeErr } = await admin
+      .from("didit_webhook_events")
+      .insert({
+        event_id: event.event_id,
+        session_id: sessionId,
+        status: rawStatus,
+      });
+    if (dedupeErr) {
+      // unique violation → already processed
+      if (
+        dedupeErr.code === "23505" ||
+        dedupeErr.message.toLowerCase().includes("duplicate")
+      ) {
+        return NextResponse.json({ ok: true, duplicate: true });
+      }
+      // table missing or other: log and continue (better than drop events)
+      console.error("didit event_id insert", dedupeErr.message);
+    }
+  }
+
+  const domainStatus = mapProviderStatus(rawStatus);
+  const kycStatus = toDriverKycStatus(domainStatus);
 
   const { data: sessionRow } = await admin
     .from("driver_kyc_sessions")
@@ -92,18 +114,16 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: true, unmatched: true });
   }
 
-  await admin
-    .from("driver_kyc_sessions")
-    .upsert(
-      {
-        user_id: userId,
-        external_session_id: sessionId,
-        provider: "didit",
-        status: domainStatus,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "external_session_id" },
-    );
+  await admin.from("driver_kyc_sessions").upsert(
+    {
+      user_id: userId,
+      external_session_id: sessionId,
+      provider: "didit",
+      status: domainStatus,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "external_session_id" },
+  );
 
   if (kycStatus) {
     await admin.rpc("apply_driver_kyc_result", {
