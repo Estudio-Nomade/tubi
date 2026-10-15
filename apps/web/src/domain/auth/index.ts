@@ -13,6 +13,7 @@ export {
   legacyRolFromCapabilities,
   primaryHomePath,
   assertDriverKycStatus,
+  driverKycStatusLabel,
 } from "./capabilities";
 export { digitsOnly, formatDniInput } from "./dni";
 export {

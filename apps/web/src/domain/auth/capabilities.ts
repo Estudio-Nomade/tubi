@@ -51,3 +51,19 @@ export function assertDriverKycStatus(s: string): DriverKycStatus {
   }
   throw new Error(`Invalid driverKycStatus: ${s}`);
 }
+
+/** User-facing Spanish label for driver KYC status (never raw enum). */
+export function driverKycStatusLabel(status: DriverKycStatus): string {
+  switch (status) {
+    case "unverified":
+      return "Sin verificar";
+    case "pending_kyc":
+      return "En revisión";
+    case "verified":
+      return "Verificado";
+    case "rejected":
+      return "Rechazado";
+    case "suspended":
+      return "Suspendido";
+  }
+}

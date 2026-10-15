@@ -6,6 +6,7 @@ import {
   canDrive,
   canOperate,
   canTravel,
+  driverKycStatusLabel,
   legacyRolFromCapabilities,
   primaryHomePath,
 } from "./capabilities";
@@ -180,5 +181,15 @@ describe("assertDriverKycStatus", () => {
 
   it("throws on unknown status", () => {
     assert.throws(() => assertDriverKycStatus("nope"), /driverKycStatus/i);
+  });
+});
+
+describe("driverKycStatusLabel", () => {
+  it("returns Spanish labels, never raw enum keys", () => {
+    assert.equal(driverKycStatusLabel("unverified"), "Sin verificar");
+    assert.equal(driverKycStatusLabel("pending_kyc"), "En revisión");
+    assert.equal(driverKycStatusLabel("verified"), "Verificado");
+    assert.equal(driverKycStatusLabel("rejected"), "Rechazado");
+    assert.equal(driverKycStatusLabel("suspended"), "Suspendido");
   });
 });
