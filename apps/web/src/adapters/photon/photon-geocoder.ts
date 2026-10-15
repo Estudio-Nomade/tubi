@@ -166,26 +166,34 @@ export function createPhotonGeocoder(): Geocoder {
       const q = input.query.trim();
       if (!q) return { results: [], error: null };
 
-      // Intento A: bias completo (lat/lon + bbox). Intento B: sin bbox (solo
-      // lat/lon). Intento C: q + " Tandil" sin bbox, cuando A/B no devuelven
-      // nada y la query no menciona la ciudad. Así el predictivo no se queda
-      // en empty por un bbox o una query demasiado local.
+      // A: full bias (lat/lon + bbox). B: lat/lon only. C: q + citySuffix when
+      // A/B empty (Tandil bbox path or caller already appended near-city).
       const attempts: { q: string; bias?: GeocodeBias }[] = [];
       const bias = input.bias;
+      const citySuffix = (input.cityHint ?? "Tandil").trim();
 
       if (bias) {
         attempts.push({ q, bias });
         if (bias.bbox) {
           attempts.push({ q, bias: { lat: bias.lat, lon: bias.lon } });
-          if (!q.toLowerCase().includes("tandil")) {
+          if (
+            citySuffix &&
+            !q.toLowerCase().includes(citySuffix.toLowerCase())
+          ) {
             attempts.push({
-              q: `${q} Tandil`,
+              q: `${q} ${citySuffix}`,
               bias: { lat: bias.lat, lon: bias.lon },
             });
           }
         }
       } else {
         attempts.push({ q });
+        if (
+          citySuffix &&
+          !q.toLowerCase().includes(citySuffix.toLowerCase())
+        ) {
+          attempts.push({ q: `${q} ${citySuffix}` });
+        }
       }
 
       let sawError = false;

@@ -35,10 +35,10 @@ function mapSolicitarError(message: string): string {
     return "No quedan asientos en este viaje.";
   }
   if (message.includes("RECOGIDA_REQUERIDA")) {
-    return "Indicá dónde te buscamos en Tandil.";
+    return "Indicá dónde te buscamos.";
   }
   if (message.includes("RECOGIDA_FUERA_ZONA")) {
-    return "Ese punto queda fuera de Tandil.";
+    return "Ese punto queda fuera de la zona de recogida del viaje.";
   }
   if (message.includes("RECOGIDA_INVALIDA")) {
     return "El punto de recogida no es válido.";

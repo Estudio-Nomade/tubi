@@ -180,19 +180,14 @@ export default async function PasajeroPage({ searchParams }: PageProps) {
           </>
         )}
 
-        <Link
-          href="/pasajero/reservas"
-          className="inline-flex h-11 w-full items-center justify-center rounded-[14px] border border-border bg-card text-sm font-semibold text-foreground"
-        >
-          Mis reservas
-        </Link>
-
-        <Link
-          href="/pasajero/cupones"
-          className="inline-flex h-11 w-full items-center justify-center rounded-[14px] border border-border bg-card text-sm font-semibold text-foreground"
-        >
-          Mis cupones
-        </Link>
+        <div className="flex flex-col gap-2">
+          <BtnSecondary asChild>
+            <Link href="/pasajero/reservas">Mis reservas</Link>
+          </BtnSecondary>
+          <BtnSecondary asChild>
+            <Link href="/pasajero/cupones">Mis cupones</Link>
+          </BtnSecondary>
+        </div>
 
         <div className="flex-1" aria-hidden />
       </main>

@@ -126,10 +126,12 @@ export async function createReservaAction(
       return { error: "Ese viaje ya no se puede reservar." };
     }
     if (message === "RECOGIDA_REQUERIDA") {
-      return { error: "Indicá dónde te buscamos en Tandil." };
+      return { error: "Indicá dónde te buscamos." };
     }
     if (message === "RECOGIDA_FUERA_ZONA") {
-      return { error: "Ese punto queda fuera de Tandil. Elegí uno dentro de la zona." };
+      return {
+        error: "Ese punto queda fuera de la zona de recogida del viaje.",
+      };
     }
     if (message === "RECOGIDA_INVALIDA") {
       return { error: "El punto de recogida no es válido." };

@@ -225,6 +225,7 @@ export default async function ViajeDetailPage({
         <ReservePanel
           viajeId={viaje.id}
           pickupMode={pickupMode}
+          origenCiudad={viaje.origen}
           fixedLabel={fixedLabel}
           precio={viaje.precio}
           montoSena={montoSena}

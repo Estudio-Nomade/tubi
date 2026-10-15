@@ -20,6 +20,8 @@ export type ReserveCuponOption = {
 type Props = {
   viajeId: string;
   pickupMode: PickupMode;
+  /** Trip origin city — drives free-pickup copy and geocode bias. */
+  origenCiudad: string;
   fixedLabel: string | null;
   precio: number;
   montoSena: number;
@@ -30,10 +32,11 @@ type Props = {
   disabledReason?: string;
 };
 
-/** Footer del detalle de viaje: recogida (Tandil libre / CABA fijo) + cupón + reserva. */
+/** Trip detail footer: pickup + coupon + reserve/request CTA. */
 export function ReservePanel({
   viajeId,
   pickupMode,
+  origenCiudad,
   fixedLabel,
   precio,
   montoSena,
@@ -44,13 +47,14 @@ export function ReservePanel({
 }: Props) {
   const [pickup, setPickup] = useState<RecogidaInput | null>(null);
   const [cuponId, setCuponId] = useState("");
-  const isTandil = pickupMode === "libre_tandil";
-  const needPickup = isTandil && !pickup;
+  const city = origenCiudad.trim() || "Tandil";
+  const isFreePickup = pickupMode === "libre_tandil";
+  const needPickup = isFreePickup && !pickup;
   const reserveDisabled = disabled || needPickup;
   const reason = disabled
     ? disabledReason
     : needPickup
-      ? "Elegí o escribí dónde te buscamos en Tandil."
+      ? `Elegí o escribí dónde te buscamos en ${city}.`
       : undefined;
 
   const descuento = useMemo(() => {
@@ -66,15 +70,19 @@ export function ReservePanel({
         <p className="text-xs font-medium text-muted-foreground">
           ¿Dónde te buscamos?
         </p>
-        {isTandil ? (
-          <PickupPlacePicker value={pickup} onChange={setPickup} />
+        {isFreePickup ? (
+          <PickupPlacePicker
+            value={pickup}
+            onChange={setPickup}
+            city={city}
+          />
         ) : (
           <p className="flex items-start gap-2 rounded-xl bg-muted/60 px-3 py-2.5 text-sm font-medium text-foreground">
             <MapPin
               className="mt-0.5 size-4 shrink-0 text-primary"
               aria-hidden
             />
-            <span>{fixedLabel ?? "Punto de recogida de la ruta"}</span>
+            <span>{fixedLabel ?? `Punto de recogida en ${city}`}</span>
           </p>
         )}
       </div>
@@ -153,7 +161,7 @@ export function ReservePanel({
       <ReserveButton
         viajeId={viajeId}
         mode={bookMode}
-        pickup={isTandil ? pickup : null}
+        pickup={isFreePickup ? pickup : null}
         cuponUsuarioId={bookMode === "book" ? cuponId || null : null}
         disabled={reserveDisabled}
         disabledReason={reason}

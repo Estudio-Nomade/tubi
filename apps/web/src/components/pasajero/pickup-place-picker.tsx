@@ -18,10 +18,19 @@ type Suggestion = {
 type Props = {
   value: RecogidaInput | null;
   onChange: (value: RecogidaInput | null) => void;
+  /** City used in copy + geocode bias (trip origin). */
+  city?: string;
 };
 
-/** Picker de lugar de recogida en Tandil vía Photon (detrás del proxy). */
-export function PickupPlacePicker({ value, onChange }: Props) {
+/** Free pickup address picker (Photon). Default bias: trip origin city. */
+export function PickupPlacePicker({
+  value,
+  onChange,
+  city = "Tandil",
+}: Props) {
+  const cityLabel = city.trim() || "Tandil";
+  const bias =
+    cityLabel.toLowerCase() === "tandil" ? "tandil" : undefined;
   const [query, setQuery] = useState(value?.label ?? "");
   const [results, setResults] = useState<Suggestion[]>([]);
   const [open, setOpen] = useState(false);
@@ -56,9 +65,10 @@ export function PickupPlacePicker({ value, onChange }: Props) {
     setNoResults(false);
     timerRef.current = setTimeout(async () => {
       try {
-        const res = await fetch(
-          `/api/geocode?q=${encodeURIComponent(q)}&bias=tandil`,
-        );
+        const qs = new URLSearchParams({ q });
+        if (bias) qs.set("bias", bias);
+        else qs.set("near", cityLabel);
+        const res = await fetch(`/api/geocode?${qs.toString()}`);
         if (!res.ok) {
           setError("No se pudo buscar. Probá de nuevo.");
           setResults([]);
@@ -90,7 +100,7 @@ export function PickupPlacePicker({ value, onChange }: Props) {
         setLoading(false);
       }
     }, 350);
-  }, []);
+  }, [bias, cityLabel]);
 
   function select(s: Suggestion) {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -157,7 +167,7 @@ export function PickupPlacePicker({ value, onChange }: Props) {
             setAproximada(false);
             search(e.target.value);
           }}
-          placeholder="Buscá tu dirección en Tandil"
+          placeholder={`Buscá tu dirección en ${cityLabel}`}
           autoComplete="off"
           className={cn(
             "h-13 w-full min-w-0 rounded-xl border border-border bg-muted pl-10 pr-4 text-base font-medium text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
@@ -207,7 +217,7 @@ export function PickupPlacePicker({ value, onChange }: Props) {
 
       {noResults && !loading ? (
         <p className="text-xs font-medium text-muted-foreground" role="status">
-          No encontramos esa dirección. Probá con calle y altura en Tandil.
+          {`No encontramos esa dirección. Probá con calle y altura en ${cityLabel}.`}
         </p>
       ) : null}
 
@@ -240,7 +250,7 @@ export function PickupPlacePicker({ value, onChange }: Props) {
 
       {value && aproximada ? (
         <p className="text-xs font-medium text-muted-foreground" role="status">
-          Dirección escrita · ubicación aproximada en Tandil.
+          {`Dirección escrita · ubicación aproximada en ${cityLabel}.`}
         </p>
       ) : null}
     </div>

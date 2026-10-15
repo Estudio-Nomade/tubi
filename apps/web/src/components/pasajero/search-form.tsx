@@ -32,7 +32,7 @@ export function SearchForm({
     const o = origen.trim();
     const d = destino.trim();
     if (!o || !d) {
-      setError("Elegí origen y destino de la lista.");
+      setError("Indicá origen y destino.");
       return;
     }
     if (o.toLowerCase() === d.toLowerCase()) {
@@ -86,7 +86,7 @@ export function SearchForm({
 
       <BtnPrimary type="submit">Ver viajes</BtnPrimary>
       <p className="text-center text-xs font-medium text-muted-foreground">
-        Escribí unas letras y elegí la ciudad de la lista.
+        Podés buscar cualquier ciudad. Si no hay viajes, te lo decimos.
       </p>
     </form>
   );

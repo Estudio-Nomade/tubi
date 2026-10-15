@@ -11,9 +11,10 @@ type Props = {
   onChange: (value: string) => void;
   required?: boolean;
   disabled?: boolean;
+  placeholder?: string;
 };
 
-/** Text field with catalog city suggestions (Tubi routes/stops). */
+/** Origin/destination field: catalog + Photon cities; free text allowed. */
 export function CityField({
   label,
   name,
@@ -21,6 +22,7 @@ export function CityField({
   onChange,
   required,
   disabled,
+  placeholder = "Ciudad o localidad",
 }: Props) {
   const listId = useId();
   const [query, setQuery] = useState(value);
@@ -29,12 +31,10 @@ export function CityField({
   const [loading, setLoading] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
-  const selectedRef = useRef(value);
   const reqIdRef = useRef(0);
 
   useEffect(() => {
     setQuery(value);
-    selectedRef.current = value;
   }, [value]);
 
   useEffect(() => {
@@ -85,13 +85,12 @@ export function CityField({
       } finally {
         if (reqId === reqIdRef.current) setLoading(false);
       }
-    }, 200);
+    }, 250);
   }
 
   function select(city: string) {
     if (timerRef.current) clearTimeout(timerRef.current);
     reqIdRef.current += 1;
-    selectedRef.current = city;
     setQuery(city);
     onChange(city);
     setOpen(false);
@@ -99,17 +98,20 @@ export function CityField({
     setLoading(false);
   }
 
-  function onBlur() {
+  function commitTyped() {
     const typed = query.trim();
+    if (!typed) {
+      onChange("");
+      return;
+    }
     const exact = results.find((c) => c.toLowerCase() === typed.toLowerCase());
     if (exact) {
       select(exact);
       return;
     }
-    // Only commit canonical catalog values to the parent (search uses .eq).
-    if (typed.toLowerCase() !== selectedRef.current.toLowerCase()) {
-      setQuery(selectedRef.current);
-    }
+    // Free search: keep what the user typed (not catalog-only).
+    onChange(typed);
+    setQuery(typed);
   }
 
   const inputId = `city-${name}`;
@@ -126,6 +128,7 @@ export function CityField({
         required={required}
         disabled={disabled}
         autoComplete="off"
+        placeholder={placeholder}
         role="combobox"
         aria-expanded={open}
         aria-controls={listId}
@@ -133,12 +136,13 @@ export function CityField({
         onChange={(e) => {
           const next = e.target.value;
           setQuery(next);
+          onChange(next);
           fetchCities(next);
         }}
         onFocus={() => {
           if (query.trim().length >= 1) fetchCities(query);
         }}
-        onBlur={onBlur}
+        onBlur={commitTyped}
         className={cn(
           "h-13 w-full min-w-0 rounded-xl border border-border bg-muted px-3.5 text-base font-medium text-foreground transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50",
         )}

@@ -5,8 +5,8 @@ import { TANDIL_BBOX, TANDIL_CENTER } from "@/domain/geo";
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * Proxy de geocodificación (AD-9): el browser nunca llama a Photon directo.
- * Forward: GET /api/geocode?q=<texto>&bias=tandil
+ * Geocode proxy (AD-9): browser never calls Photon directly.
+ * Forward: GET /api/geocode?q=<text>&bias=tandil | &near=<city>
  * Reverse: GET /api/geocode?lat=<lat>&lng=<lng>
  */
 export async function GET(request: Request) {
@@ -21,11 +21,9 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const q = (url.searchParams.get("q") ?? "").trim();
   const biasParam = (url.searchParams.get("bias") ?? "").trim().toLowerCase();
+  const near = (url.searchParams.get("near") ?? "").trim();
   const limitRaw = Number(url.searchParams.get("limit") ?? "6");
 
-  // `lat`/`lng` ausentes → get() devuelve null → Number(null) === 0 (finito).
-  // Detectar reverse por presencia del parámetro, no por Number(), o todo
-  // search caería en el branch reverse (reverse en 0,0 → features vacías).
   const latParam = url.searchParams.get("lat");
   const lngParam = url.searchParams.get("lng");
   const isReverse = latParam !== null && lngParam !== null;
@@ -54,13 +52,17 @@ export async function GET(request: Request) {
   const results = await geocoder.search({
     query: q,
     bias,
+    cityHint: near || (biasParam === "tandil" ? "Tandil" : undefined),
   });
 
   if (results.error) {
     return NextResponse.json({ results: [], error: results.error });
   }
 
-  const limit = Number.isFinite(limitRaw) && limitRaw > 0 ? limitRaw : results.results.length;
+  const limit =
+    Number.isFinite(limitRaw) && limitRaw > 0
+      ? limitRaw
+      : results.results.length;
 
   return NextResponse.json({ results: results.results.slice(0, limit) });
 }

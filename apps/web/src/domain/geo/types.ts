@@ -25,7 +25,9 @@ export type GeocodeBias = {
 export type GeocodeInput = {
   query: string;
   bias?: GeocodeBias;
-};
+  /** Optional locality appended when bias search is empty (default Tandil). */
+  cityHint?: string;
+}
 
 export type GeocodeSearchResult = {
   results: GeocodeSuggestion[];
