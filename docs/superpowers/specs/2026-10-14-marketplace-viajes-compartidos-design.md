@@ -20,7 +20,7 @@ Abrir un **marketplace mínimo** al costado del MVP actual para:
 3. **Diferenciar** la oferta propia con el badge **“Operado por Tubi”** (narrativa de marca, no prioridad artificial en el listado).
 
 ### Enfoque elegido
-**Marketplace mínimo en la misma app** (no dos productos, no big-bang con escrow/chat rico/ratings día 1):
+**Marketplace mínimo en la misma app** (no dos productos, no big-bang con escrow/ratings día 1):
 
 - Un solo listado.
 - Dos orígenes de oferta en el **viaje** (`peer` | `tubi_operated`).
@@ -37,9 +37,10 @@ Abrir un **marketplace mínimo** al costado del MVP actual para:
 4. **Flujo de negocio único** para peer y Operado por Tubi (solicitud → aceptación → seña → QR → saldo…).
 5. **Seña a Tubi** (no escrow en este corte). Escrow es evolución.
 6. **Comisión 15% solo en peer.** Viajes Operado por Tubi mantienen acuerdo interno con el conductor.
-7. **Mapas:** MapLibre + OSM detrás de `MapsProvider` si hace falta ruteo. No Google como dependencia de este diseño.
-8. **Valores de negocio en settings**, nunca hardcodeados.
-9. **Proveedores detrás de interfaces** (`PaymentProvider`, `MapsProvider`, `IdentityVerifier`).
+7. **Sin mapas ni GPS en vivo en este diseño.** PWA: la ubicación en background no es confiable cross-device; no se promete tracking ni UI de mapa. Rutas = lugares y paradas **estructurados** (listas ordenadas), no canvas de mapa.
+8. **Chat in-app = único canal de comunicación** entre pasajero y conductor. No se desbloquea teléfono/WhatsApp en el producto.
+9. **Valores de negocio en settings**, nunca hardcodeados.
+10. **Proveedores detrás de interfaces** (`PaymentProvider`, `IdentityVerifier`; geocoding/distancias server-side si hace falta, sin `MapsProvider` de UI).
 
 ---
 
@@ -206,7 +207,7 @@ Post-viaje: no “debés castigo a la app”, sino **“Liquidá tu comisión �
 
 ### Efectivo y transferencia del saldo
 - **Efectivo:** el conductor peer cobra el saldo en mano; Tubi no intercepta ese cash.
-- **Transferencia del saldo (peer):** el pasajero transfiere al **alias/CBU del conductor** (visible solo con seña confirmada), o registra comprobante en app; no es custodia Tubi.
+- **Transferencia del saldo (peer):** el pasajero transfiere al **alias/CBU del conductor**. Esos datos de **pago** se muestran solo post-seña en pantalla de pago in-app o se pegan en el **chat** (no es teléfono/WhatsApp de contacto personal); no es custodia Tubi.
 - La comisión queda como obligación del conductor hacia Tubi en ambos casos.
 
 ### Waterfall de plata (peer) — invariante contable
@@ -252,15 +253,17 @@ Que el bypass sea más caro/riesgoso que cerrar en Tubi — sin pretender 0%.
 ### Gates de información (peer; Operado por Tubi puede reutilizar el mismo esquema)
 | Momento | Visible |
 |---|---|
-| Antes de solicitar | Ruta, horario, precio tramo, cupos, badge, métricas blandas si hay historial |
-| Solicitud / seña en curso | Datos útiles de viaje (vehículo, punto de encuentro) **sin** teléfono/WhatsApp del otro |
-| Seña confirmada | Contacto y/o chat in-app desbloqueado |
-| En viaje | QR, GPS, estados (valor off-app no replica) |
+| Antes de solicitar | Ruta (paradas ordenadas), horario, precio tramo, cupos, badge, métricas blandas si hay historial |
+| Solicitud / seña en curso | Datos útiles de viaje (vehículo, punto de encuentro acordado como texto/parada) **sin** teléfono ni WhatsApp |
+| Seña confirmada | **Chat in-app desbloqueado** (único canal) |
+| En viaje | QR, estados del viaje (sin mapa ni tracking en vivo en este diseño) |
 
-### Contacto post-seña (alcance de este corte)
-- **Día 1 obligatorio:** desbloqueo de **teléfono/WhatsApp** (o canal de contacto del perfil) solo con seña confirmada + CTA **Reportar bypass**.
-- **Chat in-app:** opcional en el mismo corte si es barato; si no, se posterga. No es blocker del marketplace mínimo.
-- Si hay chat: solo post-seña; filtro básico de patrones de teléfono / “mandame al WhatsApp”.
+### Chat in-app (obligatorio — único medio)
+- **Único canal de comunicación** pasajero ↔ conductor. El producto **no** muestra ni desbloquea teléfono, WhatsApp ni otros contactos directos.
+- Se habilita solo con **seña confirmada** (y solicitud aceptada).
+- Filtro de contenido: detectar/bloquear patrones de teléfono, @handles, “mandame al WhatsApp”, links de evasión.
+- CTA permanente: **Reportar intento de eludir la plataforma**.
+- ToS: coordinar el viaje solo por chat Tubi; compartir contacto personal para cerrar el viaje afuera es violación.
 
 ### Cancelaciones como contraincentivo
 Tipificación (reutiliza política actual de seña/ventanas):
@@ -293,38 +296,41 @@ Si la cola está vacía, no molesta; si no, no depende de que el operador “se 
 - Multicuenta: mitigada por KYC conductor.
 
 ### ToS (producto)
-- Condiciones de uso explícitas: prohibido eludir la plataforma para cerrar el viaje; el contacto off-app para coordinar logistica puntual post-seña no equivale a cobrar/pagar el viaje afuera sin liquidar comisión.
+- Condiciones de uso explícitas: prohibido eludir la plataforma; **toda** la coordinación pasajero–conductor va por chat Tubi; cobrar/pagar el viaje afuera sin liquidar comisión es violación.
 - Violación reiterada + señales detective → pausa/suspensión (humano en el loop al inicio).
 
 ---
 
-## 8. Rutas, mapas y búsqueda
+## 8. Rutas y búsqueda (sin mapas)
 
-### Stack
-- `MapsProvider` con implementación **MapLibre + OSM** (geocoding + ruteo) para este diseño.
-- No Google Directions como dependencia.
+### Qué queda fuera (explícito)
+- **UI de mapa** (MapLibre, Google, tiles, canvas).
+- **GPS / tracking en vivo** del vehículo (background location en PWA no es confiable cross-device; no se promete).
+- Dependencia de `MapsProvider` orientado a mapas en cliente.
+- Cualquier feature de este diseño que asuma “ver el auto en el mapa”.
 
-### Publicar ruta (waypoints de primera clase, UX no tortuosa)
-1. Origen y destino por geocoder / pin (estructurados, no textarea).
-2. Motor devuelve **2–3 alternativas** de trazo.
-3. Conductor **elige una**.
-4. Plataforma propone **lista de tramos/paradas sugeridas** sobre esa geometría.
-5. Conductor acepta el set o saca sugeridas.
-6. **+ Agregar parada** (búsqueda/pin) → se **inserta sola** en el orden geográfico correcto del trazo y se recalcula. **No** hay reordenado manual libre (evita Flores → Rauch al revés).
-7. Persistencia estructurada: origin, destination, geometry/polyline, stops ordenados, distance, duration_est.
+### Modelo de ruta (listas estructuradas)
+La ruta es una **secuencia ordenada de lugares**, no un dibujo:
+
+1. Origen y destino por **búsqueda de lugar** (texto / catálogo de places: ciudad, parada conocida, POI con id estable) — **sin pin en mapa**.
+2. El backend puede devolver **2–3 alternativas de corredor** como **listas distintas de paradas sugeridas** (misma idea que “tres rutas”, pero como tramos/ciudades, no polylines en pantalla).
+3. Conductor **elige una** lista.
+4. Puede **sacar** paradas sugeridas o **+ Agregar parada** (misma búsqueda de lugar).
+5. Al agregar, el sistema **inserta en el orden correcto** según orden de corredor / distancia conocida entre places (tabla o cálculo server-side). **No** hay drag libre que permita Flores → Rauch al revés.
+6. Persistencia: `origin_place_id`, `destination_place_id`, `stops[]` ordenados (`place_id`, label, orden), `distance_m` / `duration_s` opcionales **server-side** para precio — sin geometry expuesta al cliente como mapa.
 
 ### Precio y tramos
-- Precio lleno en el viaje; precio pedible por par de stops = f(distancia del subtramo).
+- Precio lleno en el viaje; precio pedible por par de stops = f(distancia del subtramo) usando distancias **server-side** entre places (no UI de mapa).
 
-### Búsqueda pasajero (sin “radio mágico” como producto)
-El pasajero declara **quiero ir de A → B** (lugares reales; ej. Necochea aunque Tubi nunca haya operado ahí):
+### Búsqueda pasajero
+El pasajero declara **quiero ir de A → B** (lugares del catálogo/geocoder de texto; ej. Necochea aunque Tubi nunca haya operado ahí):
 
-1. Geocodifica A y B (place-id / localidad resuelta).
-2. Match de viajes cuya ruta estructurada **sirva el pedido en orden**: el trazo tiene un punto/parada alineado a A y después uno alineado a B (misma localidad/place, no string libre ni radio arbitrario tipo “30 km a la redonda” como regla de negocio central).
+1. Resuelve A y B a `place_id` (o localidad canónica).
+2. Match de viajes cuya secuencia de stops **contenga A y después B** (mismo place / misma localidad canónica — no radio mágico ni string libre).
 3. Resultado = viajes con **tramo pedible** A→B y precio calculado.
-4. Si no hay oferta, lista vacía — la búsqueda **no** está limitada al catálogo histórico de corredores Operado por Tubi.
+4. Si no hay oferta, lista vacía — la búsqueda **no** está limitada al historial de corredores Operado por Tubi.
 
-Principio: **el mapa/geometría es el catálogo**, no una lista fija de rutas oficiales.
+Principio: **el catálogo de lugares + paradas ordenadas es el índice de descubrimiento**, no un mapa ni una lista fija hardcodeada solo de lo que Tubi operó.
 
 ---
 
@@ -359,7 +365,7 @@ Todo configurable sin redeploy, entre otros:
 - `schedule.conflict_margin_*` (solapamiento pasajero/conductor)
 - `reliability.cancel_rate_threshold_*`
 - `detective.*` (ventanas, umbrales de duplas)
-- `maps.*` (tolerancia de match localidad a nivel provider)
+- `places.*` (resolución de localidad / place_id server-side, sin UI de mapa)
 - Política de devolución existente (se mantiene y se tipifica; + causa `cancelled_by_driver` / `cancelled_by_platform`)
 
 ---
@@ -373,22 +379,25 @@ Todo configurable sin redeploy, entre otros:
 - Comisión 15% → solo **peer**, liquidada por conductor.
 - Conductor: de recurso operativo a **cuenta verificable** que puede publicar.
 - Auth: de dos logins a **una persona + switch Viajar/Conducir**.
-- Descubrimiento: de corredor fijo a **búsqueda A→B sobre geometría**.
-- Mapas: MapLibre/OSM para ruteo de este diseño.
+- Descubrimiento: de corredor fijo a **búsqueda A→B sobre lugares/paradas ordenadas**.
+- Comunicación: **solo chat in-app** (no teléfono/WhatsApp entre partes).
+- Sin mapas ni GPS en vivo en el alcance de este diseño (PWA).
 
 ### Se mantiene
 - Web mobile-first / PWA.
 - Seña a Tubi + política de ventanas de cancelación (marco).
-- QR, estados de viaje, GPS offline queue, espera en recogida.
-- Providers e interfaces.
+- QR, estados de viaje, espera en recogida.
+- Providers e interfaces (`PaymentProvider`, `IdentityVerifier`).
 - Settings en DB + `.env` para secretos.
 
 ### Entidades / conceptos nuevos o extendidos
 - `User` unificado + capabilities + `ui_mode`
 - `DriverKyc` / estado vía `IdentityVerifier`
-- `Trip.offer_source`, geometry, stops, full_price
+- `Trip.offer_source`, stops ordenados (`place_id`), full_price
+- `Place` (catálogo / id estable de localidad o parada)
 - `SeatRequest` (o extensión de `Reservation` con estados de solicitud)
 - `CommissionObligation` (peer)
+- `ChatThread` / mensajes (único canal post-seña)
 - `ReliabilityStats` / eventos de cancelación tipificados
 - `DetectiveSignal` (cola operador)
 - `Notification` / outbox de eventos
@@ -399,9 +408,10 @@ Todo configurable sin redeploy, entre otros:
 ## 12. Fuera de alcance (este diseño)
 
 - Escrow de seña / pasarela completa
-- Chat rico, ratings completos, reputación elaborada
+- Ratings completos, reputación elaborada
 - Apps nativas
-- Google Maps como dependencia
+- **UI de mapas** (MapLibre, Google, tiles) y **GPS / tracking en vivo** (background location PWA)
+- Desbloqueo de teléfono/WhatsApp entre pasajero y conductor
 - Policía de “línea vacía”
 - KYC fuerte de pasajero
 - Prioridad artificial de Tubi en el listado
@@ -413,7 +423,7 @@ Todo configurable sin redeploy, entre otros:
 
 | Riesgo | Mitigación |
 |---|---|
-| Bypass off-platform | Gate de contacto, seña a Tubi, valor QR/GPS, reportes, detective, métricas |
+| Bypass off-platform | Chat único post-seña, filtro de teléfonos, seña a Tubi, QR, reportes, detective, métricas |
 | Conductor no liquida 15% | UX clara “tu parte”, bloqueo de publicación, detective |
 | Multicuenta conductor | KYC Didit al primer uso conductor |
 | Migración auth dual | Plan de fusión de cuentas; feature flag marketplace |
@@ -446,9 +456,9 @@ Orientativo para el plan posterior:
 4. Solicitud/aceptación + notificaciones  
 5. Precio por tramo + seña %  
 6. Liquidación comisión peer  
-7. Mapas/rutas/waypoints + búsqueda A→B  
-8. Cancelaciones tipificadas + detective mínimo  
-9. Gates de contacto / anti-bypass  
+7. Rutas por places/paradas + búsqueda A→B (sin UI de mapa)  
+8. Chat in-app post-seña (único canal) + anti-bypass  
+9. Cancelaciones tipificadas + detective mínimo  
 10. Migración de cuentas legacy + flag marketplace  
 
 ---
@@ -467,7 +477,8 @@ Orientativo para el plan posterior:
 - [x] Badge/origen en el viaje; conductor desacoplado del aval  
 - [x] Una cuenta; switch Viajar/Conducir siempre visible (no long-press)  
 - [x] No regular “línea vacía”  
-- [x] MapLibre + OSM; waypoints auto-ordenados; búsqueda A→B  
+- [x] Rutas por places/paradas ordenadas; búsqueda A→B; **sin mapas ni GPS**  
+- [x] Chat in-app **único** canal post-seña (sin teléfono/WhatsApp)  
 - [x] Detective mínimo + notificaciones PWA  
 - [x] Cancelaciones tipificadas como contraincentivo  
 - [x] Waterfall seña↔comisión sin doble cobro  
@@ -475,7 +486,6 @@ Orientativo para el plan posterior:
 - [x] Solicitud→aceptación también con marketplace flag off  
 - [x] Solapamiento agenda con márgenes en settings  
 - [x] Migración KYC conductores Tubi existentes  
-- [x] Contacto post-seña día 1; chat in-app no blocker  
 
 ---
 
@@ -487,10 +497,11 @@ Orientativo para el plan posterior:
 3. **Flag marketplace** — peer se apaga con flag; solicitud→aceptación **no**.
 4. **Solapamiento** — definición con intervalos y márgenes en settings.
 5. **KYC conductores legacy Tubi** — deben verificarse antes de nuevas asignaciones.
-6. **Chat** — desbloqueado como no-blocker; contacto post-seña sí es día 1.
-7. **Cancelación de viaje completo** y **peer sin obligación de salir con 1 pax**.
-8. **Saldo por transferencia peer** — al conductor, no custodia Tubi.
-9. **ToS anti-bypass** — párrafo explícito.
+6. **Chat in-app** — único canal; sin teléfono/WhatsApp (corregido: ya no es opcional).
+7. **Sin mapas/GPS** — PWA no garantiza background location; rutas = places ordenados (corregido: se saca MapLibre/tracking del diseño).
+8. **Cancelación de viaje completo** y **peer sin obligación de salir con 1 pax**.
+9. **Saldo por transferencia peer** — al conductor (datos de pago in-app/chat), no custodia Tubi.
+10. **ToS anti-bypass** — coordinación solo por chat Tubi.
 
 ### Invariantes de sesión — cobertura
 
@@ -508,7 +519,8 @@ Orientativo para el plan posterior:
 | Identidad ≠ aval (offer_source en viaje) | §3, §4 |
 | Una cuenta; switch visible; no long-press | §4 |
 | No regular línea vacía | §2, §3 |
-| MapLibre+OSM; waypoints auto; búsqueda A→B | §8 |
+| Rutas places/paradas; búsqueda A→B; sin mapas/GPS | §8 |
+| Chat in-app único canal | §7 |
 | Anti-bypass + cancelaciones + detective mínimo | §7 |
 | Notificaciones PWA | §9 |
 | UX “tu parte” optimista | §6 |
@@ -517,15 +529,15 @@ Orientativo para el plan posterior:
 
 ### Riesgos / bordes aún deliberadamente abiertos (plan, no spec bloqueante)
 - Montos exactos default de `deposit.pct`, márgenes de solapamiento y timeouts (settings de operador al implementar).
-- Algoritmo fino de “parada alineada a localidad” del geocoder (detalle de `MapsProvider`).
-- UI concreta de bottom nav por modo (wireframes).
+- Catálogo de places y matching de localidad (server-side, sin mapa).
+- UI concreta de bottom nav por modo y de chat (wireframes).
 - Fusión mecánica de users legacy duplicados (paso de migración en plan).
 - Si Operado por Tubi usa auto-accept más adelante (`request.auto_accept`).
 
 ### Consistencia interna
 - Sin TBD/TODO.
-- §12 (fuera de alcance) alineado con chat no-blocker y sin escrow pasarela.
-- §16 checklist actualizado con invariantes del self-review.
+- §12: sin mapas/GPS, sin teléfono entre partes, chat obligatorio, sin escrow pasarela.
+- §16 checklist alineado al self-review.
 
 ---
 
